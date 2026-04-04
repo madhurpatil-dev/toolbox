@@ -175,7 +175,6 @@ export class FontsComponent implements OnInit, AfterViewInit {
       }, 2000);
       
     } catch (err) {
-      console.error('Failed to copy styled text: ', err);
       this.snackBar.open('Failed to copy styled text. Please try selecting and copying manually.', 'Dismiss', {
         duration: 3000,
         horizontalPosition: 'center',

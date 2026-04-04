@@ -299,7 +299,6 @@ export class FindflagComponent implements OnInit {
       duration: 5000,
       panelClass: ['error-snackbar']
     });
-    console.error('API Error:', error);
   }
 
   downloadFlag(): void {
