@@ -53,29 +53,28 @@
           }
         </div>
 
-        <!-- Population Card (Reduced Size) -->
-        @if (countryPopulation !== undefined) {
-          <div
-            class="population-card compact"
-            @fadeIn
-            >
-            <div class="flag-container">
-              @if (getCountryInfo('flags')) {
-                <img
-                  [src]="getCountryInfo('flags')"
-                  alt="{{ selectedCountryName }} flag"
-                  class="country-flag"
-                  />
-              }
-            </div>
-            <div class="population-content">
-              <h2 class="population-title">
-                <mat-icon>groups</mat-icon> {{ selectedCountryName }}
-              </h2>
-              <p class="population-value">Population: <span>{{ countryPopulation | number }}</span></p>
-            </div>
-          </div>
-        }
+       <!-- Population Card (Reduced Size) -->
+@if (countryPopulation !== undefined) {
+  <div class="population-card compact" @fadeIn>
+    <div class="flag-container">
+      @if (selectedCountryFlagUrl) {
+        <img
+          [src]="selectedCountryFlagUrl"
+          alt="{{ selectedCountryName }} flag"
+          class="country-flag"
+        />
+      }
+    </div>
+    <div class="population-content">
+      <h2 class="population-title">
+        <mat-icon>groups</mat-icon> {{ selectedCountryName }}
+      </h2>
+      <p class="population-value">
+        Population: <span>{{ countryPopulation | number }}</span>
+      </p>
+    </div>
+  </div>
+}
 
         <!-- Error Message -->
         @if (errorMessage) {
