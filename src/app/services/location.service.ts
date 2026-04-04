@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class LocationService {
-  private countriesUrl = 'https://restcountries.com/v3.1/all?fields=name,cca2,flags';
+  private countriesUrl = 'https://restcountries.com/v4/all?fields=name,cca2,flags';
   private citiesUrl = 'https://countriesnow.space/api/v0.1/countries/cities';
 
   constructor(private http: HttpClient) {}
