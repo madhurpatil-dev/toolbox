@@ -23,7 +23,6 @@ export class WorldTimeService {
         timezone: data.timeZone
       })),
       catchError(error => {
-        console.error('API error:', error);
         return throwError(() => new Error('Failed to fetch time'));
       }),
       shareReplay(1) // Cache the response

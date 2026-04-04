@@ -57,7 +57,6 @@ export class WorldClockComponent implements OnInit, OnDestroy {
 
   onCountryChange() {
     if (!this.selectedCountryCode) {
-      console.warn('No country selected');
       return;
     }
 
@@ -78,7 +77,6 @@ export class WorldClockComponent implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          console.error('Error fetching time:', error);
           this.errorMessage = 'Failed to fetch time. Please try again later.';
           this.cdr.markForCheck(); // Manually trigger change detection
         }

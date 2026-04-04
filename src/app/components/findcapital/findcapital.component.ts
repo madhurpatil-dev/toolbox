@@ -200,7 +200,6 @@ export class FindcapitalComponent implements OnInit {
   }
 
   private handleFetchError(error: any): void {
-    console.error('API Error:', error);
     this.capital = '';
     this.countryFlag = '';
     this.countryInfo = null;

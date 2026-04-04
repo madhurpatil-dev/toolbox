@@ -117,7 +117,6 @@ fetchCountryPopulation() {
   // Step 2: fetch FULL details separately (has all fields)
   this.countryService.getCountryByCode(this.selectedCountryCode).subscribe(
     (fullDetails) => {
-      console.log('Full details fetched:', fullDetails);
       this.countryPopulation = fullDetails.population;
       this.additionalInfo = fullDetails; // ← full object with all fields
 
@@ -137,17 +136,12 @@ fetchCountryPopulation() {
 renderChart() {
   // Ensure we have required data
   if (!this.selectedCountryName || this.countryPopulation === undefined) {
-    console.log('Missing data for chart:', { 
-      selectedCountryName: this.selectedCountryName, 
-      countryPopulation: this.countryPopulation 
-    });
     return;
   }
 
   // Get canvas element
   const canvas = document.getElementById('myChart') as HTMLCanvasElement;
   if (!canvas) {
-    console.error('Canvas element not found');
     return;
   }
 
@@ -160,7 +154,6 @@ renderChart() {
   // Get context
   const ctx = canvas.getContext('2d');
   if (!ctx) {
-    console.error('Could not get canvas context');
     return;
   }
 
@@ -262,9 +255,7 @@ renderChart() {
       data: chartData,
       options: chartOptions
     });
-    console.log('Chart created successfully:', this.chart);
   } catch (error) {
-    console.error('Error creating chart:', error);
   }
 }
 
@@ -296,27 +287,21 @@ get selectedCountryFlagUrl(): string {
   return code ? `https://flagcdn.com/w320/${code}.png` : '';
 }
 getCountryInfo(field: string): any {
-  // Debug: log every call
-  console.log(`getCountryInfo called with field: "${field}"`);
-  console.log(`additionalInfo:`, this.additionalInfo);
+
   
   if (!this.additionalInfo) {
-    console.log('additionalInfo is null/undefined');
     return 'N/A';
   }
 
   const data = this.additionalInfo[field];
-  console.log(`data for field "${field}":`, data);
 
   if (data === undefined || data === null) {
-    console.log(`field "${field}" is undefined/null`);
     return 'N/A';
   }
 
   switch (field) {
     case 'flags':
       const code = this.additionalInfo['cca2']?.toLowerCase();
-      console.log('flag code:', code);
       return code ? `https://flagcdn.com/w320/${code}.png` : '';
 
     case 'coatOfArms':
