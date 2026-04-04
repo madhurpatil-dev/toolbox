@@ -7,7 +7,7 @@ import { catchError, tap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class FindCapitalService {
-  private apiUrl = 'https://restcountries.com/v3.1/name/';
+  private apiUrl = 'https://restcountries.com/v4/name/';
   private countryNamesCache: string[] = [];
 
   constructor(private http: HttpClient) { }
@@ -21,7 +21,7 @@ export class FindCapitalService {
     if (this.countryNamesCache.length > 0) {
       return of(this.countryNamesCache); // Return cached data if available
     } else {
-      const apiUrl = 'https://restcountries.com/v3.1/all?fields=name';
+      const apiUrl = 'https://restcountries.com/v4/all?fields=name';
       return this.http.get<any[]>(apiUrl).pipe(
         tap(data => {
           this.countryNamesCache = data.map(country => country.name.common);

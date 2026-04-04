@@ -96,37 +96,43 @@ showChart: boolean = false;
 // Modify your fetchCountryPopulation method
 fetchCountryPopulation() {
   if (!this.selectedCountryCode) return;
-  
-  this.showChart = false; // Hide chart while loading
+
+  this.showChart = false;
   this.isLoading = true;
-  
-  // Find the selected country from the already loaded countries array
+
+  // Step 1: get population from already-loaded list (fast)
   const selectedCountry = this.countries.find(
     (country) => country.cca2 === this.selectedCountryCode
   );
-  
-  if (selectedCountry) {
-    this.countryPopulation = selectedCountry.population;
-    this.selectedCountryName = selectedCountry.name.common;
-    this.errorMessage = undefined;
-    this.additionalInfo = selectedCountry;
-    
-    console.log('Selected Country:', selectedCountry);
-    console.log('Population:', this.countryPopulation);
-    
-    // Render chart after a small delay to ensure DOM is ready
-    setTimeout(() => {
-      this.renderChart();
-      this.showChart = true;
-    }, 100);
-    
-    this.isLoading = false;
-  } else {
+
+  if (!selectedCountry) {
     this.errorMessage = 'Country not found. Please try again.';
-    this.countryPopulation = undefined;
-    this.showChart = false;
     this.isLoading = false;
+    return;
   }
+
+  this.selectedCountryName = selectedCountry.name.common;
+  this.errorMessage = undefined;
+
+  // Step 2: fetch FULL details separately (has all fields)
+  this.countryService.getCountryByCode(this.selectedCountryCode).subscribe(
+    (fullDetails) => {
+      console.log('Full details fetched:', fullDetails);
+      this.countryPopulation = fullDetails.population;
+      this.additionalInfo = fullDetails; // ← full object with all fields
+
+      setTimeout(() => {
+        this.renderChart();
+        this.showChart = true;
+      }, 100);
+
+      this.isLoading = false;
+    },
+    (error) => {
+      this.errorMessage = 'Error fetching country details.';
+      this.isLoading = false;
+    }
+  );
 }
 renderChart() {
   // Ensure we have required data
@@ -285,24 +291,73 @@ onChartTypeChange() {
       .slice(0, 5);
   }
 
-  getCountryInfo(field: string): any {
-    if (this.additionalInfo && this.additionalInfo[field]) {
-      if (field === 'currencies') {
-        const currencies = this.additionalInfo[field];
-        const currencyNames = Object.values(currencies).map(
-          (currency: any) => currency.name
-        );
-        return currencyNames.join(', ');
-      } else if (field === 'flags' || field === 'coatOfArms') {
-        return this.additionalInfo[field]?.png;
-      } else if (typeof this.additionalInfo[field] === 'object') {
-        return Object.values(this.additionalInfo[field]).join(', ');
-      } else {
-        return this.additionalInfo[field];
-      }
-    }
+get selectedCountryFlagUrl(): string {
+  const code = this.additionalInfo?.cca2?.toLowerCase();
+  return code ? `https://flagcdn.com/w320/${code}.png` : '';
+}
+getCountryInfo(field: string): any {
+  // Debug: log every call
+  console.log(`getCountryInfo called with field: "${field}"`);
+  console.log(`additionalInfo:`, this.additionalInfo);
+  
+  if (!this.additionalInfo) {
+    console.log('additionalInfo is null/undefined');
     return 'N/A';
   }
+
+  const data = this.additionalInfo[field];
+  console.log(`data for field "${field}":`, data);
+
+  if (data === undefined || data === null) {
+    console.log(`field "${field}" is undefined/null`);
+    return 'N/A';
+  }
+
+  switch (field) {
+    case 'flags':
+      const code = this.additionalInfo['cca2']?.toLowerCase();
+      console.log('flag code:', code);
+      return code ? `https://flagcdn.com/w320/${code}.png` : '';
+
+    case 'coatOfArms':
+      return data?.png || data?.svg || '';
+
+    case 'currencies':
+      if (Array.isArray(data)) {
+        // Array format: [{code, name, symbol}]
+        return data.length === 0 ? 'N/A' : data.map((c: any) => `${c.name} (${c.symbol || c.code})`).join(', ');
+      } else if (typeof data === 'object') {
+        // Object format: {"USD": {name, symbol}}
+        return Object.values(data).map((c: any) => `${c.name} (${c.symbol || ''})`).join(', ');
+      }
+      return 'N/A';
+
+    case 'languages':
+      if (Array.isArray(data)) {
+        // Array format: [{name, iso639_1}]
+        return data.length === 0 ? 'N/A' : data.map((l: any) => l.name).join(', ');
+      } else if (typeof data === 'object') {
+        // Object format: {"eng": "English"}
+        return Object.values(data).join(', ');
+      }
+      return 'N/A';
+
+    case 'capital':
+    case 'continents':
+      if (Array.isArray(data)) {
+        return data.length === 0 ? 'N/A' : data.join(', ');
+      }
+      return data || 'N/A';
+
+    case 'area':
+      if (data === 0) return '0';
+      return data ? data.toLocaleString() : 'N/A';
+
+    default:
+      if (typeof data === 'object') return Object.values(data).join(', ');
+      return data ?? 'N/A';
+  }
+}
 
   openPopulationGraphModal() {
     this.isPopulationGraphModalOpen = true;

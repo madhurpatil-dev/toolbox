@@ -1,32 +1,28 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
+import { shareReplay } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CountryServiceService {
-  // Updated to only request needed fields
-  private apiUrl = 'https://restcountries.com/v3.1/all?fields=name,cca2,flags,population';
+  // Minimal fields for the dropdown list only
+  private allCountriesUrl = 'https://restcountries.com/v4/all?fields=name,cca2,population';
   private countriesCache$: Observable<any[]> | undefined;
 
   constructor(private http: HttpClient) {}
 
   getAllCountries(): Observable<any[]> {
     if (!this.countriesCache$) {
-      this.countriesCache$ = this.http.get<any[]>(this.apiUrl).pipe(
-        shareReplay(1) // Cache and share
-      );
+      this.countriesCache$ = this.http.get<any[]>(this.allCountriesUrl).pipe(shareReplay(1));
     }
     return this.countriesCache$;
   }
 
-  getCountryPopulation(countryCode: string): Observable<number> {
-    const url = `https://restcountries.com/v3.1/alpha/${countryCode}?fields=population`;
-    return this.http.get<any[]>(url).pipe(
-      map(response => response?.[0]?.population || 0),
-      shareReplay(1)
-    );
+  // NEW: fetch full details for a single country on demand
+  getCountryByCode(code: string): Observable<any> {
+    const url = `https://restcountries.com/v4/alpha/${code}?fields=name,cca2,population,flags,area,capital,languages,currencies,continents,coatOfArms`;
+    return this.http.get<any>(url);
   }
 }

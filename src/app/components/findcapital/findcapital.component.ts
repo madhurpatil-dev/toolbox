@@ -272,10 +272,19 @@ export class FindcapitalComponent implements OnInit {
       .join(', ');
   }
   
-  getLanguages(): string {
-    if (!this.countryInfo?.languages) return 'Unknown';
-    return Object.values(this.countryInfo.languages).join(', ');
+ getLanguages(): string {
+  if (!this.countryInfo?.languages) return 'Unknown';
+
+  const langs = this.countryInfo.languages;
+
+  // If it's an array of objects like [{name: 'Pashto'}, {name: 'Dari'}]
+  if (Array.isArray(langs)) {
+    return langs.map((l: any) => l.name || l).join(', ');
   }
+
+  // If it's a plain object like { pus: 'Pashto', prs: 'Dari' }
+  return Object.values(langs).join(', ');
+}
   
   resetSearch(): void {
     this.selectedCountry = '';
