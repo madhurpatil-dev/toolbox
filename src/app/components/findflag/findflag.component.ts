@@ -281,18 +281,21 @@ export class FindflagComponent implements OnInit {
     this.searchTerm$.next(this.selectedCountry);
   }
 
-  private fetchFlagUrl(countryName: string): Observable<string> {
-    const apiUrl = `https://restcountries.com/v3.1/name/${encodeURIComponent(countryName)}`;
-    return this.http.get<any[]>(apiUrl).pipe(
-      map(data => {
-        if (Array.isArray(data) && data.length > 0 && data[0].flags) {
-          return data[0].flags.png || data[0].flags.svg || '';
-        }
-        return '';
-      })
-    );
-  }
+private readonly API_KEY = 'rc_live_960b8d0b0dc84a30b10577a8f29dbc9c';
 
+private fetchFlagUrl(countryName: string): Observable<string> {
+  const resolvedName = countryName === 'Bharat' ? 'India' : countryName;
+  const url = `https://api.restcountries.com/countries/v5/names.common/${encodeURIComponent(resolvedName)}?response_fields=flag&api-key=${this.API_KEY}`;
+  return this.http.get<any>(url).pipe(
+    map(response => {
+      const objects = response?.data?.objects;
+      if (Array.isArray(objects) && objects.length > 0) {
+        return objects[0]?.flag?.url_png || objects[0]?.flag?.url_svg || '';
+      }
+      return '';
+    })
+  );
+}
   private handleError(error: any): void {
     this.isLoading = false;
     this.snackBar.open('Error loading flag. Please try again.', 'Close', {
