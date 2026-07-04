@@ -127,65 +127,64 @@ export class FindcapitalComponent implements OnInit {
     }
   }
 
-  fetchCountryNames(): void {
-    this.isLoading = true;
-    this.findCapitalService.fetchCountryNames().subscribe(
-      (data: any[]) => {
-        this.countryNames = data.map(country => country.name.common).sort();
-        this.isLoading = false;
-      },
-      (error) => {
-        this.handleFetchError(error);
-        this.isLoading = false;
-      }
-    );
-  }
-
+fetchCountryNames(): void {
+  this.isLoading = true;
+  this.findCapitalService.fetchCountryNames().subscribe(
+    (names: string[]) => {
+      this.countryNames = names.sort();
+      this.isLoading = false;
+    },
+    (error) => {
+      this.handleFetchError(error);
+      this.isLoading = false;
+    }
+  );
+}
   onCountrySelected(): void {
     if (this.selectedCountry) {
       this.searchTerm$.next(this.selectedCountry);
     }
   }
 
-  private handleCountryData(data: any): void {
-    if (!data || data.status === 404) {
+ private handleCountryData(data: any): void {
+  if (!data) {
+    this.handleNoCountryFound();
+    return;
+  }
+
+  try {
+    const objects = data?.data?.objects;
+    if (!Array.isArray(objects) || objects.length === 0) {
       this.handleNoCountryFound();
       return;
     }
 
-    try {
-      const countryData = Array.isArray(data) ? data[0] : data;
-      
-      if (!countryData || !countryData.name) {
-        this.handleNoCountryFound();
-        return;
-      }
+    const countryData = objects[0];
+    this.countryInfo = countryData;
 
-      this.countryInfo = countryData;
-      this.countryFlag = countryData.flags?.svg || countryData.flags?.png || '';
-      
-      // Handle capital information
-      if (this.selectedCountry.toLowerCase() === 'india') {
-        this.capital = 'New Delhi';
-      } else if (countryData.capital) {
-        this.capital = Array.isArray(countryData.capital) 
-          ? countryData.capital[0] 
-          : countryData.capital;
-      } else {
-        this.capital = 'Capital information not available';
-      }
-      
-      this.error = '';
-      this.addToRecentSearches();
-      
-      this.snackBar.open(`Found capital for ${this.selectedCountry}!`, 'Close', {
-        duration: 3000,
-        panelClass: ['success-snackbar']
-      });
-    } catch (error) {
-      this.handleFetchError(error);
+    // flag: url_png / url_svg
+    this.countryFlag = countryData.flag?.url_png || countryData.flag?.url_svg || '';
+
+    // capitals: array of objects with .name
+    if (this.selectedCountry.toLowerCase() === 'india') {
+      this.capital = 'New Delhi';
+    } else if (countryData.capitals?.length > 0) {
+      this.capital = countryData.capitals[0].name;
+    } else {
+      this.capital = 'Capital information not available';
     }
+
+    this.error = '';
+    this.addToRecentSearches();
+
+    this.snackBar.open(`Found capital for ${this.selectedCountry}!`, 'Close', {
+      duration: 3000,
+      panelClass: ['success-snackbar']
+    });
+  } catch (error) {
+    this.handleFetchError(error);
   }
+}
 
   private handleNoCountryFound(): void {
     this.capital = '';
@@ -257,35 +256,8 @@ export class FindcapitalComponent implements OnInit {
     this.themeMode = this.themeMode === 'light' ? 'dark' : 'light';
     this.applyTheme();
   }
-  
-  getFormattedPopulation(): string {
-    if (!this.countryInfo?.population) return 'Unknown';
-    return new Intl.NumberFormat().format(this.countryInfo.population);
-  }
-  
-  getCurrencies(): string {
-    if (!this.countryInfo?.currencies) return 'Unknown';
-    
-    return Object.values(this.countryInfo.currencies)
-      .map((curr: any) => `${curr.name} (${curr.symbol || '—'})`)
-      .join(', ');
-  }
-  
- getLanguages(): string {
-  if (!this.countryInfo?.languages) return 'Unknown';
 
-  const langs = this.countryInfo.languages;
-
-  // If it's an array of objects like [{name: 'Pashto'}, {name: 'Dari'}]
-  if (Array.isArray(langs)) {
-    return langs.map((l: any) => l.name || l).join(', ');
-  }
-
-  // If it's a plain object like { pus: 'Pashto', prs: 'Dari' }
-  return Object.values(langs).join(', ');
-}
-  
-  resetSearch(): void {
+    resetSearch(): void {
     this.selectedCountry = '';
     this.capital = '';
     this.countryFlag = '';
@@ -293,21 +265,40 @@ export class FindcapitalComponent implements OnInit {
     this.error = '';
     this.showResults = false;
   }
-  
-  getRegionInfo(): string {
-    if (!this.countryInfo) return 'Unknown';
-    
-    const regionParts = [];
-    if (this.countryInfo.region) regionParts.push(this.countryInfo.region);
-    if (this.countryInfo.subregion) regionParts.push(this.countryInfo.subregion);
-    
-    return regionParts.join(' • ') || 'Unknown';
-  }
-  
-  getTimezones(): string {
-    if (!this.countryInfo?.timezones) return 'Unknown';
-    return this.countryInfo.timezones.join(', ');
-  }
+ getFormattedPopulation(): string {
+  if (!this.countryInfo?.population) return 'Unknown';
+  return new Intl.NumberFormat().format(this.countryInfo.population);
+}
+
+getCurrencies(): string {
+  if (!this.countryInfo?.currencies?.length) return 'Unknown';
+  // v5: currencies is array of {code, name, symbol}
+  return this.countryInfo.currencies
+    .map((curr: any) => `${curr.name} (${curr.symbol || '—'})`)
+    .join(', ');
+}
+
+getLanguages(): string {
+  if (!this.countryInfo?.languages?.length) return 'Unknown';
+  // v5: languages is array of objects with .name
+  return this.countryInfo.languages
+    .map((l: any) => l.name)
+    .join(', ');
+}
+
+getRegionInfo(): string {
+  if (!this.countryInfo) return 'Unknown';
+  const parts = [];
+  if (this.countryInfo.region) parts.push(this.countryInfo.region);
+  if (this.countryInfo.subregion) parts.push(this.countryInfo.subregion);
+  return parts.join(' • ') || 'Unknown';
+}
+
+getTimezones(): string {
+  if (!this.countryInfo?.timezones?.length) return 'Unknown';
+  // v5: timezones is array of strings
+  return this.countryInfo.timezones.join(', ');
+}
   
   onSearchFocus(): void {
     this.searchInputFocused = true;

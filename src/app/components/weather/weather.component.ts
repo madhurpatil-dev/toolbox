@@ -64,16 +64,16 @@ export class WeatherComponent implements OnInit {
     localStorage.setItem('darkMode', this.isDarkMode.toString());
   }
 
-  fetchCountries(): void {
-    this.locationService.getCountries().subscribe(
-      (data) => {
-        this.countries = data.map((country: any) => country.name.common).sort();
-      },
-      () => {
-        this.error = 'Failed to load countries. Please try again later.';
-      },
-    );
-  }
+fetchCountries(): void {
+  this.locationService.getCountries().subscribe(
+    (data) => {
+      this.countries = data.map((country: any) => country.names?.common).sort();
+    },
+    () => {
+      this.error = 'Failed to load countries. Please try again later.';
+    },
+  );
+}
 
   onCountryChange(): void {
     this.cities = [];
