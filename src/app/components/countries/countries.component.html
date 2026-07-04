@@ -28,9 +28,9 @@
               >
               <mat-option value="" disabled>Choose a country</mat-option>
               @for (country of countries; track country) {
-                <mat-option [value]="country.cca2">
-                  {{ country.name.common }}
-                </mat-option>
+<mat-option [value]="country.codes?.alpha_2">
+  {{ country.names?.common }}
+</mat-option>
               }
             </mat-select>
           </mat-form-field>
@@ -108,7 +108,8 @@
                   class="stats-item"
                   >
                   <span class="rank">{{ i + 1 }}</span>
-                  <span class="country-name">{{ country.name.common }}</span>
+                  <span class="country-name">{{ country.names?.common }}</span>
+
                   <span class="population">{{ country.population | number }}</span>
                 </div>
               }
@@ -125,7 +126,7 @@
                   class="stats-item"
                   >
                   <span class="rank">{{ i + 1 }}</span>
-                  <span class="country-name">{{ country.name.common }}</span>
+                  <span class="country-name">{{ country.names?.common }}</span>
                   <span class="population">{{ country.population | number }}</span>
                 </div>
               }
@@ -175,7 +176,7 @@
               <div class="detail-item">
                 <mat-icon>groups</mat-icon>
                 <span class="label">Population</span>
-                <span class="value">{{ getCountryInfo('population') | number }}</span>
+                <span class="value">{{ countryPopulation | number }}</span>
               </div>
               <div class="detail-item">
                 <mat-icon>map</mat-icon>

@@ -22,7 +22,7 @@ export class WeatherService {
         sunrise: data.weather[0].astronomy[0].sunrise,
         sunset: data.weather[0].astronomy[0].sunset,
         description: data.current_condition[0].weatherDesc[0].value,
-      }))
+      })),
     );
   }
 }
