@@ -54,7 +54,7 @@ export class CalculatorComponent implements OnInit {
   }
 
   @HostListener('window:resize', ['$event'])
-  onResize() {
+  onResize(event: Event) {
     this.checkScreenSize();
   }
 

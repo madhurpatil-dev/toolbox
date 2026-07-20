@@ -35,7 +35,7 @@ export class CurrencyconverterComponent implements OnInit {
   }
 
   @HostListener('window:resize', ['$event'])
-  onResize() {
+  onResize(event: Event) {
     this.checkScreenSize();
   }
 
