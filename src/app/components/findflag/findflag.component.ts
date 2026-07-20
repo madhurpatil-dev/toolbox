@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { saveAs } from 'file-saver';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from 'rxjs/operators';
@@ -219,9 +219,10 @@ export class FindflagComponent implements OnInit {
   private searchTerm$ = new Subject<string>();
 
   constructor(
-    private http: HttpClient, 
+    private http: HttpClient,
     private breakpointObserver: BreakpointObserver,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -247,8 +248,16 @@ export class FindflagComponent implements OnInit {
       debounceTime(300),
       distinctUntilChanged(),
       switchMap(term => {
-        if (!term) return of('');
+        if (!term) {
+          this.flagUrl = '';
+          this.isLoading = false;
+          this.cdr.detectChanges();
+          return of('');
+        }
+
         this.isLoading = true;
+        this.cdr.detectChanges();
+
         return this.fetchFlagUrl(term).pipe(
           catchError(error => {
             this.handleError(error);
@@ -259,7 +268,8 @@ export class FindflagComponent implements OnInit {
     ).subscribe(flagUrl => {
       this.flagUrl = flagUrl;
       this.isLoading = false;
-      
+      this.cdr.detectChanges();
+
       if (flagUrl && this.selectedCountry) {
         this.snackBar.open(`Flag loaded for ${this.selectedCountry}`, 'Close', {
           duration: 3000,
@@ -278,7 +288,15 @@ export class FindflagComponent implements OnInit {
   }
 
   onCountrySelected(): void {
+    if (!this.selectedCountry) {
+      this.flagUrl = '';
+      this.isLoading = false;
+      this.cdr.detectChanges();
+      return;
+    }
+
     this.searchTerm$.next(this.selectedCountry);
+    this.cdr.detectChanges();
   }
 
 private readonly API_KEY = 'rc_live_960b8d0b0dc84a30b10577a8f29dbc9c';
@@ -286,12 +304,24 @@ private readonly API_KEY = 'rc_live_960b8d0b0dc84a30b10577a8f29dbc9c';
 private fetchFlagUrl(countryName: string): Observable<string> {
   const resolvedName = countryName === 'Bharat' ? 'India' : countryName;
   const url = `https://api.restcountries.com/countries/v5/names.common/${encodeURIComponent(resolvedName)}?response_fields=flag&api-key=${this.API_KEY}`;
+
   return this.http.get<any>(url).pipe(
     map(response => {
       const objects = response?.data?.objects;
       if (Array.isArray(objects) && objects.length > 0) {
         return objects[0]?.flag?.url_png || objects[0]?.flag?.url_svg || '';
       }
+
+      const fallbackList = Array.isArray(response) ? response : [];
+      const fallbackEntry = fallbackList[0];
+      if (fallbackEntry?.flags?.png) {
+        return fallbackEntry.flags.png;
+      }
+
+      if (fallbackEntry?.flag?.png) {
+        return fallbackEntry.flag.png;
+      }
+
       return '';
     })
   );
