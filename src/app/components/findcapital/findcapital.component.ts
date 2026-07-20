@@ -166,7 +166,7 @@ fetchCountryNames(): void {
     this.countryFlag = countryData.flag?.url_png || countryData.flag?.url_svg || '';
 
     // capitals: array of objects with .name
-    if (this.selectedCountry.toLowerCase() === 'india') {
+    if (this.selectedCountry.toLowerCase() === 'India') {
       this.capital = 'New Delhi';
     } else if (countryData.capitals?.length > 0) {
       this.capital = countryData.capitals[0].name;
