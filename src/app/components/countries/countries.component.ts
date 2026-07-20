@@ -8,6 +8,7 @@ import {
   animate,
 } from '@angular/animations';
 import { debounceTime, Subject } from 'rxjs';
+import { finalize } from 'rxjs/operators';
 import { CountryServiceService } from '../../services/country-service.service';
 
 @Component({
@@ -50,12 +51,14 @@ export class CountriesComponent implements OnInit {
   errorMessage: string | undefined;
   chartType: string = 'bar';
   modalChartType: string = 'bar';
-  chart: any;
+  chart: Chart | null = null;
+  modalChart: Chart | null = null;
   top5HighPopulation: any[] = [];
   top5LowPopulation: any[] = [];
   additionalInfo: any = {};
   isPopulationGraphModalOpen: boolean = false;
-  isLoading: boolean = false;
+  isCountriesLoading: boolean = false;
+  isCountryDetailsLoading: boolean = false;
   isGraphButtonBlinking: boolean = true;
 
   @ViewChild('populationChart') populationChart!: ElementRef;
@@ -70,17 +73,19 @@ export class CountriesComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.isLoading = true;
-    this.countryService.getAllCountries().subscribe(
+    this.isCountriesLoading = true;
+    this.countryService.getAllCountries().pipe(
+      finalize(() => {
+        this.isCountriesLoading = false;
+      }),
+    ).subscribe(
       (countries) => {
         this.countries = countries;
         this.findTop5HighPopulation();
         this.findTop5LowPopulation();
-        this.isLoading = false;
       },
       (error) => {
         this.errorMessage = 'Error fetching countries. Please try again.';
-        this.isLoading = false;
       },
     );
   }
@@ -107,42 +112,43 @@ export class CountriesComponent implements OnInit {
 
   // Modify your fetchCountryPopulation method
   fetchCountryPopulation() {
-  if (!this.selectedCountryCode) return;
+    if (!this.selectedCountryCode) return;
 
-  this.showChart = false;
-  this.isLoading = true;
+    this.showChart = false;
+    this.isCountryDetailsLoading = true;
 
-  const selectedCountry = this.countries.find(
-    (country) => country.codes?.alpha_2 === this.selectedCountryCode
-  );
+    const selectedCountry = this.countries.find(
+      (country) => country.codes?.alpha_2 === this.selectedCountryCode,
+    );
 
-  if (!selectedCountry) {
-    this.errorMessage = 'Country not found. Please try again.';
-    this.isLoading = false;
-    return;
-  }
-
-  this.selectedCountryName = selectedCountry.names?.common ?? '';  // guard here
-  this.errorMessage = undefined;
-
-  this.countryService.getCountryByCode(this.selectedCountryCode).subscribe(
-    (fullDetails) => {
-      this.countryPopulation = fullDetails.population;
-      this.additionalInfo = fullDetails;
-
-      setTimeout(() => {
-        this.renderChart();
-        this.showChart = true;
-      }, 100);
-
-      this.isLoading = false;
-    },
-    (error) => {
-      this.errorMessage = 'Error fetching country details.';
-      this.isLoading = false;
+    if (!selectedCountry) {
+      this.errorMessage = 'Country not found. Please try again.';
+      this.isCountryDetailsLoading = false;
+      return;
     }
-  );
-}
+
+    this.selectedCountryName = selectedCountry.names?.common ?? '';
+    this.errorMessage = undefined;
+
+    this.countryService.getCountryByCode(this.selectedCountryCode).pipe(
+      finalize(() => {
+        this.isCountryDetailsLoading = false;
+      }),
+    ).subscribe(
+      (fullDetails) => {
+        this.countryPopulation = fullDetails.population;
+        this.additionalInfo = fullDetails;
+
+        setTimeout(() => {
+          this.renderChart();
+          this.showChart = true;
+        }, 0);
+      },
+      (error) => {
+        this.errorMessage = 'Error fetching country details.';
+      },
+    );
+  }
   renderChart() {
     // Ensure we have required data
     if (!this.selectedCountryName || this.countryPopulation === undefined) {
@@ -381,60 +387,74 @@ export class CountriesComponent implements OnInit {
   }
 
   renderPopulationChart(): void {
-  // use already loaded this.countries instead of re-fetching
-  const labels = this.countries.map((country) => country.names?.common);
-  const populations = this.countries.map((country) => country.population);
+    const validCountries = this.countries.filter(
+      (country) => Number.isFinite(country.population),
+    );
 
-  const ctx = this.populationChart.nativeElement.getContext('2d');
-  if (!ctx) return;
+    const labels = validCountries.map((country) => country.names?.common ?? 'Unknown');
+    const populations = validCountries.map((country) => country.population);
 
-  if (this.chart) {
-    this.chart.destroy();
-  }
+    const canvas = this.populationChart?.nativeElement as HTMLCanvasElement | undefined;
+    if (!canvas) return;
 
-  const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-  gradient.addColorStop(0, '#3498db');
-  gradient.addColorStop(1, '#2ecc71');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-  this.chart = new Chart(ctx, {
-    type: this.modalChartType as ChartType,
-    data: {
-      labels,
-      datasets: [{
-        label: 'Population',
-        data: populations,
-        backgroundColor: this.modalChartType === 'bar' || this.modalChartType === 'line'
-          ? gradient : this.colors,
-        borderColor: '#2c3e50',
-        borderWidth: 1,
-      }],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: { duration: 800, easing: 'easeOutQuart' },
-      scales: {
-        y: {
-          beginAtZero: true,
-          grid: { color: '#ecf0f1' },
-          ticks: { color: '#2c3e50', font: { size: 11 } },
-        },
-        x: {
-          grid: { display: false },
-          ticks: { color: '#2c3e50', font: { size: 11 } },
-        },
+    if (this.modalChart) {
+      this.modalChart.destroy();
+      this.modalChart = null;
+    }
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, '#3498db');
+    gradient.addColorStop(1, '#2ecc71');
+
+    this.modalChart = new Chart(ctx, {
+      type: this.modalChartType as ChartType,
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Population',
+            data: populations,
+            backgroundColor:
+              this.modalChartType === 'bar' || this.modalChartType === 'line'
+                ? gradient
+                : this.colors,
+            borderColor: '#2c3e50',
+            borderWidth: 1,
+          },
+        ],
       },
-      plugins: {
-        legend: {
-          display: true,
-          labels: {
-            color: '#2c3e50',
-            font: { size: 11 },
-            filter: () => this.modalChartType !== 'polarArea' && this.modalChartType !== 'doughnut'
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 800, easing: 'easeOutQuart' },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: { color: '#ecf0f1' },
+            ticks: { color: '#2c3e50', font: { size: 11 } },
+          },
+          x: {
+            grid: { display: false },
+            ticks: { color: '#2c3e50', font: { size: 11 } },
+          },
+        },
+        plugins: {
+          legend: {
+            display: true,
+            labels: {
+              color: '#2c3e50',
+              font: { size: 11 },
+              filter: () =>
+                this.modalChartType !== 'polarArea' &&
+                this.modalChartType !== 'doughnut',
+            },
           },
         },
       },
-    },
-  });
+    });
+  }
 }
-}
+
