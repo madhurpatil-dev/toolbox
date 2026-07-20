@@ -20,7 +20,11 @@
 
           <mat-form-field appearance="outline" class="location-field">
             <mat-label>City</mat-label>
-            <mat-select [(ngModel)]="selectedCity" [disabled]="!selectedCountry" aria-label="Select city">
+            <mat-select
+              [(ngModel)]="selectedCity"
+              [disabled]="!selectedCountry"
+              (selectionChange)="onCityChange()"
+              aria-label="Select city">
               <mat-option [value]="" disabled>Select a city</mat-option>
               @for (city of cities; track city) {
                 <mat-option [value]="city">{{ city }}</mat-option>

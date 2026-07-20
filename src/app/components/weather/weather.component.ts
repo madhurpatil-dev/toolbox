@@ -6,9 +6,10 @@ import {
   ElementRef,
   ChangeDetectorRef,
 } from '@angular/core';
+import { finalize } from 'rxjs/operators';
 import { WeatherService } from '../../services/weather.service';
 import { LocationService } from '../../services/location.service';
-import { Chart, ChartType, registerables } from 'chart.js';
+import { Chart, registerables } from 'chart.js';
 
 @Component({
   selector: 'app-weather',
@@ -64,50 +65,94 @@ export class WeatherComponent implements OnInit {
     localStorage.setItem('darkMode', this.isDarkMode.toString());
   }
 
-fetchCountries(): void {
-  this.locationService.getCountries().subscribe(
-    (data) => {
-      this.countries = data.map((country: any) => country.names?.common).sort();
-    },
-    () => {
-      this.error = 'Failed to load countries. Please try again later.';
-    },
-  );
-}
+  fetchCountries(): void {
+    this.locationService.getCountries().pipe(
+      finalize(() => this.cdr.detectChanges()),
+    ).subscribe(
+      (data: any[]) => {
+        const countryNames = data
+          .map((country: any) => country?.names?.common as string | undefined)
+          .filter((name: string | undefined): name is string => Boolean(name));
+
+        this.countries = Array.from(new Set(countryNames)) as string[];
+        this.countries.sort((a: string, b: string) => a.localeCompare(b));
+        this.cdr.detectChanges();
+      },
+      () => {
+        this.error = 'Failed to load countries. Please try again later.';
+        this.cdr.detectChanges();
+      },
+    );
+  }
 
   onCountryChange(): void {
     this.cities = [];
     this.selectedCity = '';
-    this.weatherData = null;
+    this.clearWeatherData();
+    this.error = '';
 
-    if (!this.selectedCountry) return;
+    if (!this.selectedCountry) {
+      this.cdr.detectChanges();
+      return;
+    }
 
-    this.locationService.getCities(this.selectedCountry).subscribe(
-      (data) => {
-        this.cities = data.data.sort();
+    this.locationService.getCities(this.selectedCountry).pipe(
+      finalize(() => this.cdr.detectChanges()),
+    ).subscribe(
+      (data: any) => {
+        const cityList: string[] = Array.isArray(data?.data)
+          ? data.data.map((city: string) => city).filter(Boolean)
+          : [];
+
+        this.cities = cityList.sort((a: string, b: string) => a.localeCompare(b));
+        this.cdr.detectChanges();
       },
       () => {
         this.error =
           'Failed to load cities for the selected country. Please try again.';
+        this.cdr.detectChanges();
       },
     );
+  }
+
+  onCityChange(): void {
+    if (!this.selectedCity) {
+      this.clearWeatherData();
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.getWeather();
+  }
+
+  private clearWeatherData(): void {
+    this.weatherData = null;
+    this.weatherDetails = [];
+    if (this.chart) {
+      this.chart.destroy();
+      this.chart = null;
+    }
   }
 
   getWeather(): void {
     if (!this.selectedCity) return;
 
     this.error = '';
-    this.weatherData = null;
+    this.clearWeatherData();
+    this.cdr.detectChanges();
 
-    this.weatherService.getWeather(this.selectedCity).subscribe(
+    this.weatherService.getWeather(this.selectedCity).pipe(
+      finalize(() => this.cdr.detectChanges())
+    ).subscribe(
       (data) => {
         this.weatherData = data;
         this.prepareWeatherDetails();
-        this.cdr.detectChanges(); // Forces Angular to render the canvas immediately
         this.updateChart();
+        this.cdr.detectChanges();
       },
       (err) => {
         this.error = `Failed to load weather data: ${err.message || 'Unknown error'}`;
+        this.cdr.detectChanges();
       },
     );
   }

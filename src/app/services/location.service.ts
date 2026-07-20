@@ -34,6 +34,11 @@ export class LocationService {
   }
 
   getCities(country: string): Observable<any> {
-    return this.http.post(this.citiesUrl, { country });
+    return this.http.post<any>(this.citiesUrl, { country }).pipe(
+      map((response) => ({
+        ...response,
+        data: Array.isArray(response?.data) ? response.data : [],
+      })),
+    );
   }
 }
