@@ -141,9 +141,12 @@ fetchCountryNames(): void {
   );
 }
   onCountrySelected(): void {
-    if (this.selectedCountry) {
-      this.searchTerm$.next(this.selectedCountry);
+    if (!this.selectedCountry) {
+      this.resetSearch();
+      return;
     }
+
+    this.searchTerm$.next(this.selectedCountry);
   }
 
  private handleCountryData(data: any): void {
@@ -264,6 +267,9 @@ fetchCountryNames(): void {
     this.countryInfo = null;
     this.error = '';
     this.showResults = false;
+    this.isSearching = false;
+    this.pulseState = 'inactive';
+    this.rotateState = 'inactive';
   }
  getFormattedPopulation(): string {
   if (!this.countryInfo?.population) return 'Unknown';
@@ -306,5 +312,8 @@ getTimezones(): string {
   
   onSearchBlur(): void {
     this.searchInputFocused = false;
+    if (!this.selectedCountry) {
+      this.resetSearch();
+    }
   }
 }
