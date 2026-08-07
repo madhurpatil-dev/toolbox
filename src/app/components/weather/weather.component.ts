@@ -2,6 +2,7 @@ import {
   Component,
   HostListener,
   OnInit,
+  AfterViewInit,
   ViewChild,
   ElementRef,
   ChangeDetectorRef,
@@ -17,7 +18,7 @@ import { Chart, registerables } from 'chart.js';
   styleUrls: ['./weather.component.css'],
   standalone: false,
 })
-export class WeatherComponent implements OnInit {
+export class WeatherComponent implements OnInit, AfterViewInit {
   countries: string[] = [];
   cities: string[] = [];
   selectedCountry: string = '';
@@ -42,6 +43,10 @@ export class WeatherComponent implements OnInit {
   ngOnInit(): void {
     this.fetchCountries();
     this.checkDarkModePreference();
+  }
+
+  ngAfterViewInit(): void {
+    // Ensure ViewChild is available before chart creation when weather data is loaded.
   }
 
   @HostListener('window:resize', ['$event'])
@@ -147,8 +152,8 @@ export class WeatherComponent implements OnInit {
       (data) => {
         this.weatherData = data;
         this.prepareWeatherDetails();
-        this.updateChart();
         this.cdr.detectChanges();
+        Promise.resolve().then(() => this.updateChart());
       },
       (err) => {
         this.error = `Failed to load weather data: ${err.message || 'Unknown error'}`;
