@@ -140,12 +140,20 @@ fetchCountryNames(): void {
     }
   );
 }
-  onCountrySelected(): void {
+
+  onCountrySelected(country?: string): void {
+    if (country !== undefined) {
+      this.selectedCountry = country;
+    }
+
     if (!this.selectedCountry) {
       this.resetSearch();
       return;
     }
 
+    this.showResults = false;
+    this.error = '';
+    this.capital = '';
     this.searchTerm$.next(this.selectedCountry);
   }
 
