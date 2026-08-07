@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { Subject, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
 import { FindCapitalService } from '../../services/find-capital.service';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { trigger, transition, style, animate, state, query, stagger } from '@angular/animations';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSelect } from '@angular/material/select';
 
 @Component({
     selector: 'app-findcapital',
@@ -43,6 +44,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     standalone: false
 })
 export class FindcapitalComponent implements OnInit {
+  @ViewChild('countrySelect') countrySelect?: MatSelect;
+
   selectedCountry: string = '';
   capital: string = '';
   error: string = '';
@@ -65,7 +68,8 @@ export class FindcapitalComponent implements OnInit {
   constructor(
     private findCapitalService: FindCapitalService, 
     private breakpointObserver: BreakpointObserver,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef
   ) { 
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     this.themeMode = prefersDark ? 'dark' : 'light';
@@ -115,6 +119,7 @@ export class FindcapitalComponent implements OnInit {
         this.pulseState = 'inactive';
         this.rotateState = 'inactive';
         this.showResults = true;
+        this.cdr.detectChanges();
       }
     );
   }
@@ -151,10 +156,20 @@ fetchCountryNames(): void {
       return;
     }
 
+    if (this.selectedCountry === 'India/Bharat') {
+      this.selectedCountry = 'India';
+    }
+
     this.showResults = false;
     this.error = '';
     this.capital = '';
     this.searchTerm$.next(this.selectedCountry);
+
+    if (this.countrySelect) {
+      this.countrySelect.close();
+    }
+
+    this.cdr.detectChanges();
   }
 
  private handleCountryData(data: any): void {
@@ -318,10 +333,12 @@ getTimezones(): string {
     this.searchInputFocused = true;
   }
   
-  onSearchBlur(): void {
+  onSearchClose(): void {
     this.searchInputFocused = false;
-    if (!this.selectedCountry) {
-      this.resetSearch();
-    }
+    setTimeout(() => {
+      if (!this.selectedCountry) {
+        this.resetSearch();
+      }
+    }, 0);
   }
 }

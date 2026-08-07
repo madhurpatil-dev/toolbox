@@ -18,12 +18,13 @@
             <mat-form-field appearance="fill" class="search-field">
               <mat-label>Select a country</mat-label>
               <mat-select
-                [(ngModel)]="selectedCountry"
+                #countrySelect
+                [(value)]="selectedCountry"
                 (selectionChange)="onCountrySelected($event.value)"
                 [disabled]="isLoading"
                 panelClass="custom-select-panel"
                 (opened)="onSearchFocus()"
-                (closed)="onSearchBlur()"
+                (closed)="onSearchClose()"
                 >
                 <mat-option value="" disabled>
                   <div class="select-placeholder">
