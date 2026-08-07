@@ -1,11 +1,12 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { Subject, of } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, switchMap, catchError, finalize } from 'rxjs/operators';
 import { FindCapitalService } from '../../services/find-capital.service';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { trigger, transition, style, animate, state, query, stagger } from '@angular/animations';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSelect } from '@angular/material/select';
+import { countries as fallbackCountries } from '../../constants/countries';
 
 @Component({
     selector: 'app-findcapital',
@@ -51,7 +52,7 @@ export class FindcapitalComponent implements OnInit {
   error: string = '';
   countryNames: string[] = [];
   isLargeScreen: boolean = false;
-  isLoading: boolean = true;
+  isLoading: boolean = false;
   isSearching: boolean = false;
   showResults: boolean = false;
   pulseState: string = 'inactive';
@@ -134,17 +135,30 @@ export class FindcapitalComponent implements OnInit {
 
 fetchCountryNames(): void {
   this.isLoading = true;
-  this.findCapitalService.fetchCountryNames().subscribe(
+  this.findCapitalService.fetchCountryNames().pipe(
+    finalize(() => {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    })
+  ).subscribe(
     (names: string[]) => {
-      this.countryNames = names.sort();
-      this.isLoading = false;
+      this.countryNames = names?.length ? names.sort() : this.getFallbackCountryNames();
     },
-    (error) => {
-      this.handleFetchError(error);
-      this.isLoading = false;
+    () => {
+      this.countryNames = this.getFallbackCountryNames();
     }
   );
 }
+
+  private getFallbackCountryNames(): string[] {
+    const names = fallbackCountries.map(c => c.name);
+    const uniqueNames = Array.from(new Set(names));
+    uniqueNames.sort((a, b) => a.localeCompare(b));
+    if (!uniqueNames.includes('India/Bharat')) {
+      uniqueNames.unshift('India/Bharat');
+    }
+    return uniqueNames;
+  }
 
   onCountrySelected(country?: string): void {
     if (country !== undefined) {

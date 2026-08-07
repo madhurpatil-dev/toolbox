@@ -21,7 +21,7 @@
                 #countrySelect
                 [(value)]="selectedCountry"
                 (selectionChange)="onCountrySelected($event.value)"
-                [disabled]="isLoading"
+                [disabled]="isLoading && !countryNames.length"
                 panelClass="custom-select-panel"
                 (opened)="onSearchFocus()"
                 (closed)="onSearchClose()"
