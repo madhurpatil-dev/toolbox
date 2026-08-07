@@ -1,240 +1,297 @@
-<div class="app-container">
-  <!-- Header -->
-  <header class="app-header">
-    <div class="header-content">
-      <h1 class="header-title">
-        <mat-icon class="gradient-icon">public</mat-icon>
-        Country Population Explorer
-      </h1>
-      <p class="header-subtitle">Discover population insights worldwide</p>
+<div class="explorer-shell">
+  <header class="hero" aria-labelledby="page-title">
+    <div class="hero__orb hero__orb--one" aria-hidden="true"></div>
+    <div class="hero__orb hero__orb--two" aria-hidden="true"></div>
+    <div class="hero__content">
+      <div class="brand-mark" aria-hidden="true"><mat-icon>public</mat-icon></div>
+      <div>
+        <p class="eyebrow">WORLD POPULATION AT A GLANCE</p>
+        <h1 id="page-title">Country Population Explorer</h1>
+        <p class="hero__subtitle">Explore population data, compare countries, and surface the details behind every number.</p>
+      </div>
+      <div class="hero__metrics" aria-label="Dataset summary">
+        <div class="hero-metric">
+          <strong>{{ countries.length }}</strong>
+          <span>countries</span>
+        </div>
+        <div class="hero-metric">
+          <strong>{{ favoriteCodes.size }}</strong>
+          <span>saved</span>
+        </div>
+      </div>
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main class="app-main">
-    <div class="content-grid">
-      <!-- Left Section: Controls and Chart -->
-      <section class="left-section">
-        <div class="control-panel">
-          <mat-form-field appearance="fill" class="custom-select">
-            <mat-label>
-              <mat-icon>flag_circle</mat-icon> Select a Country
-            </mat-label>
-            <mat-select
-              [(value)]="selectedCountryCode"
-              (selectionChange)="onCountrySelectionChange()"
-              panelClass="custom-mat-select"
-              aria-label="Select a country"
-              >
-              <mat-option value="" disabled>Choose a country</mat-option>
-              @for (country of countries; track country) {
-<mat-option [value]="country.codes?.alpha_2">
-  {{ country.names?.common }}
-</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
+  <main class="explorer-main">
+    <section class="overview-bar" aria-label="Explorer summary">
+      <div class="overview-bar__icon"><mat-icon>query_stats</mat-icon></div>
+      <div>
+        <p class="overview-bar__label">Population represented</p>
+        <p class="overview-bar__value">{{ totalPopulation | number }} <span>people across this dataset</span></p>
+      </div>
+      <p class="shortcut-hint"><kbd>/</kbd> to search</p>
+    </section>
 
+    <div class="dashboard-grid">
+      <section class="workspace-card selection-card" aria-labelledby="country-search-title">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">START EXPLORING</p>
+            <h2 id="country-search-title">Find a country</h2>
+          </div>
+          <span class="result-count">{{ filteredCountries.length }} available</span>
+        </div>
+
+        <mat-form-field appearance="outline" class="country-search-field">
+          <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+          <mat-label>Search by country or ISO code</mat-label>
+          <input
+            #countrySearchInput
+            matInput
+            type="search"
+            [(ngModel)]="countrySearch"
+            (input)="onCountrySearchChange()"
+            [matAutocomplete]="countryAuto"
+            aria-describedby="country-search-help"
+            autocomplete="off"
+          />
+          @if (countrySearch) {
+            <button mat-icon-button matSuffix type="button" aria-label="Clear country search" (click)="countrySearch = ''; onCountrySearchChange()">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+          <mat-hint id="country-search-help">Choose a result to load its population profile.</mat-hint>
+        </mat-form-field>
+
+        <mat-autocomplete #countryAuto="matAutocomplete" autoActiveFirstOption (optionSelected)="onCountryCodeSelected($event.option.value)">
+          @for (country of filteredCountries; track country.codes?.alpha_2) {
+            <mat-option [value]="country.codes?.alpha_2">
+              <div class="country-option">
+                <img [src]="'https://flagcdn.com/w40/' + (country.codes?.alpha_2 | lowercase) + '.png'" alt="" class="country-option__flag" loading="lazy" />
+                <span>{{ country.names?.common }}</span>
+                <small>{{ country.codes?.alpha_2 }}</small>
+              </div>
+            </mat-option>
+          } @empty {
+            <mat-option disabled>No countries match “{{ countrySearch }}”.</mat-option>
+          }
+        </mat-autocomplete>
+
+        <div class="quick-picks" aria-label="Popular countries">
+          <span class="quick-picks__label">Quick picks</span>
+          @for (country of top5HighPopulation.slice(0, 4); track country.codes?.alpha_2) {
+            <button type="button" class="quick-pick" (click)="selectCountry(country)">
+              {{ country.names?.common }}
+            </button>
+          }
+        </div>
+      </section>
+
+      <section class="workspace-card chart-card" aria-labelledby="chart-title">
+        <div class="section-heading section-heading--chart">
+          <div>
+            <p class="section-kicker">COUNTRY PROFILE</p>
+            <h2 id="chart-title">Population visual</h2>
+          </div>
           @if (selectedCountryCode) {
-            <mat-form-field
-              appearance="fill"
-              class="custom-select chart-type-select"
-              >
-              <mat-label>
-                <mat-icon>bar_chart</mat-icon> Chart Type
-              </mat-label>
-              <mat-select [(ngModel)]="chartType"
-                (selectionChange)="renderChart()"
-                [ngClass]="{'wide-select': chartType === 'bar'}">
-                <mat-option value="bar" class="barc">Bar Chart</mat-option>
-                <mat-option value="pie">Pie Chart</mat-option>
-              </mat-select>
-            </mat-form-field>
+            <div class="chart-switcher" aria-label="Chart type">
+              <button type="button" [class.active]="chartType === 'bar'" (click)="setChartType('bar')" aria-label="Show bar chart"><mat-icon>bar_chart</mat-icon></button>
+              <button type="button" [class.active]="chartType === 'line'" (click)="setChartType('line')" aria-label="Show line chart"><mat-icon>show_chart</mat-icon></button>
+              <button type="button" [class.active]="chartType === 'doughnut'" (click)="setChartType('doughnut')" aria-label="Show doughnut chart"><mat-icon>donut_large</mat-icon></button>
+            </div>
           }
         </div>
 
-       <!-- Population Card (Reduced Size) -->
-@if (countryPopulation !== undefined) {
-  <div class="population-card compact" @fadeIn>
-    <div class="flag-container">
-      @if (selectedCountryFlagUrl) {
-        <img
-          [src]="selectedCountryFlagUrl"
-          alt="{{ selectedCountryName }} flag"
-          class="country-flag"
-        />
-      }
-    </div>
-    <div class="population-content">
-      <h2 class="population-title">
-        <mat-icon>groups</mat-icon> {{ selectedCountryName }}
-      </h2>
-      <p class="population-value">
-        Population: <span>{{ countryPopulation | number }}</span>
-      </p>
-    </div>
-  </div>
-}
-
-        <!-- Error Message -->
-        @if (errorMessage) {
-          <div class="error-message">
-            <mat-icon color="warn">error_outline</mat-icon>
-            {{ errorMessage }}
-            <button mat-flat-button color="accent" (click)="fetchCountryPopulation()">Retry</button>
+        @if (isCountryDetailsLoading) {
+          <div class="chart-state chart-state--loading" role="status" aria-live="polite">
+            <mat-spinner diameter="34"></mat-spinner>
+            <p>Building {{ selectedCountryName }}’s profile…</p>
+          </div>
+        } @else if (countryPopulation !== undefined) {
+          <div class="selected-country" @fadeIn>
+            @if (selectedCountryFlagUrl) {
+              <img [src]="selectedCountryFlagUrl" [alt]="selectedCountryName + ' flag'" class="selected-country__flag" />
+            }
+            <div class="selected-country__details">
+              <p>Selected country</p>
+              <h3>{{ selectedCountryName }}</h3>
+              <strong>{{ countryPopulation | number }} <span>people</span></strong>
+            </div>
+            <div class="selected-country__actions">
+              <button type="button" class="icon-action" [class.is-saved]="isFavorite(selectedCountry)" [attr.aria-pressed]="isFavorite(selectedCountry)" [attr.aria-label]="isFavorite(selectedCountry) ? 'Remove ' + selectedCountryName + ' from saved countries' : 'Save ' + selectedCountryName" (click)="toggleFavorite(selectedCountry)">
+                <mat-icon>{{ isFavorite(selectedCountry) ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+              </button>
+              <button type="button" class="icon-action" aria-label="Copy population" (click)="copyPopulation()"><mat-icon>content_copy</mat-icon></button>
+            </div>
+          </div>
+          <div class="chart-wrapper chart-wrapper--active" @fadeIn>
+            <canvas id="myChart" aria-label="Population chart for {{ selectedCountryName }}" role="img"></canvas>
+          </div>
+          @if (copyFeedback) {
+            <p class="copy-feedback" role="status"><mat-icon>check_circle</mat-icon>{{ copyFeedback }}</p>
+          }
+        } @else {
+          <div class="chart-state">
+            <div class="chart-state__icon"><mat-icon>insights</mat-icon></div>
+            <h3>Your country insight will appear here</h3>
+            <p>Search above or use a quick pick to view a population profile.</p>
           </div>
         }
-
-        <!-- Chart -->
-        <div
-          class="chart-wrapper"
-          [ngClass]="{ 'chart-active': selectedCountryCode && chartType }"
-          >
-          <canvas id="myChart"></canvas>
-        </div>
       </section>
 
-      <!-- Right Section: Stats and Details -->
-      <section class="right-section">
-        <!-- Population Stats -->
-        <div class="stats-grid">
-          <div class="stats-card" @cardAnimation>
-            <h2 class="stats-title">
-              <mat-icon>arrow_circle_up</mat-icon> Highest Populations
-            </h2>
-            <div class="stats-list">
-              @for (country of top5HighPopulation; track country; let i = $index) {
-                <div
-                  class="stats-item"
-                  >
-                  <span class="rank">{{ i + 1 }}</span>
-                  <span class="country-name">{{ country.names?.common }}</span>
-
-                  <span class="population">{{ country.population | number }}</span>
-                </div>
-              }
+      <aside class="insights-column" aria-label="Population rankings and country details">
+        <section class="workspace-card ranking-card" aria-labelledby="high-population-title">
+          <div class="section-heading section-heading--compact">
+            <div>
+              <p class="section-kicker">GLOBAL RANKING</p>
+              <h2 id="high-population-title"><mat-icon class="title-icon title-icon--up">trending_up</mat-icon> Most populous</h2>
             </div>
           </div>
+          <ol class="ranking-list">
+            @for (country of top5HighPopulation; track country.codes?.alpha_2; let index = $index) {
+              <li>
+                <button type="button" class="ranking-row" (click)="selectCountry(country)" [attr.aria-label]="'Explore ' + country.names?.common">
+                  <span class="ranking-row__rank">0{{ index + 1 }}</span>
+                  <span class="ranking-row__country">
+                    <img [src]="'https://flagcdn.com/w40/' + (country.codes?.alpha_2 | lowercase) + '.png'" alt="" loading="lazy" />
+                    {{ country.names?.common }}
+                  </span>
+                  <strong>{{ country.population | number }}</strong>
+                </button>
+              </li>
+            }
+          </ol>
+        </section>
 
-          <div class="stats-card" @cardAnimation>
-            <h2 class="stats-title">
-              <mat-icon>arrow_circle_down</mat-icon> Lowest Populations
-            </h2>
-            <div class="stats-list">
-              @for (country of top5LowPopulation; track country; let i = $index) {
-                <div
-                  class="stats-item"
-                  >
-                  <span class="rank">{{ i + 1 }}</span>
-                  <span class="country-name">{{ country.names?.common }}</span>
-                  <span class="population">{{ country.population | number }}</span>
-                </div>
-              }
+        <section class="workspace-card ranking-card ranking-card--low" aria-labelledby="low-population-title">
+          <div class="section-heading section-heading--compact">
+            <div>
+              <p class="section-kicker">SMALLEST RECORDS</p>
+              <h2 id="low-population-title"><mat-icon class="title-icon title-icon--down">trending_down</mat-icon> Least populous</h2>
             </div>
           </div>
+          <ol class="ranking-list">
+            @for (country of top5LowPopulation; track country.codes?.alpha_2; let index = $index) {
+              <li>
+                <button type="button" class="ranking-row" (click)="selectCountry(country)" [attr.aria-label]="'Explore ' + country.names?.common">
+                  <span class="ranking-row__rank">0{{ index + 1 }}</span>
+                  <span class="ranking-row__country">
+                    <img [src]="'https://flagcdn.com/w40/' + (country.codes?.alpha_2 | lowercase) + '.png'" alt="" loading="lazy" />
+                    {{ country.names?.common }}
+                  </span>
+                  <strong>{{ country.population | number }}</strong>
+                </button>
+              </li>
+            }
+          </ol>
+        </section>
+      </aside>
+
+      <section class="workspace-card details-card" aria-labelledby="details-title">
+        <div class="section-heading details-card__heading">
+          <div>
+            <p class="section-kicker">COUNTRY SNAPSHOT</p>
+            <h2 id="details-title">Details at a glance</h2>
+          </div>
+          <button mat-stroked-button type="button" class="global-graph-button" (click)="openPopulationGraphModal()" [disabled]="!countries.length">
+            <mat-icon>language</mat-icon>
+            Compare globally
+          </button>
         </div>
 
-        <!-- Country Details -->
-        <div class="details-card">
-          <div class="details-header">
-            <h2 class="details-title">
-              <mat-icon>info_outline</mat-icon> Country Details
-            </h2>
-            <button
-              mat-flat-button
-              color="primary"
-              (click)="openPopulationGraphModal()"
-              class="graph-button"
-              [ngClass]="{ 'blink': isGraphButtonBlinking }"
-              >
-              <mat-icon class="gradient-icon">insights</mat-icon>
-              View Global Graph
-            </button>
+        @if (isCountryDetailsLoading) {
+          <div class="detail-skeleton" aria-label="Loading country details">
+            @for (item of [1, 2, 3, 4, 5, 6]; track item) { <span></span> }
           </div>
-          @if (selectedCountryCode) {
-            <div class="details-grid" @fadeIn>
-              <div class="detail-item">
-                <mat-icon>square_foot</mat-icon>
-                <span class="label">Area</span>
-                <span class="value">{{ getCountryInfo('area') }} sq. km</span>
-              </div>
-              <div class="detail-item">
-                <mat-icon>location_city</mat-icon>
-                <span class="label">Capital</span>
-                <span class="value">{{ getCountryInfo('capital') }}</span>
-              </div>
-              <div class="detail-item">
-                <mat-icon>language</mat-icon>
-                <span class="label">Languages</span>
-                <span class="value">{{ getCountryInfo('languages') }}</span>
-              </div>
-              <div class="detail-item">
-                <mat-icon>attach_money</mat-icon>
-                <span class="label">Currency</span>
-                <span class="value">{{ getCountryInfo('currencies') }}</span>
-              </div>
-              <div class="detail-item">
-                <mat-icon>groups</mat-icon>
-                <span class="label">Population</span>
-                <span class="value">{{ countryPopulation | number }}</span>
-              </div>
-              <div class="detail-item">
-                <mat-icon>map</mat-icon>
-                <span class="label">Continent</span>
-                <span class="value">{{ getCountryInfo('continents') }}</span>
-              </div>
+        } @else if (countryPopulation !== undefined) {
+          <dl class="details-grid" @fadeIn>
+            <div class="detail-item">
+              <dt><mat-icon>groups</mat-icon>Population</dt>
+              <dd>{{ countryPopulation | number }}</dd>
             </div>
-          }
-        </div>
+            <div class="detail-item">
+              <dt><mat-icon>location_city</mat-icon>Capital</dt>
+              <dd>{{ getCountryInfo('capitals') }}</dd>
+            </div>
+            <div class="detail-item">
+              <dt><mat-icon>square_foot</mat-icon>Area</dt>
+              <dd>{{ getCountryInfo('area') }}<small> sq. km</small></dd>
+            </div>
+            <div class="detail-item">
+              <dt><mat-icon>language</mat-icon>Languages</dt>
+              <dd>{{ getCountryInfo('languages') }}</dd>
+            </div>
+            <div class="detail-item">
+              <dt><mat-icon>payments</mat-icon>Currency</dt>
+              <dd>{{ getCountryInfo('currencies') }}</dd>
+            </div>
+            <div class="detail-item">
+              <dt><mat-icon>map</mat-icon>Continent</dt>
+              <dd>{{ getCountryInfo('continents') }}</dd>
+            </div>
+          </dl>
+        } @else {
+          <div class="details-empty">
+            <mat-icon>travel_explore</mat-icon>
+            <p>Select a country to reveal its geography, language, currency, and more.</p>
+          </div>
+        }
       </section>
     </div>
+
+    @if (errorMessage) {
+      <div class="error-message" role="alert">
+        <mat-icon>error_outline</mat-icon>
+        <p>{{ errorMessage }}</p>
+        @if (selectedCountryCode) {
+          <button mat-button type="button" (click)="fetchCountryPopulation()">Try again</button>
+        }
+      </div>
+    }
   </main>
 
-  <!-- Modal (Enlarged) -->
-  <div
-    class="modal-overlay"
-    [ngClass]="{ open: isPopulationGraphModalOpen }"
-    @modalAnimation
-    >
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title">
-          <mat-icon>insights</mat-icon> Global Population Insights
-        </h2>
-        <button
-          mat-icon-button
-          class="close-button"
-          (click)="closePopulationGraphModal()"
-          >
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-      <mat-form-field appearance="fill" class="custom-select">
-        <mat-label>
-          <mat-icon>bar_chart</mat-icon> Graph Type
-        </mat-label>
-        <mat-select
-          [(value)]="modalChartType"
-          (selectionChange)="renderPopulationChart()"
-          >
-          <mat-option value="bar">Bar</mat-option>
-          <mat-option value="line">Line</mat-option>
-          <mat-option value="polarArea">Polar Area</mat-option>
-          <mat-option value="radar">Radar</mat-option>
-          <mat-option value="doughnut">Doughnut</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <div class="modal-chart-wrapper">
-        <canvas #populationChart></canvas>
-      </div>
-    </div>
-  </div>
+  @if (isPopulationGraphModalOpen) {
+    <div class="modal-overlay" role="presentation" (click)="closePopulationGraphModal()">
+      <section class="modal-content" role="dialog" aria-modal="true" aria-labelledby="global-chart-title" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <div>
+            <p class="section-kicker">GLOBAL VIEW</p>
+            <h2 id="global-chart-title">Population comparison</h2>
+            <p>Ranked from highest to lowest population.</p>
+          </div>
+          <button #closeModalButton mat-icon-button type="button" class="icon-action" aria-label="Close global comparison" (click)="closePopulationGraphModal()"><mat-icon>close</mat-icon></button>
+        </header>
 
-  <!-- Loading Overlay -->
+        <div class="modal-controls">
+          <mat-button-toggle-group [(ngModel)]="globalChartLimit" (change)="onGlobalChartSettingsChange()" aria-label="Number of countries to compare">
+            <mat-button-toggle [value]="10">Top 10</mat-button-toggle>
+            <mat-button-toggle value="all">All {{ countries.length }}</mat-button-toggle>
+          </mat-button-toggle-group>
+          <mat-form-field appearance="outline" class="modal-chart-select">
+            <mat-label>Chart type</mat-label>
+            <mat-select [(ngModel)]="modalChartType" (selectionChange)="onGlobalChartSettingsChange()">
+              <mat-option value="bar">Bar chart</mat-option>
+              <mat-option value="line">Line chart</mat-option>
+              <mat-option value="doughnut">Doughnut chart</mat-option>
+              <mat-option value="polarArea">Polar area chart</mat-option>
+              <mat-option value="radar">Radar chart</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="modal-chart-wrapper">
+          <canvas #populationChart aria-label="Global population comparison chart" role="img"></canvas>
+        </div>
+      </section>
+    </div>
+  }
+
   @if (isCountriesLoading) {
-    <div class="loading-overlay">
-      <mat-spinner diameter="50" color="primary"></mat-spinner>
-      <p class="loading-text">Fetching population data...</p>
+    <div class="loading-overlay" role="status" aria-live="polite" aria-label="Loading country data">
+      <div class="loading-card">
+        <mat-spinner diameter="44"></mat-spinner>
+        <strong>Loading population data</strong>
+        <span>Preparing your explorer…</span>
+      </div>
     </div>
   }
 </div>
