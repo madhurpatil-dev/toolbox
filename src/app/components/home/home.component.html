@@ -3,15 +3,12 @@
     <div class="hero-copy"><p class="eyebrow"><span class="material-icons">auto_awesome</span> Everyday utility suite</p><h1>Useful tools, <em>without the clutter.</em></h1><p class="subtitle">A focused collection of calculators, world data, and conversion tools—built to help you get answers quickly.</p></div>
     <div class="hero-stat"><span class="material-icons">grid_view</span><strong>{{ allServices.length }}</strong><span>tools in one place</span></div>
   </div>
-  <div class="search-panel" [class.focused]="isSearchFocused"><div class="search-panel-header"><div><label class="search-label" for="tool-search">Find the right tool</label><p class="search-help">Search by name or what you need to do.</p></div><span class="search-status">{{ filteredServices.length }} tools</span></div><div class="search-container"><span class="material-icons search-icon">search</span><input id="tool-search" type="search" placeholder="Try “currency”, “weather”, or “calculator”" class="search-input" [formControl]="searchControl" (focus)="onSearchFocus()" (blur)="onSearchBlur()" autocomplete="off"><button *ngIf="searchControl.value" class="clear-button" type="button" (click)="clearSearch()" aria-label="Clear search"><span class="material-icons">close</span><span>Clear</span></button></div></div>
-  <div class="section-heading"><div><p class="eyebrow">Tool library</p><h2>{{ searchControl.value ? 'Matching tools' : 'Choose a starting point' }}</h2></div><span class="result-count">{{ filteredServices.length }} available</span></div>
-  @if (filteredServices.length > 0) {
+  <div class="section-heading"><div><p class="eyebrow">Tool library</p><h2>Choose a starting point</h2></div><span class="result-count">{{ allServices.length }} available</span></div>
+  @if (allServices.length > 0) {
     <div class="services-grid">
-      @for (service of filteredServices; track service.route) {
+      @for (service of allServices; track service.route) {
         <a class="service-card" [routerLink]="service.route" [style.--card-color]="service.color"><div class="card-icon"><img [src]="service.image" alt="" loading="lazy"></div><div class="card-content"><h3>{{ service.title }}</h3><p>{{ service.description }}</p></div><div class="card-footer"><span>Open tool</span><span class="material-icons">arrow_forward</span></div></a>
       }
     </div>
-  } @else {
-    <div class="no-results"><span class="material-icons">search_off</span><h3>No matching tools</h3><p>Try a broader term, or clear your search to browse the full library.</p><button type="button" (click)="clearSearch()">Clear search</button></div>
   }
 </section>
