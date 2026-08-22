@@ -1,65 +1,17 @@
-<div class="home-container">
-  <div class="header">
-    <h1>Utility Services</h1>
-    <p class="subtitle">Explore our collection of useful tools and services</p>
+<section class="home-container">
+  <div class="hero">
+    <div class="hero-copy"><p class="eyebrow"><span class="material-icons">auto_awesome</span> Everyday utility suite</p><h1>Useful tools, <em>without the clutter.</em></h1><p class="subtitle">A focused collection of calculators, world data, and conversion tools—built to help you get answers quickly.</p></div>
+    <div class="hero-stat"><span class="material-icons">grid_view</span><strong>{{ allServices.length }}</strong><span>tools in one place</span></div>
   </div>
-
-  <div class="search-container" [class.focused]="isSearchFocused">
-    <div class="search-icon">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-      </svg>
-    </div>
-    <input
-      type="text"
-      placeholder="Search services..."
-      class="search-input"
-      [formControl]="searchControl"
-      (focus)="onSearchFocus()"
-      (blur)="onSearchBlur()"
-      >
-      @if (searchControl.value) {
-        <button class="clear-button" (click)="clearSearch()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-          </svg>
-        </button>
+  <div class="search-panel" [class.focused]="isSearchFocused"><div class="search-panel-header"><div><label class="search-label" for="tool-search">Find the right tool</label><p class="search-help">Search by name or what you need to do.</p></div><span class="search-status">{{ filteredServices.length }} tools</span></div><div class="search-container"><span class="material-icons search-icon">search</span><input id="tool-search" type="search" placeholder="Try “currency”, “weather”, or “calculator”" class="search-input" [formControl]="searchControl" (focus)="onSearchFocus()" (blur)="onSearchBlur()" autocomplete="off"><button *ngIf="searchControl.value" class="clear-button" type="button" (click)="clearSearch()" aria-label="Clear search"><span class="material-icons">close</span><span>Clear</span></button></div></div>
+  <div class="section-heading"><div><p class="eyebrow">Tool library</p><h2>{{ searchControl.value ? 'Matching tools' : 'Choose a starting point' }}</h2></div><span class="result-count">{{ filteredServices.length }} available</span></div>
+  @if (filteredServices.length > 0) {
+    <div class="services-grid">
+      @for (service of filteredServices; track service.route) {
+        <a class="service-card" [routerLink]="service.route" [style.--card-color]="service.color"><div class="card-icon"><img [src]="service.image" alt="" loading="lazy"></div><div class="card-content"><h3>{{ service.title }}</h3><p>{{ service.description }}</p></div><div class="card-footer"><span>Open tool</span><span class="material-icons">arrow_forward</span></div></a>
       }
     </div>
-
-    @if (filteredServices.length > 0) {
-      <div class="services-grid">
-        @for (service of filteredServices; track service) {
-          <div
-            class="service-card"
-            [routerLink]="service.route"
-            routerLinkActive="active"
-            [style.--card-color]="service.color">
-            <div class="card-icon">
-              <img [src]="service.image" [alt]="service.title + ' Image'" loading="lazy">
-            </div>
-            <div class="card-content">
-              <h3>{{ service.title }}</h3>
-              <p>{{ service.description }}</p>
-            </div>
-            <div class="card-footer">
-              <span>Try it now</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
-              </svg>
-            </div>
-          </div>
-        }
-      </div>
-    } @else {
-      <div class="no-results">
-        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-          <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
-        </svg>
-        <h3>No services found</h3>
-        <p>Try a different search term</p>
-      </div>
-    }
-
-  </div>
+  } @else {
+    <div class="no-results"><span class="material-icons">search_off</span><h3>No matching tools</h3><p>Try a broader term, or clear your search to browse the full library.</p><button type="button" (click)="clearSearch()">Clear search</button></div>
+  }
+</section>

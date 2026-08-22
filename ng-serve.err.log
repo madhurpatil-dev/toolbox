@@ -1,0 +1,603 @@
+▲ [WARNING] Using direct eval with a bundler is not recommended and may cause problems [direct-eval]
+
+    src/app/components/calculator/calculator.component.ts:131:26:
+      131 │             this.result = eval(expression).toString();
+          ╵                           ~~~~
+
+  You can read more about direct eval and bundling here: https://esbuild.github.io/link/direct-eval
+
+
+12:29:24 pm [vite] (client) [console.warn] NG0913: An image with src http://127.0.0.1:4200/assets/weather.jpg has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+12:29:26 pm [vite] (client) [console.warn] NG0913: An image with src http://127.0.0.1:4200/assets/weather.jpg has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+▲ [WARNING] Using direct eval with a bundler is not recommended and may cause problems [direct-eval]
+
+    src/app/components/calculator/calculator.component.ts:131:26:
+      131 │             this.result = eval(expression).toString();
+          ╵                           ~~~~
+
+  You can read more about direct eval and bundling here: https://esbuild.github.io/link/direct-eval
+
+
+▲ [WARNING] Using direct eval with a bundler is not recommended and may cause problems [direct-eval]
+
+    src/app/components/calculator/calculator.component.ts:131:26:
+      131 │             this.result = eval(expression).toString();
+          ╵                           ~~~~
+
+  You can read more about direct eval and bundling here: https://esbuild.github.io/link/direct-eval
+
+
+1:09:35 pm [vite] (client) [console.warn] NG0913: An image with src http://127.0.0.1:4200/assets/weather.jpg has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+1:10:53 pm [vite] (client) [console.warn] NG0913: An image with src http://127.0.0.1:4200/assets/weather.jpg has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+1:12:30 pm [vite] (client) [console.warn] NG0913: An image with src http://127.0.0.1:4200/assets/weather.jpg has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+▲ [WARNING] Using direct eval with a bundler is not recommended and may cause problems [direct-eval]
+
+    src/app/components/calculator/calculator.component.ts:131:26:
+      131 │             this.result = eval(expression).toString();
+          ╵                           ~~~~
+
+  You can read more about direct eval and bundling here: https://esbuild.github.io/link/direct-eval
+
+
+1:13:12 pm [vite] (client) [console.warn] NG0913: An image with src http://127.0.0.1:4200/assets/weather.jpg has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+▲ [WARNING] Using direct eval with a bundler is not recommended and may cause problems [direct-eval]
+
+    src/app/components/calculator/calculator.component.ts:131:26:
+      131 │             this.result = eval(expression).toString();
+          ╵                           ~~~~
+
+  You can read more about direct eval and bundling here: https://esbuild.github.io/link/direct-eval
+
+
+1:13:49 pm [vite] (client) [console.warn] NG0913: An image with src http://127.0.0.1:4200/assets/weather.jpg has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+▲ [WARNING] Using direct eval with a bundler is not recommended and may cause problems [direct-eval]
+
+    src/app/components/calculator/calculator.component.ts:131:26:
+      131 │             this.result = eval(expression).toString();
+          ╵                           ~~~~
+
+  You can read more about direct eval and bundling here: https://esbuild.github.io/link/direct-eval
+
+
+1:14:13 pm [vite] (client) [console.warn] NG0913: An image with src http://127.0.0.1:4200/assets/weather.jpg has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+1:14:13 pm [vite] (client) [console.warn] NG0913: An image with src http://127.0.0.1:4200/assets/weather.jpg has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+▲ [WARNING] Using direct eval with a bundler is not recommended and may cause problems [direct-eval]
+
+    src/app/components/calculator/calculator.component.ts:131:26:
+      131 │             this.result = eval(expression).toString();
+          ╵                           ~~~~
+
+  You can read more about direct eval and bundling here: https://esbuild.github.io/link/direct-eval
+
+
+1:15:22 pm [vite] (client) [console.warn] NG0913: An image with src http://127.0.0.1:4200/assets/weather.jpg has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+1:15:23 pm [vite] (client) [console.warn] NG0913: An image with src http://127.0.0.1:4200/assets/weather.jpg has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+▲ [WARNING] Using direct eval with a bundler is not recommended and may cause problems [direct-eval]
+
+    src/app/components/calculator/calculator.component.ts:131:26:
+      131 │             this.result = eval(expression).toString();
+          ╵                           ~~~~
+
+  You can read more about direct eval and bundling here: https://esbuild.github.io/link/direct-eval
+
+
+1:15:32 pm [vite] (client) [console.warn] NG0913: An image with src http://127.0.0.1:4200/assets/weather.jpg has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+1:15:34 pm [vite] (client) [console.warn] NG0913: An image with src http://127.0.0.1:4200/assets/weather.jpg has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+4:46:20 pm [vite] (client) [console.warn] NG0913: An image with src http://127.0.0.1:4200/assets/weather.jpg has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+4:46:50 pm [vite] (client) [console.warn] NG0913: An image with src http://127.0.0.1:4200/assets/weather.jpg has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+4:58:31 pm [vite] (client) [console.warn] NG0913: An image with src http://127.0.0.1:4200/assets/weather.jpg has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+▲ [WARNING] Using direct eval with a bundler is not recommended and may cause problems [direct-eval]
+
+    src/app/components/calculator/calculator.component.ts:131:26:
+      131 │             this.result = eval(expression).toString();
+          ╵                           ~~~~
+
+  You can read more about direct eval and bundling here: https://esbuild.github.io/link/direct-eval
+
+
+5:03:05 pm [vite] (client) [console.warn] NG0913: An image with src http://127.0.0.1:4200/assets/weather.jpg has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+▲ [WARNING] Using direct eval with a bundler is not recommended and may cause problems [direct-eval]
+
+    src/app/components/calculator/calculator.component.ts:131:26:
+      131 │             this.result = eval(expression).toString();
+          ╵                           ~~~~
+
+  You can read more about direct eval and bundling here: https://esbuild.github.io/link/direct-eval
+
+
+▲ [WARNING] Using direct eval with a bundler is not recommended and may cause problems [direct-eval]
+
+    src/app/components/calculator/calculator.component.ts:131:26:
+      131 │             this.result = eval(expression).toString();
+          ╵                           ~~~~
+
+  You can read more about direct eval and bundling here: https://esbuild.github.io/link/direct-eval
+
+
+▲ [WARNING] Using direct eval with a bundler is not recommended and may cause problems [direct-eval]
+
+    src/app/components/calculator/calculator.component.ts:131:26:
+      131 │             this.result = eval(expression).toString();
+          ╵                           ~~~~
+
+  You can read more about direct eval and bundling here: https://esbuild.github.io/link/direct-eval
+
+
+X [ERROR] NG2008: Could not find stylesheet file './home.component.css'. [plugin angular-compiler]
+
+    src/app/components/home/home.component.ts:16:16:
+      16 │     styleUrls: ['./home.component.css'],
+         ╵                 ~~~~~~~~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] Using direct eval with a bundler is not recommended and may cause problems [direct-eval]
+
+    src/app/components/calculator/calculator.component.ts:131:26:
+      131 │             this.result = eval(expression).toString();
+          ╵                           ~~~~
+
+  You can read more about direct eval and bundling here: https://esbuild.github.io/link/direct-eval
+
+
+X [ERROR] NG2008: Could not find stylesheet file './home.component.css'. [plugin angular-compiler]
+
+    src/app/components/home/home.component.ts:16:16:
+      16 │     styleUrls: ['./home.component.css'],
+         ╵                 ~~~~~~~~~~~~~~~~~~~~~~
+
+
+5:05:29 pm [vite] (client) [console.warn] NG0913: An image with src http://127.0.0.1:4200/assets/weather.jpg has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+5:11:52 pm [vite] (client) [console.warn] NG0913: An image with src http://127.0.0.1:4200/assets/weather.jpg has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+5:12:08 pm [vite] (client) [console.warn] NG0913: An image with src http://127.0.0.1:4200/assets/weather.jpg has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+mes/deeppurple-amber.css';
+        ╵         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@angular/material/prebuilt-themes/deeppurple-amber.css" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Could not resolve "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
+
+    angular:styles/global:styles:2:8:
+      2 │ @import './node_modules/@angular/material/prebuilt-themes/indigo-pi...
+        ╵         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] Could not resolve "src/styles.css"
+
+    angular:styles/global:styles:3:8:
+      3 │ @import 'src/styles.css';
+        ╵         ~~~~~~~~~~~~~~~~
+
+  You can mark the path "src/styles.css" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Cannot read directory "../..": Access is denied. [plugin angular-compiler]
+
+
+X [ERROR] Could not resolve "C:\\Users\\madhu\\Downloads\\toolbox\\src\\app\\components\\navbar\\navbar.component.css" [plugin angular-compiler]
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "C:\\Users\\madhu\\Downloads\\toolbox\\src\\main.ts"
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "zone.js"
+
+    angular:polyfills:angular:polyfills:1:7:
+      1 │ import 'zone.js';
+        ╵        ~~~~~~~~~
+
+  You can mark the path "zone.js" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "@angular/material/prebuilt-themes/deeppurple-amber.css"
+
+    angular:styles/global:styles:1:8:
+      1 │ @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+        ╵         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@angular/material/prebuilt-themes/deeppurple-amber.css" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Could not resolve "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
+
+    angular:styles/global:styles:2:8:
+      2 │ @import './node_modules/@angular/material/prebuilt-themes/indigo-pi...
+        ╵         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] Could not resolve "src/styles.css"
+
+    angular:styles/global:styles:3:8:
+      3 │ @import 'src/styles.css';
+        ╵         ~~~~~~~~~~~~~~~~
+
+  You can mark the path "src/styles.css" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Cannot read directory "../..": Access is denied. [plugin angular-compiler]
+
+
+X [ERROR] Could not resolve "C:\\Users\\madhu\\Downloads\\toolbox\\src\\app\\components\\navbar\\navbar.component.css" [plugin angular-compiler]
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "C:\\Users\\madhu\\Downloads\\toolbox\\src\\main.ts"
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "zone.js"
+
+    angular:polyfills:angular:polyfills:1:7:
+      1 │ import 'zone.js';
+        ╵        ~~~~~~~~~
+
+  You can mark the path "zone.js" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "@angular/material/prebuilt-themes/deeppurple-amber.css"
+
+    angular:styles/global:styles:1:8:
+      1 │ @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+        ╵         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@angular/material/prebuilt-themes/deeppurple-amber.css" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Could not resolve "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
+
+    angular:styles/global:styles:2:8:
+      2 │ @import './node_modules/@angular/material/prebuilt-themes/indigo-pi...
+        ╵         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] Could not resolve "src/styles.css"
+
+    angular:styles/global:styles:3:8:
+      3 │ @import 'src/styles.css';
+        ╵         ~~~~~~~~~~~~~~~~
+
+  You can mark the path "src/styles.css" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Cannot read directory "../..": Access is denied. [plugin angular-compiler]
+
+
+X [ERROR] Could not resolve "C:\\Users\\madhu\\Downloads\\toolbox\\src\\app\\components\\navbar\\navbar.component.css" [plugin angular-compiler]
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "C:\\Users\\madhu\\Downloads\\toolbox\\src\\main.ts"
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "zone.js"
+
+    angular:polyfills:angular:polyfills:1:7:
+      1 │ import 'zone.js';
+        ╵        ~~~~~~~~~
+
+  You can mark the path "zone.js" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "@angular/material/prebuilt-themes/deeppurple-amber.css"
+
+    angular:styles/global:styles:1:8:
+      1 │ @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+        ╵         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@angular/material/prebuilt-themes/deeppurple-amber.css" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Could not resolve "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
+
+    angular:styles/global:styles:2:8:
+      2 │ @import './node_modules/@angular/material/prebuilt-themes/indigo-pi...
+        ╵         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] Could not resolve "src/styles.css"
+
+    angular:styles/global:styles:3:8:
+      3 │ @import 'src/styles.css';
+        ╵         ~~~~~~~~~~~~~~~~
+
+  You can mark the path "src/styles.css" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Cannot read directory "../..": Access is denied. [plugin angular-compiler]
+
+
+X [ERROR] Could not resolve "C:\\Users\\madhu\\Downloads\\toolbox\\src\\app\\components\\navbar\\navbar.component.css" [plugin angular-compiler]
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "C:\\Users\\madhu\\Downloads\\toolbox\\src\\main.ts"
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "zone.js"
+
+    angular:polyfills:angular:polyfills:1:7:
+      1 │ import 'zone.js';
+        ╵        ~~~~~~~~~
+
+  You can mark the path "zone.js" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "@angular/material/prebuilt-themes/deeppurple-amber.css"
+
+    angular:styles/global:styles:1:8:
+      1 │ @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+        ╵         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@angular/material/prebuilt-themes/deeppurple-amber.css" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Could not resolve "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
+
+    angular:styles/global:styles:2:8:
+      2 │ @import './node_modules/@angular/material/prebuilt-themes/indigo-pi...
+        ╵         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] Could not resolve "src/styles.css"
+
+    angular:styles/global:styles:3:8:
+      3 │ @import 'src/styles.css';
+        ╵         ~~~~~~~~~~~~~~~~
+
+  You can mark the path "src/styles.css" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Cannot read directory "../..": Access is denied. [plugin angular-compiler]
+
+
+X [ERROR] Could not resolve "C:\\Users\\madhu\\Downloads\\toolbox\\src\\app\\components\\navbar\\navbar.component.css" [plugin angular-compiler]
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "C:\\Users\\madhu\\Downloads\\toolbox\\src\\main.ts"
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "zone.js"
+
+    angular:polyfills:angular:polyfills:1:7:
+      1 │ import 'zone.js';
+        ╵        ~~~~~~~~~
+
+  You can mark the path "zone.js" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "@angular/material/prebuilt-themes/deeppurple-amber.css"
+
+    angular:styles/global:styles:1:8:
+      1 │ @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+        ╵         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@angular/material/prebuilt-themes/deeppurple-amber.css" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Could not resolve "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
+
+    angular:styles/global:styles:2:8:
+      2 │ @import './node_modules/@angular/material/prebuilt-themes/indigo-pi...
+        ╵         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] Could not resolve "src/styles.css"
+
+    angular:styles/global:styles:3:8:
+      3 │ @import 'src/styles.css';
+        ╵         ~~~~~~~~~~~~~~~~
+
+  You can mark the path "src/styles.css" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Cannot read directory "../..": Access is denied. [plugin angular-compiler]
+
+
+X [ERROR] Could not resolve "C:\\Users\\madhu\\Downloads\\toolbox\\src\\app\\components\\navbar\\navbar.component.css" [plugin angular-compiler]
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "C:\\Users\\madhu\\Downloads\\toolbox\\src\\main.ts"
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "zone.js"
+
+    angular:polyfills:angular:polyfills:1:7:
+      1 │ import 'zone.js';
+        ╵        ~~~~~~~~~
+
+  You can mark the path "zone.js" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "@angular/material/prebuilt-themes/deeppurple-amber.css"
+
+    angular:styles/global:styles:1:8:
+      1 │ @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+        ╵         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@angular/material/prebuilt-themes/deeppurple-amber.css" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Could not resolve "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
+
+    angular:styles/global:styles:2:8:
+      2 │ @import './node_modules/@angular/material/prebuilt-themes/indigo-pi...
+        ╵         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] Could not resolve "src/styles.css"
+
+    angular:styles/global:styles:3:8:
+      3 │ @import 'src/styles.css';
+        ╵         ~~~~~~~~~~~~~~~~
+
+  You can mark the path "src/styles.css" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Cannot read directory "../..": Access is denied. [plugin angular-compiler]
+
+
+X [ERROR] Could not resolve "C:\\Users\\madhu\\Downloads\\toolbox\\src\\app\\components\\home\\home.component.css" [plugin angular-compiler]
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "C:\\Users\\madhu\\Downloads\\toolbox\\src\\main.ts"
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "zone.js"
+
+    angular:polyfills:angular:polyfills:1:7:
+      1 │ import 'zone.js';
+        ╵        ~~~~~~~~~
+
+  You can mark the path "zone.js" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "@angular/material/prebuilt-themes/deeppurple-amber.css"
+
+    angular:styles/global:styles:1:8:
+      1 │ @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+        ╵         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@angular/material/prebuilt-themes/deeppurple-amber.css" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Could not resolve "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
+
+    angular:styles/global:styles:2:8:
+      2 │ @import './node_modules/@angular/material/prebuilt-themes/indigo-pi...
+        ╵         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] Could not resolve "src/styles.css"
+
+    angular:styles/global:styles:3:8:
+      3 │ @import 'src/styles.css';
+        ╵         ~~~~~~~~~~~~~~~~
+
+  You can mark the path "src/styles.css" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "C:\\Users\\madhu\\Downloads\\toolbox\\src\\main.ts"
+
+
+X [ERROR] NG2008: Could not find stylesheet file './home.component.css'. [plugin angular-compiler]
+
+    src/app/components/home/home.component.ts:16:16:
+      16 │     styleUrls: ['./home.component.css'],
+         ╵                 ~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "zone.js"
+
+    angular:polyfills:angular:polyfills:1:7:
+      1 │ import 'zone.js';
+        ╵        ~~~~~~~~~
+
+  You can mark the path "zone.js" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "@angular/material/prebuilt-themes/deeppurple-amber.css"
+
+    angular:styles/global:styles:1:8:
+      1 │ @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+        ╵         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@angular/material/prebuilt-themes/deeppurple-amber.css" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Could not resolve "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
+
+    angular:styles/global:styles:2:8:
+      2 │ @import './node_modules/@angular/material/prebuilt-themes/indigo-pi...
+        ╵         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] Could not resolve "src/styles.css"
+
+    angular:styles/global:styles:3:8:
+      3 │ @import 'src/styles.css';
+        ╵         ~~~~~~~~~~~~~~~~
+
+  You can mark the path "src/styles.css" as external to exclude it from the bundle, which will remove this error and leave the unresolved path in the bundle.
+
+
+X [ERROR] Cannot read directory "../..": Access is denied.
+
+
+X [ERROR] Could not resolve "C:\\Users\\madhu\\Downloads\\toolbox\\src\\main.ts"
+
+
+X [ERROR] NG2008: Could not find stylesheet file './home.component.css'. [plugin angular-compiler]
+
+    src/app/components/home/home.component.ts:16:16:
+      16 │     styleUrls: ['./home.component.css'],
+         ╵                 ~~~~~~~~~~~~~~~~~~~~~~
+
+
