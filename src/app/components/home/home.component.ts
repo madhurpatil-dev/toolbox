@@ -1,6 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { Component } from '@angular/core';
 
 interface Service {
   title: string;
@@ -16,8 +14,7 @@ interface Service {
     styleUrls: ['./home.component.css'],
     standalone: false
 })
-export class HomeComponent implements OnInit {
-  searchControl = new FormControl('');
+export class HomeComponent {
   allServices: Service[] = [
     {
       title: 'Calculator',
@@ -97,50 +94,5 @@ export class HomeComponent implements OnInit {
       color: '#36b9cc'
     }
   ];
-  filteredServices: Service[] = [];
-  isSearchFocused: boolean = false;
-
   constructor() { }
-
-  ngOnInit(): void {
-    this.filteredServices = [...this.allServices];
-    this.setupSearch();
-  }
-
-  private setupSearch(): void {
-    this.searchControl.valueChanges
-      .pipe(
-        debounceTime(200),
-        distinctUntilChanged()
-      )
-      .subscribe(searchTerm => {
-        this.filterServices(searchTerm || '');
-      });
-  }
-
-  private filterServices(searchTerm: string): void {
-    if (!searchTerm) {
-      this.filteredServices = [...this.allServices];
-      return;
-    }
-
-    const term = searchTerm.toLowerCase();
-    this.filteredServices = this.allServices.filter(service => 
-      service.title.toLowerCase().includes(term) || 
-      service.description.toLowerCase().includes(term)
-    );
-  }
-
-  onSearchFocus(): void {
-    this.isSearchFocused = true;
-  }
-
-  onSearchBlur(): void {
-    this.isSearchFocused = false;
-  }
-
-  clearSearch(): void {
-    this.searchControl.setValue('');
-    this.filteredServices = [...this.allServices];
-  }
 }
