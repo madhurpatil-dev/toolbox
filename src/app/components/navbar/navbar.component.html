@@ -1,25 +1,17 @@
-<nav class="navbar-v2">
-  <div class="brand-container-v2">
-    <a class="brand-v2" routerLink="/" routerLinkActive="active">ToolBox</a>
-    <button class="menu-toggle-v2" (click)="toggleMenu()" aria-label="Toggle menu">
-      <span class="menu-icon-v2" [class.open]="isMenuOpen"></span>
-    </button>
-  </div>
-  <ul class="nav-links-v2" [class.open]="isMenuOpen">
-    <li><a routerLink="/" routerLinkActive="active" (click)="closeMenu()">Home</a></li>
-    <li><a routerLink="calculator" routerLinkActive="active" (click)="closeMenu()">Calculator</a></li>
-    <li><a routerLink="age-calculator" routerLinkActive="active" (click)="closeMenu()">Age Calculator</a></li>
-    <li><a routerLink="currencyconverter" routerLinkActive="active" (click)="closeMenu()">Currency Converter</a></li>
-    <li><a routerLink="findcapital" routerLinkActive="active" (click)="closeMenu()">Find Capital</a></li>
-    <li><a routerLink="colorpicker" routerLinkActive="active" (click)="closeMenu()">Color Picker</a></li>
-    <li><a routerLink="findflag" routerLinkActive="active" (click)="closeMenu()">Find Flag</a></li>
-    <li><a routerLink="worldclock" routerLinkActive="active" (click)="closeMenu()">World Clock</a></li>
-    <li><a routerLink="population" routerLinkActive="active" (click)="closeMenu()">Find Population</a></li>
-    <li><a routerLink="data-manipulation" routerLinkActive="active" (click)="closeMenu()">Data Manipulation</a></li>
-    <li><a routerLink="fontconverter" routerLinkActive="active" (click)="closeMenu()">Font Converter</a></li>
-    <li><a routerLink="weather-service" routerLinkActive="active" (click)="closeMenu()">Weather Service</a></li>
-  </ul>
-  <div class="overlay-v2" [class.active]="isMenuOpen" (click)="closeMenu()"></div>
-</nav>
-<router-outlet></router-outlet>
-<app-footer></app-footer>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<header class="site-header">
+  <nav class="navbar-v2" aria-label="Primary navigation">
+    <a class="brand-v2" routerLink="/" (click)="closeAll()" aria-label="Toolbox home"><span class="brand-mark">T</span><span>Toolbox</span></a>
+    <button *ngIf="isToolPage" class="back-button" type="button" (click)="goBack()" aria-label="Go back to the previous page"><span class="material-icons">arrow_back</span><span>Back to tools</span></button>
+    <button class="menu-toggle-v2" (click)="toggleMenu()" [attr.aria-expanded]="isMenuOpen" aria-controls="primary-menu" aria-label="Toggle navigation"><span class="menu-icon-v2" [class.open]="isMenuOpen"></span></button>
+    <div class="nav-links-v2" id="primary-menu" [class.open]="isMenuOpen">
+      <a routerLink="/" routerLinkActive="router-link-active" [routerLinkActiveOptions]="{exact: true}" (click)="closeAll()">All tools</a>
+      <div class="tools-menu">
+        <button class="tools-trigger" type="button" (click)="toggleTools($event)" [attr.aria-expanded]="isToolsOpen">Explore tools <span class="material-icons chevron" aria-hidden="true">expand_more</span></button>
+        <div class="tools-popover" [class.open]="isToolsOpen">
+          <a routerLink="calculator" (click)="closeAll()"><span class="material-icons">calculate</span>Calculator</a><a routerLink="age-calculator" (click)="closeAll()"><span class="material-icons">cake</span>Age calculator</a><a routerLink="currencyconverter" (click)="closeAll()"><span class="material-icons">currency_exchange</span>Currency converter</a><a routerLink="findcapital" (click)="closeAll()"><span class="material-icons">public</span>Country capital</a><a routerLink="colorpicker" (click)="closeAll()"><span class="material-icons">palette</span>Color explorer</a><a routerLink="findflag" (click)="closeAll()"><span class="material-icons">flag</span>Flag finder</a><a routerLink="worldclock" (click)="closeAll()"><span class="material-icons">schedule</span>World clock</a><a routerLink="population" (click)="closeAll()"><span class="material-icons">groups</span>Population data</a><a routerLink="data-manipulation" (click)="closeAll()"><span class="material-icons">data_object</span>Data tools</a><a routerLink="fontconverter" (click)="closeAll()"><span class="material-icons">text_fields</span>Font converter</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
