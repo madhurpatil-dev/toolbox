@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { AppModule } from '../../app.module';
 import { AgeCalculatorComponent } from './age-calculator.component';
 
 describe('AgeCalculatorComponent', () => {
@@ -8,7 +8,7 @@ describe('AgeCalculatorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AgeCalculatorComponent ]
+      imports: [AppModule]
     })
     .compileComponents();
 

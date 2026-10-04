@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { AppModule } from '../../app.module';
 import { FontsComponent } from './fonts.component';
 
 describe('FontsComponent', () => {
@@ -8,7 +8,7 @@ describe('FontsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ FontsComponent ]
+      imports: [AppModule],
     })
     .compileComponents();
   });

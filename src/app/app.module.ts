@@ -38,6 +38,16 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import { MatDividerModule } from '@angular/material/divider';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import { A11yModule } from '@angular/cdk/a11y';
+import {
+    ChartCardComponent,
+    CountryCardComponent,
+    CountrySearchComponent,
+    EmptyStateComponent,
+    ErrorStateComponent,
+    SkeletonLoaderComponent,
+    StatCardComponent,
+} from './components/countries/countries-ui.components';
 
 
 @NgModule({ declarations: [
@@ -53,7 +63,6 @@ import {MatButtonToggleModule} from '@angular/material/button-toggle';
         WorldClockComponent,
         AgeCalculatorComponent,
         FontsComponent,
-        CountriesComponent,
         StringManipulatorComponent,
         WeatherComponent
     ],
@@ -79,5 +88,14 @@ import {MatButtonToggleModule} from '@angular/material/button-toggle';
         MatAutocompleteModule,
         MatDividerModule,
         MatChipsModule,
-        NgxMatSelectSearchModule], providers: [WorldTimeService, provideHttpClient(withInterceptorsFromDi())] })
+        NgxMatSelectSearchModule,
+        A11yModule,
+        CountriesComponent,
+        ChartCardComponent,
+        CountryCardComponent,
+        CountrySearchComponent,
+        EmptyStateComponent,
+        ErrorStateComponent,
+        SkeletonLoaderComponent,
+        StatCardComponent], providers: [WorldTimeService, provideHttpClient(withInterceptorsFromDi())] })
 export class AppModule {}
