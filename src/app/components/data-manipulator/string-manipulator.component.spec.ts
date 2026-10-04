@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { AppModule } from '../../app.module';
 import { StringManipulatorComponent } from './string-manipulator.component';
 
 describe('StringManipulatorComponent', () => {
@@ -8,7 +8,7 @@ describe('StringManipulatorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [StringManipulatorComponent]
+      imports: [AppModule],
     })
     .compileComponents();
     

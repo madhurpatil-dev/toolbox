@@ -1,16 +1,23 @@
-/// <reference types="jasmine" />
-
+import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
+import { vi } from 'vitest';
+import { AppModule } from '../../app.module';
 import { FindcapitalComponent } from './findcapital.component';
 
 describe('FindcapitalComponent', () => {
   let component: FindcapitalComponent;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({ imports: [AppModule] }).compileComponents();
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: vi.fn().mockReturnValue({ matches: false }),
+    });
     component = new FindcapitalComponent(
-      { findCapital: jasmine.createSpy('findCapital').and.returnValue(of(null)), fetchCountryNames: jasmine.createSpy('fetchCountryNames').and.returnValue(of([])) } as any,
-      { observe: jasmine.createSpy('observe').and.returnValue(of({ breakpoints: {} })) } as any,
-      { open: jasmine.createSpy('open') } as any
+      { findCapital: vi.fn().mockReturnValue(of(null)), fetchCountryNames: vi.fn().mockReturnValue(of([])) } as any,
+      { observe: vi.fn().mockReturnValue(of({ breakpoints: {} })) } as any,
+      { open: vi.fn() } as any,
+      { markForCheck: vi.fn() } as any,
     );
   });
 
@@ -29,6 +36,6 @@ describe('FindcapitalComponent', () => {
     expect(component.countryFlag).toBe('');
     expect(component.countryInfo).toBeNull();
     expect(component.error).toBe('');
-    expect(component.showResults).toBeFalse();
+    expect(component.showResults).toBe(false);
   });
 });
