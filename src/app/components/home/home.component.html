@@ -3,12 +3,30 @@
     <div class="hero-copy"><p class="eyebrow"><span class="material-icons">auto_awesome</span> Everyday utility suite</p><h1>Useful tools, <em>without the clutter.</em></h1><p class="subtitle">A focused collection of calculators, world data, and conversion tools—built to help you get answers quickly.</p></div>
     <div class="hero-stat"><span class="material-icons">grid_view</span><strong>{{ allServices.length }}</strong><span>tools in one place</span></div>
   </div>
-  <div class="section-heading"><div><p class="eyebrow">Tool library</p><h2>Choose a starting point</h2></div><span class="result-count">{{ allServices.length }} available</span></div>
-  @if (allServices.length > 0) {
-    <div class="services-grid">
-      @for (service of allServices; track service.route) {
-        <a class="service-card" [routerLink]="service.route" [style.--card-color]="service.color"><div class="card-icon"><img [src]="service.image" alt="" loading="lazy"></div><div class="card-content"><h3>{{ service.title }}</h3><p>{{ service.description }}</p></div><div class="card-footer"><span>Open tool</span><span class="material-icons">arrow_forward</span></div></a>
+  <div class="section-heading"><div><p class="eyebrow">Tool library</p><h2>Choose a starting point</h2></div><span class="result-count" aria-live="polite">{{ filteredServices.length }} of {{ allServices.length }} tools</span></div>
+  <div class="tool-search">
+    <label for="tool-search">Find a tool</label>
+    <div class="tool-search-field">
+      <span class="material-icons" aria-hidden="true">search</span>
+      <input #toolSearch id="tool-search" type="search" autocomplete="off" placeholder="Search calculators, converters, and more" aria-keyshortcuts="Control+K Meta+K" (input)="onSearchInput($event)">
+      @if (searchTerm) {
+        <button type="button" class="clear-search" aria-label="Clear tool search" (click)="clearSearch()">×</button>
       }
+    </div>
+    <span class="search-hint"><kbd>Ctrl</kbd>/<kbd>⌘</kbd> <kbd>K</kbd> to focus search</span>
+  </div>
+  @if (filteredServices.length > 0) {
+    <div class="services-grid">
+      @for (service of filteredServices; track service.route) {
+        <a class="service-card" [routerLink]="service.route" [style.--card-color]="service.color"><div class="card-icon"><img [src]="service.image" alt="" loading="lazy" decoding="async"></div><div class="card-content"><h3>{{ service.title }}</h3><p>{{ service.description }}</p></div><div class="card-footer"><span>Open tool</span><span class="material-icons" aria-hidden="true">arrow_forward</span></div></a>
+      }
+    </div>
+  } @else {
+    <div class="tool-empty-state" role="status">
+      <span class="material-icons" aria-hidden="true">search_off</span>
+      <h3>No matching tools</h3>
+      <p>Try a different search, or clear the current query.</p>
+      <button type="button" (click)="clearSearch()">Clear search</button>
     </div>
   }
 </section>

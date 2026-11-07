@@ -98,6 +98,17 @@
                 <strong>Dataset coverage</strong>
                 <p>Urban split and historical population series are not provided. Source: configured country dataset; no reference year is supplied.</p>
               </div>
+              <div class="population-actions">
+                <button type="button" class="secondary-action" (click)="shareSelectedCountry()">Copy share link</button>
+                <button type="button" class="secondary-action" (click)="exportPopulationCsv()">Export CSV</button>
+              </div>
+              @if (shareStatus) {
+                <p class="action-status" role="status" aria-live="polite">{{ shareStatus }}</p>
+              }
+              @if (shareUrl && !shareCopied) {
+                <label class="share-url-label" for="share-url">Share URL</label>
+                <input id="share-url" class="share-url" type="url" readonly [value]="shareUrl" (focus)="selectShareUrl($event)" />
+              }
               <button #globalChartButton type="button" class="global-button" (click)="openPopulationGraphModal()">Explore global population</button>
             </section>
           </section>

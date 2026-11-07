@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 
 interface Service {
   title: string;
@@ -15,6 +15,9 @@ interface Service {
     standalone: false
 })
 export class HomeComponent {
+  @ViewChild('toolSearch') toolSearch?: ElementRef<HTMLInputElement>;
+  searchTerm = '';
+
   allServices: Service[] = [
     {
       title: 'Calculator',
@@ -89,10 +92,40 @@ export class HomeComponent {
     {
       title: 'Weather Info',
       description: 'Check current weather conditions and forecasts for any location',
-      image: './assets/weather.jpg',
+      image: './assets/weather-thumb.svg',
       route: 'weather-service',
       color: '#36b9cc'
     }
   ];
   constructor() { }
+
+  get filteredServices(): Service[] {
+    const query = this.searchTerm.trim().toLowerCase();
+    if (!query) return this.allServices;
+    return this.allServices.filter(({ title, description }) =>
+      `${title} ${description}`.toLowerCase().includes(query),
+    );
+  }
+
+  onSearchInput(event: Event): void {
+    if (event.target instanceof HTMLInputElement) {
+      this.searchTerm = event.target.value;
+    }
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    if (this.toolSearch) {
+      this.toolSearch.nativeElement.value = '';
+      this.toolSearch.nativeElement.focus();
+    }
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  handleSearchShortcut(event: KeyboardEvent): void {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      this.toolSearch?.nativeElement.focus();
+    }
+  }
 }

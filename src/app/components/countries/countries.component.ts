@@ -2,9 +2,12 @@ import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { A11yModule } from '@angular/cdk/a11y';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import type { Chart as ChartInstance, ChartType } from 'chart.js';
 import { finalize } from 'rxjs/operators';
 import { CountryServiceService } from '../../services/country-service.service';
+import { ThemeService } from '../../services/theme.service';
 import {
   ChartCardComponent,
   CountryCardComponent,
@@ -52,8 +55,10 @@ export class CountriesComponent implements OnInit, OnDestroy {
   sortBy = 'population';
   comparedCodes: string[] = [];
   recentCodes: string[] = [];
-  theme: 'light' | 'dark' = 'light';
   comparisonMessage = '';
+  shareUrl = '';
+  shareStatus = '';
+  shareCopied = false;
 
   @ViewChild('populationChart') populationChart!: ElementRef;
   @ViewChild('globalChartButton') globalChartButton!: ElementRef<HTMLButtonElement>;
@@ -61,17 +66,33 @@ export class CountriesComponent implements OnInit, OnDestroy {
 
   private chartModulePromise?: Promise<typeof import('chart.js/auto')>;
   private detailRequestId = 0;
+  private queryParamSubscription?: Subscription;
+  private requestedCountryCode = '';
 
-  constructor(private countryService: CountryServiceService) {}
+  constructor(
+    private countryService: CountryServiceService,
+    private route: ActivatedRoute,
+    private router: Router,
+    public themeService: ThemeService,
+  ) {}
 
   ngOnInit() {
     this.loadPreferences();
+    this.queryParamSubscription = this.route.queryParamMap.subscribe((params) => {
+      this.requestedCountryCode = params.get('country')?.toUpperCase() ?? '';
+      this.selectSharedCountry();
+    });
     this.loadCountries();
   }
 
   ngOnDestroy(): void {
+    this.queryParamSubscription?.unsubscribe();
     this.chart?.destroy();
     this.modalChart?.destroy();
+  }
+
+  get theme(): 'light' | 'dark' {
+    return this.themeService.theme;
   }
 
   private loadCountries(): void {
@@ -83,6 +104,7 @@ export class CountriesComponent implements OnInit, OnDestroy {
     ).subscribe(
       (countries) => {
         this.countries = countries;
+        this.selectSharedCountry();
       },
       (error) => {
         this.errorMessage = 'Error fetching countries. Please try again.';
@@ -92,15 +114,22 @@ export class CountriesComponent implements OnInit, OnDestroy {
 
   private loadPreferences(): void {
     try {
-      const storedTheme = localStorage.getItem('population-finder-theme-v2');
-      this.theme = storedTheme === 'dark' || storedTheme === 'light' ? storedTheme : 'light';
       const storedRecent = JSON.parse(localStorage.getItem('population-finder-recent') ?? '[]');
       this.recentCodes = Array.isArray(storedRecent)
         ? storedRecent.filter((code): code is string => typeof code === 'string').slice(0, 4)
         : [];
     } catch {
-      this.theme = 'light';
       this.recentCodes = [];
+    }
+  }
+
+  private selectSharedCountry(): void {
+    if (
+      this.requestedCountryCode &&
+      this.countries.some((country) => country.codes?.alpha_2 === this.requestedCountryCode) &&
+      this.selectedCountryCode !== this.requestedCountryCode
+    ) {
+      this.selectCountry(this.requestedCountryCode);
     }
   }
 
@@ -209,10 +238,76 @@ export class CountriesComponent implements OnInit, OnDestroy {
   }
 
   toggleTheme(): void {
-    this.theme = this.theme === 'dark' ? 'light' : 'dark';
-    try { localStorage.setItem('population-finder-theme-v2', this.theme); } catch { /* Storage is optional. */ }
+    this.themeService.toggle();
     if (this.countryPopulation !== undefined) setTimeout(() => this.renderChart(), 0);
     if (this.isPopulationGraphModalOpen) setTimeout(() => this.renderPopulationChart(), 0);
+  }
+
+  async shareSelectedCountry(): Promise<void> {
+    if (!this.selectedCountryCode) return;
+
+    const urlTree = this.router.createUrlTree(['/population'], {
+      queryParams: { country: this.selectedCountryCode },
+    });
+    this.shareUrl = new URL(this.router.serializeUrl(urlTree), window.location.origin).toString();
+    this.shareCopied = false;
+    this.shareStatus = 'Preparing share link...';
+
+    try {
+      if (!navigator.clipboard?.writeText) {
+        throw new Error('Clipboard access is unavailable.');
+      }
+      await navigator.clipboard.writeText(this.shareUrl);
+      this.shareCopied = true;
+      this.shareStatus = 'Share link copied to clipboard.';
+    } catch (error) {
+      this.shareStatus = 'The link is ready below. Copy it manually to share this country profile.';
+      console.warn('Unable to copy the population share link.', error);
+    }
+  }
+
+  selectShareUrl(event: FocusEvent): void {
+    if (event.target instanceof HTMLInputElement) event.target.select();
+  }
+
+  createPopulationCsv(): string {
+    const rows = this.comparedCountries.length > 0
+      ? this.comparedCountries
+      : this.countries.filter((country) => country.codes?.alpha_2 === this.selectedCountryCode);
+    const columns = ['Country', 'Code', 'Region', 'Population', 'Land area (km2)'];
+    const escapeCell = (value: unknown): string => {
+      const text = String(value ?? '');
+      const safeText = /^[=+\-@]/.test(text) ? `'${text}` : text;
+      return `"${safeText.replace(/"/g, '""')}"`;
+    };
+    const records = rows.map((country) => [
+      country.names?.common ?? 'Unknown',
+      country.codes?.alpha_2 ?? '',
+      country.region ?? country.continents?.join(', ') ?? '',
+      country.population ?? '',
+      country.area?.kilometers ?? country.area ?? '',
+    ]);
+
+    return [columns, ...records].map((record) => record.map(escapeCell).join(',')).join('\r\n');
+  }
+
+  exportPopulationCsv(): void {
+    const csv = this.createPopulationCsv();
+    if (!csv || csv.split('\r\n').length < 2) {
+      this.shareStatus = 'Select a country before exporting population data.';
+      return;
+    }
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = 'population-data.csv';
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+    this.shareStatus = 'Population data exported as CSV.';
   }
 
   toggleComparedCountry(code: string): void {
@@ -612,4 +707,3 @@ export class CountriesComponent implements OnInit, OnDestroy {
     });
   }
 }
-
