@@ -8,7 +8,7 @@
           <div class="input">{{ currentInput || '0' }}</div>
         </div>
         <div class="output-display">
-          <div class="output">{{ result || '0' }}</div>
+          <div class="output" aria-live="polite" aria-atomic="true">{{ result || '0' }}</div>
         </div>
       </div>
 
@@ -16,6 +16,7 @@
         @for (button of calculatorButtons; track button) {
           <button
             (click)="handleButtonClick(button.value, button.type)"
+            [attr.aria-label]="button.value === 'backspace' ? 'Delete last character' : button.label"
           [ngClass]="[
             'calculator-button',
             'button-' + button.type,

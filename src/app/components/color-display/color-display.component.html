@@ -10,6 +10,7 @@
         [(ngModel)]="searchTerm"
         placeholder="Search colors..."
         class="search-input"
+        aria-label="Search colors"
         >
       </div>
     </header>
@@ -18,6 +19,7 @@
       <button
         class="tab-button"
         [class.active]="activeTab === 'normal'"
+        [attr.aria-pressed]="activeTab === 'normal'"
         (click)="activeTab = 'normal'"
         >
         Solid Colors
@@ -25,6 +27,7 @@
       <button
         class="tab-button"
         [class.active]="activeTab === 'gradient'"
+        [attr.aria-pressed]="activeTab === 'gradient'"
         (click)="activeTab = 'gradient'"
         >
         Gradients
@@ -35,13 +38,14 @@
       @if (activeTab === 'normal') {
         <div class="color-grid">
           @for (color of filteredNormalColors; track color) {
-            <div
+            <button type="button"
               class="color-box"
+              [attr.aria-pressed]="selectedColor === color"
               (click)="onColorBoxClick($event, color)"
               >
               <div class="color-swatch" [style.background]="color"></div>
               <div class="color-name">{{ getColorName(color) }}</div>
-            </div>
+            </button>
           }
         </div>
       }
@@ -49,13 +53,15 @@
       @if (activeTab === 'gradient') {
         <div class="gradient-grid">
           @for (color of filteredGradientColors; track color) {
-            <div
+            <button type="button"
               class="gradient-box"
+              [attr.aria-label]="'Show color formats for ' + color"
+              [attr.aria-pressed]="selectedColor === color"
               (click)="onColorBoxClick($event, color)"
               >
               <div class="gradient-swatch" [style.background]="color"></div>
               <div class="gradient-name">Gradient</div>
-            </div>
+            </button>
           }
         </div>
       }
@@ -79,13 +85,13 @@
         [style.border-color]="selectedColor">
         <div class="format-header">
           <h3>{{ getColorName(selectedColor) }}</h3>
-          <button class="close-button" (click)="selectedColor = null">&times;</button>
+          <button type="button" class="close-button" aria-label="Close color formats" (click)="selectedColor = null">&times;</button>
         </div>
         <div class="format-content">
           <div class="format-row">
             <span class="format-label">CSS:</span>
             <span class="format-value">{{ selectedColor }}</span>
-            <button class="copy-button" (click)="copyToClipboard(selectedColor)">
+            <button type="button" class="copy-button" aria-label="Copy CSS color value" (click)="copyToClipboard(selectedColor)">
               <svg viewBox="0 0 24 24" width="16" height="16">
                 <path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/>
               </svg>
@@ -95,7 +101,7 @@
             <div class="format-row">
               <span class="format-label">RGB:</span>
               <span class="format-value">{{ colorFormats[selectedColor]?.rgb }}</span>
-              <button class="copy-button" (click)="copyToClipboard(colorFormats[selectedColor]?.rgb || '')">
+              <button type="button" class="copy-button" aria-label="Copy RGB color value" (click)="copyToClipboard(colorFormats[selectedColor]?.rgb || '')">
                 <svg viewBox="0 0 24 24" width="16" height="16">
                   <path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/>
                 </svg>
@@ -106,7 +112,7 @@
             <div class="format-row">
               <span class="format-label">HEX:</span>
               <span class="format-value">{{ colorFormats[selectedColor]?.hex }}</span>
-              <button class="copy-button" (click)="copyToClipboard(colorFormats[selectedColor]?.hex || '')">
+              <button type="button" class="copy-button" aria-label="Copy HEX color value" (click)="copyToClipboard(colorFormats[selectedColor]?.hex || '')">
                 <svg viewBox="0 0 24 24" width="16" height="16">
                   <path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/>
                 </svg>

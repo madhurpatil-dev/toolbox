@@ -94,6 +94,14 @@
 }
 
 .color-box, .gradient-box {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid #e7eaf0;
+  background: white;
+  color: #172033;
+  font: inherit;
+  text-align: inherit;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);

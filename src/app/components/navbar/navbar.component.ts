@@ -1,6 +1,8 @@
-import { Location } from '@angular/common';
-import { Component, DoCheck, HostListener, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, DestroyRef, HostListener, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
     selector: 'app-navbar',
@@ -8,19 +10,28 @@ import { Router } from '@angular/router';
     styleUrls: ['./navbar.component.css'],
     standalone: false
 })
-export class NavbarComponent implements OnInit, DoCheck {
+export class NavbarComponent implements OnInit {
   isMenuOpen = false;
   isToolsOpen = false;
   isToolPage = false;
 
-  constructor(private router: Router, private location: Location) {}
+  constructor(
+    private router: Router,
+    private destroyRef: DestroyRef,
+    public themeService: ThemeService,
+  ) {}
 
   ngOnInit(): void {
     this.checkScreenSize();
-  }
-
-  ngDoCheck(): void {
-    this.isToolPage = window.location.pathname !== '/';
+    this.isToolPage = this.router.url !== '/';
+    this.router.events
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(() => {
+        this.isToolPage = this.router.url !== '/';
+      });
   }
 
   toggleMenu(): void {
@@ -58,10 +69,6 @@ export class NavbarComponent implements OnInit, DoCheck {
 
   goBack(): void {
     this.closeAll();
-    if (window.history.length > 1) {
-      this.location.back();
-      return;
-    }
     this.router.navigateByUrl('/');
   }
 

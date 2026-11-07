@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
+import { Component, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
 
 @Component({
     selector: 'app-root',
@@ -7,15 +8,21 @@ import { NavigationEnd, Router } from '@angular/router';
     styleUrl: './app.component.css',
     standalone: false
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'toolsproject';
+  isNavigating = false;
 
-  constructor(private router: Router) {}
-
-  ngOnInit() {
-    this.router.events.subscribe(event => {
+  constructor(private router: Router, destroyRef: DestroyRef) {
+    this.router.events.pipe(takeUntilDestroyed(destroyRef)).subscribe(event => {
+      if (event instanceof NavigationStart) {
+        this.isNavigating = true;
+      }
       if (event instanceof NavigationEnd) {
+        this.isNavigating = false;
         window.scrollTo(0, 0);
+      }
+      if (event instanceof NavigationCancel || event instanceof NavigationError) {
+        this.isNavigating = false;
       }
     });
   }

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AppModule } from '../../app.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AgeCalculatorComponent } from './age-calculator.component';
+import { ToolsModule } from '../../tools.module';
 
 describe('AgeCalculatorComponent', () => {
   let component: AgeCalculatorComponent;
@@ -8,7 +9,7 @@ describe('AgeCalculatorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AppModule]
+      imports: [BrowserAnimationsModule, ToolsModule]
     })
     .compileComponents();
 
@@ -19,5 +20,14 @@ describe('AgeCalculatorComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('clears its timer when the screen is destroyed', () => {
+    const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval');
+
+    fixture.destroy();
+
+    expect(clearIntervalSpy).toHaveBeenCalled();
+    clearIntervalSpy.mockRestore();
   });
 });

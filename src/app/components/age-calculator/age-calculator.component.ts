@@ -1,6 +1,7 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, OnDestroy } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-age-calculator',
@@ -19,15 +20,16 @@ export class AgeCalculatorComponent implements OnDestroy {
   showResults: boolean = false;
   currentTime: Date = new Date();
   showCelebration: boolean = false;
+  private refreshInterval?: ReturnType<typeof setInterval>;
+  private breakpointSubscription?: Subscription;
 
   ngOnInit(): void {
-    this.breakpointObserver.observe([Breakpoints.Large, Breakpoints.XLarge])
+    this.breakpointSubscription = this.breakpointObserver.observe([Breakpoints.Large, Breakpoints.XLarge])
       .subscribe(result => {
         this.isLargeScreen = result.matches;
       });
     
-    // Update current time every second
-    setInterval(() => {
+    this.refreshInterval = setInterval(() => {
       this.currentTime = new Date();
       if (this.birthDate) {
         this.calculateAge();
@@ -86,6 +88,7 @@ export class AgeCalculatorComponent implements OnDestroy {
   }
 
   ngOnDestroy() {
-    // Clear any intervals if needed
+    if (this.refreshInterval) clearInterval(this.refreshInterval);
+    this.breakpointSubscription?.unsubscribe();
   }
 }

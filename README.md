@@ -1,10 +1,12 @@
-# Toolsproject
+# Toolbox
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.6.
+Toolbox is a responsive collection of calculators, converters, and world-data utilities for everyday use.
+
+The application uses Angular 22, TypeScript, Angular Material, and RxJS. Unit tests run with Vitest.
 
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Run `npm start` for a dev server. Navigate to `http://localhost:4200/`. The application automatically reloads when source files change. Use Node.js 22.15.1 or later.
 
 ## Code scaffolding
 
@@ -12,11 +14,11 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Run `npm run build` to build the project. Build artifacts are stored in `dist/`.
 
 ## Running unit tests
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Run `npm test` to execute the Vitest unit tests.
 
 ## Running end-to-end tests
 

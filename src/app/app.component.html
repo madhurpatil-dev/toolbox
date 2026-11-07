@@ -1,5 +1,13 @@
 <div class="app-frame">
   <app-navbar></app-navbar>
-  <main class="app-main" id="main-content"><router-outlet></router-outlet></main>
+  <main class="app-main" id="main-content" tabindex="-1">
+    @if (isNavigating) {
+      <div class="route-progress" role="status" aria-live="polite">
+        <span class="route-progress-bar"></span>
+        <span class="visually-hidden">Loading tool</span>
+      </div>
+    }
+    <router-outlet></router-outlet>
+  </main>
   <app-footer></app-footer>
 </div>

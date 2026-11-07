@@ -175,7 +175,7 @@
         </div>
         <div class="combinations-grid">
           @for (combo of fontCombinations; track combo) {
-            <div class="combination-card" (click)="applyFontCombination(combo.heading, combo.body)">
+            <div class="combination-card">
               <div class="combination-header">
                 <h3 [style.font-family]="combo.heading">{{ combo.name }}</h3>
               </div>
@@ -190,7 +190,7 @@
                 </div>
               </div>
               <div class="combination-footer">
-                <button mat-button color="primary">Use this pairing</button>
+                <button type="button" mat-button color="primary" (click)="applyFontCombination(combo.heading, combo.body)">Use this pairing</button>
               </div>
             </div>
           }
