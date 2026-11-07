@@ -25,6 +25,7 @@ export class WeatherComponent implements OnInit, AfterViewInit {
   selectedCity: string = '';
   weatherData: any = null;
   error: string = '';
+  cityLookupMessage: string = '';
   isDarkMode: boolean = false;
   weatherDetails: any[] = [];
 
@@ -95,6 +96,7 @@ export class WeatherComponent implements OnInit, AfterViewInit {
     this.selectedCity = '';
     this.clearWeatherData();
     this.error = '';
+    this.cityLookupMessage = '';
 
     if (!this.selectedCountry) {
       this.cdr.detectChanges();
@@ -110,6 +112,10 @@ export class WeatherComponent implements OnInit, AfterViewInit {
           : [];
 
         this.cities = cityList.sort((a: string, b: string) => a.localeCompare(b));
+        if (this.cities.length === 0) {
+          this.cityLookupMessage =
+            'City data is unavailable for this country. Please choose another country.';
+        }
         this.cdr.detectChanges();
       },
       () => {

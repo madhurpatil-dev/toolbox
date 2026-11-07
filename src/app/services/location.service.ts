@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -39,6 +39,13 @@ export class LocationService {
         ...response,
         data: Array.isArray(response?.data) ? response.data : [],
       })),
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 404) {
+          return of({ data: [] });
+        }
+
+        return throwError(() => error);
+      }),
     );
   }
 }

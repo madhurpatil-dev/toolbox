@@ -22,7 +22,7 @@
             <mat-label>City</mat-label>
             <mat-select
               [(ngModel)]="selectedCity"
-              [disabled]="!selectedCountry"
+              [disabled]="!selectedCountry || !cities.length"
               (selectionChange)="onCityChange()"
               aria-label="Select city">
               <mat-option [value]="" disabled>Select a city</mat-option>
@@ -51,6 +51,10 @@
           <mat-icon>close</mat-icon>
         </button>
       </div>
+    }
+
+    @if (cityLookupMessage) {
+      <p class="city-lookup-message" role="status">{{ cityLookupMessage }}</p>
     }
 
     @if (weatherData) {

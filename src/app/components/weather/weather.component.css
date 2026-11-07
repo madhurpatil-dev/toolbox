@@ -181,6 +181,15 @@
   align-self: flex-start;
 }
 
+.city-lookup-message {
+  margin: 0 0 16px;
+  color: #5f6368;
+}
+
+.weather-container.dark-mode .city-lookup-message {
+  color: rgba(255, 255, 255, 0.7);
+}
+
 .weather-data {
   margin-top: 32px;
   animation: fadeIn 0.5s ease;
