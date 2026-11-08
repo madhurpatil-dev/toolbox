@@ -1,4 +1,4 @@
-import { evaluateArithmeticExpression } from './calculator.component';
+import { evaluateArithmeticExpression } from './arithmetic-expression';
 
 describe('evaluateArithmeticExpression', () => {
   it('respects standard operator precedence and parentheses', () => {
