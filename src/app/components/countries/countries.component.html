@@ -43,13 +43,12 @@
     } @else if (countries.length) {
       <section class="dashboard" aria-live="polite" [attr.aria-busy]="isCountryDetailsLoading">
         @if (isCountryDetailsLoading) {
-          <section class="loading-section" aria-live="polite" aria-busy="true">
-            <p class="loading-label">Loading country profile...</p>
-            <app-skeleton-loader></app-skeleton-loader>
-          </section>
-        } @else if (errorMessage) {
+          <p class="loading-label" role="status">Updating country details...</p>
+        }
+        @if (errorMessage) {
           <app-error-state [message]="errorMessage" (retry)="fetchCountryPopulation()"></app-error-state>
-        } @else if (selectedCountryCode && countryPopulation !== undefined) {
+        }
+        @if (selectedCountryCode && countryPopulation !== undefined) {
           <section class="profile-panel" aria-label="Selected country">
             <app-country-card
               [name]="selectedCountryName"
@@ -132,7 +131,7 @@
               </div>
             </section>
           }
-        } @else {
+        } @else if (!errorMessage) {
           <app-empty-state></app-empty-state>
         }
       </section>

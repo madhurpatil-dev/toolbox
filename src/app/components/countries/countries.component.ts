@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { A11yModule } from '@angular/cdk/a11y';
@@ -74,6 +74,7 @@ export class CountriesComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     public themeService: ThemeService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
@@ -81,6 +82,7 @@ export class CountriesComponent implements OnInit, OnDestroy {
     this.queryParamSubscription = this.route.queryParamMap.subscribe((params) => {
       this.requestedCountryCode = params.get('country')?.toUpperCase() ?? '';
       this.selectSharedCountry();
+      this.cdr.markForCheck();
     });
     this.loadCountries();
   }
@@ -100,14 +102,17 @@ export class CountriesComponent implements OnInit, OnDestroy {
     this.countryService.getAllCountries().pipe(
       finalize(() => {
         this.isCountriesLoading = false;
+        this.cdr.markForCheck();
       }),
     ).subscribe(
       (countries) => {
         this.countries = countries;
         this.selectSharedCountry();
+        this.cdr.markForCheck();
       },
       (error) => {
         this.errorMessage = 'Error fetching countries. Please try again.';
+        this.cdr.markForCheck();
       },
     );
   }
@@ -233,7 +238,13 @@ export class CountriesComponent implements OnInit, OnDestroy {
       this.countryPopulation = selectedCountry.population;
       this.additionalInfo = selectedCountry;
       this.isCountryDetailsLoading = false;
+      this.errorMessage = undefined;
+    } else {
+      this.selectedCountryName = '';
+      this.countryPopulation = undefined;
+      this.additionalInfo = {};
     }
+    this.cdr.markForCheck();
     this.fetchCountryPopulation();
   }
 
@@ -353,6 +364,8 @@ export class CountriesComponent implements OnInit, OnDestroy {
     const requestedCode = this.selectedCountryCode;
     this.showChart = false;
     this.isCountryDetailsLoading = true;
+    this.errorMessage = undefined;
+    this.cdr.markForCheck();
 
     const selectedCountry = this.countries.find(
       (country) => country.codes?.alpha_2 === requestedCode,
@@ -361,6 +374,7 @@ export class CountriesComponent implements OnInit, OnDestroy {
     if (!selectedCountry) {
       this.errorMessage = 'Country not found. Please try again.';
       this.isCountryDetailsLoading = false;
+      this.cdr.markForCheck();
       return;
     }
 
@@ -371,22 +385,29 @@ export class CountriesComponent implements OnInit, OnDestroy {
 
     this.countryService.getCountryByCode(requestedCode).pipe(
       finalize(() => {
-        if (requestId === this.detailRequestId) this.isCountryDetailsLoading = false;
+        if (requestId === this.detailRequestId) {
+          this.isCountryDetailsLoading = false;
+          this.cdr.markForCheck();
+        }
       }),
     ).subscribe(
       (fullDetails) => {
         if (requestId !== this.detailRequestId) return;
         this.countryPopulation = fullDetails.population;
         this.additionalInfo = fullDetails;
+        this.cdr.markForCheck();
 
         setTimeout(() => {
+          if (requestId !== this.detailRequestId) return;
           this.renderChart();
           this.showChart = true;
+          this.cdr.markForCheck();
         }, 0);
       },
       (error) => {
         if (requestId !== this.detailRequestId) return;
         this.errorMessage = 'Error fetching country details.';
+        this.cdr.markForCheck();
       },
     );
   }

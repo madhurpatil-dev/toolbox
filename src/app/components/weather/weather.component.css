@@ -190,6 +190,54 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
+.loading-message {
+  margin: 12px 0;
+  color: #3f51b5;
+  font-weight: 500;
+}
+
+.unit-toggle {
+  border: 1px solid rgba(63, 81, 181, 0.3);
+  border-radius: 16px;
+  padding: 4px 10px;
+  background: transparent;
+  color: #3f51b5;
+  cursor: pointer;
+}
+
+.forecast-section {
+  margin: 32px 0;
+}
+
+.forecast-section h3 {
+  margin: 0 0 12px;
+  color: #3f51b5;
+}
+
+.forecast-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.forecast-day {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid rgba(63, 81, 181, 0.12);
+  border-radius: 10px;
+  background: rgba(63, 81, 181, 0.04);
+}
+
+.forecast-day h4,
+.forecast-day p {
+  margin: 0;
+}
+
+.forecast-day small {
+  color: #5f6368;
+}
+
 .weather-data {
   margin-top: 32px;
   animation: fadeIn 0.5s ease;

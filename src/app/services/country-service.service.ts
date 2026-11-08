@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { forkJoin, Observable, of } from 'rxjs';
+import { forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, map, shareReplay, tap } from 'rxjs/operators';
 
 @Injectable({
@@ -99,9 +99,13 @@ export class CountryServiceService {
     const url = `${this.BASE_URL}/codes.alpha_2/${normalizedCode}?response_fields=${fields}&api-key=${this.API_KEY}`;
 
     return this.http.get<any>(url).pipe(
-      map((response) => response?.data?.objects?.[0] ?? fallbackDetail),
+      map((response) => {
+        const detail = response?.data?.objects?.[0] ?? fallbackDetail;
+        if (!detail) throw new Error(`No details were returned for country ${normalizedCode}.`);
+        return detail;
+      }),
       tap((detail) => this.countryDetailCache.set(normalizedCode, detail)),
-      catchError(() => of(fallbackDetail)),
+      catchError((error) => fallbackDetail ? of(fallbackDetail) : throwError(() => error)),
     );
   }
 }

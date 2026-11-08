@@ -1,16 +1,22 @@
 import {
   Component,
-  HostListener,
   OnInit,
-  AfterViewInit,
+  OnDestroy,
   ViewChild,
   ElementRef,
   ChangeDetectorRef,
 } from '@angular/core';
 import { finalize } from 'rxjs/operators';
-import { WeatherService } from '../../services/weather.service';
+import { WeatherService, type WeatherData } from '../../services/weather.service';
 import { LocationService } from '../../services/location.service';
-import { Chart, registerables } from 'chart.js';
+import { Chart, registerables, type Chart as ChartInstance } from 'chart.js';
+
+interface WeatherDetail {
+  label: string;
+  value: string;
+  icon: string;
+  iconClass: string;
+}
 
 @Component({
   selector: 'app-weather',
@@ -18,20 +24,25 @@ import { Chart, registerables } from 'chart.js';
   styleUrls: ['./weather.component.css'],
   standalone: false,
 })
-export class WeatherComponent implements OnInit, AfterViewInit {
+export class WeatherComponent implements OnInit, OnDestroy {
   countries: string[] = [];
   cities: string[] = [];
   selectedCountry: string = '';
   selectedCity: string = '';
-  weatherData: any = null;
+  weatherData: WeatherData | null = null;
   error: string = '';
   cityLookupMessage: string = '';
   isDarkMode: boolean = false;
-  weatherDetails: any[] = [];
+  weatherDetails: WeatherDetail[] = [];
+  isCitiesLoading = false;
+  isWeatherLoading = false;
+  temperatureUnit: 'C' | 'F' = 'C';
 
-  chart: any;
+  chart: ChartInstance | null = null;
 
   @ViewChild('weatherChart') weatherChart!: ElementRef;
+  private cityRequestId = 0;
+  private weatherRequestId = 0;
 
   constructor(
     private weatherService: WeatherService,
@@ -46,13 +57,10 @@ export class WeatherComponent implements OnInit, AfterViewInit {
     this.checkDarkModePreference();
   }
 
-  ngAfterViewInit(): void {
-    // Ensure ViewChild is available before chart creation when weather data is loaded.
-  }
-
-  @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
-    // Chart.js handles resize automatically
+  ngOnDestroy(): void {
+    this.cityRequestId++;
+    this.weatherRequestId++;
+    this.chart?.destroy();
   }
 
   private checkDarkModePreference() {
@@ -92,8 +100,10 @@ export class WeatherComponent implements OnInit, AfterViewInit {
   }
 
   onCountryChange(): void {
+    const requestId = ++this.cityRequestId;
     this.cities = [];
     this.selectedCity = '';
+    this.isCitiesLoading = false;
     this.clearWeatherData();
     this.error = '';
     this.cityLookupMessage = '';
@@ -103,10 +113,16 @@ export class WeatherComponent implements OnInit, AfterViewInit {
       return;
     }
 
+    this.isCitiesLoading = true;
     this.locationService.getCities(this.selectedCountry).pipe(
-      finalize(() => this.cdr.detectChanges()),
+      finalize(() => {
+        if (requestId !== this.cityRequestId) return;
+        this.isCitiesLoading = false;
+        this.cdr.detectChanges();
+      }),
     ).subscribe(
       (data: any) => {
+        if (requestId !== this.cityRequestId) return;
         const cityList: string[] = Array.isArray(data?.data)
           ? data.data.map((city: string) => city).filter(Boolean)
           : [];
@@ -119,6 +135,7 @@ export class WeatherComponent implements OnInit, AfterViewInit {
         this.cdr.detectChanges();
       },
       () => {
+        if (requestId !== this.cityRequestId) return;
         this.error =
           'Failed to load cities for the selected country. Please try again.';
         this.cdr.detectChanges();
@@ -137,6 +154,8 @@ export class WeatherComponent implements OnInit, AfterViewInit {
   }
 
   private clearWeatherData(): void {
+    this.weatherRequestId++;
+    this.isWeatherLoading = false;
     this.weatherData = null;
     this.weatherDetails = [];
     if (this.chart) {
@@ -150,18 +169,28 @@ export class WeatherComponent implements OnInit, AfterViewInit {
 
     this.error = '';
     this.clearWeatherData();
+    const requestId = ++this.weatherRequestId;
+    this.isWeatherLoading = true;
     this.cdr.detectChanges();
 
     this.weatherService.getWeather(this.selectedCity).pipe(
-      finalize(() => this.cdr.detectChanges())
+      finalize(() => {
+        if (requestId !== this.weatherRequestId) return;
+        this.isWeatherLoading = false;
+        this.cdr.detectChanges();
+      })
     ).subscribe(
       (data) => {
+        if (requestId !== this.weatherRequestId) return;
         this.weatherData = data;
         this.prepareWeatherDetails();
         this.cdr.detectChanges();
-        Promise.resolve().then(() => this.updateChart());
+        Promise.resolve().then(() => {
+          if (requestId === this.weatherRequestId) this.updateChart();
+        });
       },
       (err) => {
+        if (requestId !== this.weatherRequestId) return;
         this.error = `Failed to load weather data: ${err.message || 'Unknown error'}`;
         this.cdr.detectChanges();
       },
@@ -185,8 +214,14 @@ export class WeatherComponent implements OnInit, AfterViewInit {
         iconClass: 'wind-icon',
       },
       {
+        label: 'Wind Direction',
+        value: this.weatherData.windDirection || 'Unavailable',
+        icon: 'navigation',
+        iconClass: 'wind-icon',
+      },
+      {
         label: 'UV Index',
-        value: this.weatherData.uvIndex,
+        value: `${this.weatherData.uvIndex} (${this.uvRiskLevel})`,
         icon: 'wb_sunny',
         iconClass: 'uv-icon',
       },
@@ -205,24 +240,41 @@ export class WeatherComponent implements OnInit, AfterViewInit {
     ];
   }
 
+  get uvRiskLevel(): string {
+    const index = this.weatherData?.uvIndex ?? 0;
+    if (index < 3) return 'Low';
+    if (index < 6) return 'Moderate';
+    if (index < 8) return 'High';
+    if (index < 11) return 'Very high';
+    return 'Extreme';
+  }
+
+  formatTemperature(celsius: number): number {
+    return Math.round(this.temperatureUnit === 'C' ? celsius : celsius * 9 / 5 + 32);
+  }
+
+  toggleTemperatureUnit(): void {
+    this.temperatureUnit = this.temperatureUnit === 'C' ? 'F' : 'C';
+    this.prepareWeatherDetails();
+    this.updateChart();
+  }
+
   updateChart(): void {
     if (this.weatherData && this.weatherChart) {
-      // Destroy existing chart
-      if (this.chart) {
-        this.chart.destroy();
-      }
+      this.chart?.destroy();
 
       const ctx = this.weatherChart.nativeElement.getContext('2d');
+      if (!ctx) return;
       const data = [
-        this.weatherData.temperature,
-        this.weatherData.feelsLike,
+        this.formatTemperature(this.weatherData.temperature),
+        this.formatTemperature(this.weatherData.feelsLike),
         this.weatherData.humidity,
         this.weatherData.windSpeed,
         this.weatherData.uvIndex,
       ];
       const labels = [
-        'Temperature (°C)',
-        'Feels Like (°C)',
+        `Temperature (°${this.temperatureUnit})`,
+        `Feels Like (°${this.temperatureUnit})`,
         'Humidity (%)',
         'Wind (km/h)',
         'UV Index',

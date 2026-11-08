@@ -118,4 +118,13 @@ describe('CountryServiceService', () => {
       true,
     );
   });
+
+  it('surfaces a detail failure when no fallback exists for a country', async () => {
+    const detailsPromise = firstValueFrom(service.getCountryByCode('ZZ'));
+    httpTestingController.expectOne(
+      (request) => request.urlWithParams.includes('/codes.alpha_2/ZZ'),
+    ).flush('Not Found', { status: 404, statusText: 'Not Found' });
+
+    await expect(detailsPromise).rejects.toThrow();
+  });
 });

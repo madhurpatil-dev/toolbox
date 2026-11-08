@@ -1,8 +1,11 @@
-<div class="weather-container">
+<div class="weather-container" [class.dark-mode]="isDarkMode">
   <div class="card">
     <div class="card-header">
       <div class="header-content">
         <h1 class="title">Weather Forecast</h1>
+        <button mat-icon-button class="theme-toggle" (click)="toggleTheme()" [attr.aria-label]="isDarkMode ? 'Switch to light theme' : 'Switch to dark theme'">
+          <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+        </button>
       </div>
 
       <div class="location-selection">
@@ -33,8 +36,9 @@
             <mat-icon matSuffix>location_city</mat-icon>
           </mat-form-field>
 
-          <button mat-raised-button color="primary" class="get-weather-btn" (click)="getWeather()" [disabled]="!selectedCity" aria-label="Get weather">
-            <mat-icon>search</mat-icon> Get Weather
+          <button mat-raised-button color="primary" class="get-weather-btn" (click)="getWeather()" [disabled]="!selectedCity || isWeatherLoading" aria-label="Get weather">
+            <mat-icon>{{ isWeatherLoading ? 'hourglass_empty' : 'search' }}</mat-icon>
+            {{ isWeatherLoading ? 'Loading...' : 'Get Weather' }}
           </button>
         </div>
       </div>
@@ -57,6 +61,14 @@
       <p class="city-lookup-message" role="status">{{ cityLookupMessage }}</p>
     }
 
+    @if (isCitiesLoading) {
+      <p class="loading-message" role="status" aria-live="polite">Loading cities...</p>
+    }
+
+    @if (isWeatherLoading) {
+      <p class="loading-message" role="status" aria-live="polite">Loading current conditions and forecast...</p>
+    }
+
     @if (weatherData) {
       <div class="weather-data">
         <div class="current-weather">
@@ -65,9 +77,12 @@
           </div>
           <div class="weather-main">
             <h2>{{ selectedCity }}, {{ selectedCountry }}</h2>
-            <div class="temperature">{{ weatherData.temperature }}<span>°C</span></div>
+            <button type="button" class="unit-toggle" (click)="toggleTemperatureUnit()" [attr.aria-label]="'Switch to degrees ' + (temperatureUnit === 'C' ? 'Fahrenheit' : 'Celsius')">
+              °{{ temperatureUnit }} / °{{ temperatureUnit === 'C' ? 'F' : 'C' }}
+            </button>
+            <div class="temperature">{{ formatTemperature(weatherData.temperature) }}<span>°{{ temperatureUnit }}</span></div>
             <div class="description">{{ weatherData.description | titlecase }}</div>
-            <div class="feels-like">Feels like {{ weatherData.feelsLike }}°C</div>
+            <div class="feels-like">Feels like {{ formatTemperature(weatherData.feelsLike) }}°{{ temperatureUnit }}</div>
           </div>
         </div>
         <div class="weather-details">
@@ -83,6 +98,23 @@
             </div>
           }
         </div>
+        @if (weatherData.forecast.length) {
+          <section class="forecast-section" aria-labelledby="forecast-title">
+            <h3 id="forecast-title">Upcoming forecast</h3>
+            <div class="forecast-list">
+              @for (day of weatherData.forecast; track day.date) {
+                <article class="forecast-day">
+                  <h4>{{ day.date | date:'EEE, MMM d' }}</h4>
+                  <p>{{ day.description | titlecase }}</p>
+                  <strong>{{ formatTemperature(day.high) }}° / {{ formatTemperature(day.low) }}°{{ temperatureUnit }}</strong>
+                  @if (day.chanceOfRain !== null) {
+                    <small>Rain chance up to {{ day.chanceOfRain }}%</small>
+                  }
+                </article>
+              }
+            </div>
+          </section>
+        }
         <div class="chart-section">
           <h3>Weather Metrics</h3>
           <div class="chart-container">
@@ -92,7 +124,7 @@
       </div>
     }
 
-    @if (!weatherData && !error) {
+    @if (!weatherData && !error && !isWeatherLoading) {
       <div class="placeholder" aria-hidden="true">
         <div class="placeholder-icon">
           <mat-icon class="large-icon">cloud_queue</mat-icon>

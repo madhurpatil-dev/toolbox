@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { vi } from 'vitest';
 import { CountryServiceService } from '../../services/country-service.service';
 import { ThemeService } from '../../services/theme.service';
@@ -76,6 +76,31 @@ describe('CountriesComponent', () => {
 
     expect(component.comparedCodes).toEqual(['IN', 'US', 'CN']);
     expect(component.comparisonMessage).toContain('up to three');
+  });
+
+  it('shows the selected country summary while its full details load', () => {
+    const detailsRequest = new Subject<any>();
+    vi.mocked(countryService.getCountryByCode).mockReturnValue(detailsRequest);
+    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({
+      matches: false,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }));
+
+    try {
+      component.selectCountry('IN');
+      fixture.detectChanges();
+
+      expect(component.isCountryDetailsLoading).toBe(true);
+      expect(fixture.nativeElement.textContent).toContain('Country IN');
+      expect(fixture.nativeElement.textContent).toContain('1,000');
+    } finally {
+      component.ngOnDestroy();
+      vi.unstubAllGlobals();
+    }
   });
 
   it('selects the active autocomplete option with the keyboard', () => {
