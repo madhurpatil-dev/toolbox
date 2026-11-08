@@ -46,28 +46,24 @@ export class AgeCalculatorComponent implements OnDestroy {
     if (this.birthDate) {
       const today = new Date();
       const birthDate = new Date(this.birthDate);
-      
-      // Calculate years
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const month = today.getMonth() - birthDate.getMonth();
-      
-      if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-      }
-      
-      // Calculate months
-      let months = (today.getFullYear() - birthDate.getFullYear()) * 12;
-      months -= birthDate.getMonth();
-      months += today.getMonth();
-      
-      // Calculate days
+
+      const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const birthDateOnly = new Date(birthDate.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+      const totalMonths = (todayDate.getFullYear() - birthDateOnly.getFullYear()) * 12
+        + todayDate.getMonth() - birthDateOnly.getMonth();
+      const completedMonths = totalMonths - (todayDate.getDate() < birthDateOnly.getDate() ? 1 : 0);
+      const monthAnniversary = this.addMonthsClamped(birthDateOnly, completedMonths);
+      const days = Math.round((
+        Date.UTC(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate())
+        - Date.UTC(monthAnniversary.getFullYear(), monthAnniversary.getMonth(), monthAnniversary.getDate())
+      ) / (1000 * 60 * 60 * 24));
+
       const diffTime = Math.abs(today.getTime() - birthDate.getTime());
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
       
       this.age = {
-        years: age,
-        months: months,
-        days: diffDays,
+        years: Math.floor(completedMonths / 12),
+        months: completedMonths % 12,
+        days,
         hours: Math.floor(diffTime / (1000 * 60 * 60)),
         minutes: Math.floor(diffTime / (1000 * 60)),
         seconds: Math.floor(diffTime / 1000)
@@ -75,6 +71,14 @@ export class AgeCalculatorComponent implements OnDestroy {
       
       this.showResults = true;
     }
+  }
+
+  private addMonthsClamped(date: Date, months: number): Date {
+    const monthIndex = date.getFullYear() * 12 + date.getMonth() + months;
+    const year = Math.floor(monthIndex / 12);
+    const month = monthIndex % 12;
+    const day = Math.min(date.getDate(), new Date(year, month + 1, 0).getDate());
+    return new Date(year, month, day);
   }
 
   toggleCelebration() {

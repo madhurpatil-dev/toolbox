@@ -27,6 +27,7 @@ export class WorldClockComponent implements OnInit, OnDestroy {
 
   private countryChangeSubject = new Subject<string>();
   private intervalId: any; // Store the interval ID
+  private clockDate: Date | null = null;
 
   constructor(
     private worldTimeService: WorldTimeService,
@@ -87,6 +88,8 @@ export class WorldClockComponent implements OnInit, OnDestroy {
     const dateTimeParts = datetime.split('T');
     let timeParts = dateTimeParts[1].split(':');
 
+    const [year, month, day] = dateTimeParts[0].split('-').map(Number);
+    this.clockDate = new Date(Date.UTC(year, month - 1, day));
     this.hours = parseInt(timeParts[0]);
     this.minutes = parseInt(timeParts[1]);
     this.seconds = parseInt(timeParts[2]);
@@ -113,6 +116,9 @@ export class WorldClockComponent implements OnInit, OnDestroy {
       }
       if (this.hours === 24) {
         this.hours = 0;
+        if (this.clockDate) {
+          this.clockDate.setUTCDate(this.clockDate.getUTCDate() + 1);
+        }
       }
       this.cdr.markForCheck(); // Manually trigger change detection
     }, 1000);
@@ -139,12 +145,16 @@ export class WorldClockComponent implements OnInit, OnDestroy {
   }
   
   getCurrentDate(): string {
-    const now = new Date();
-    return now.toLocaleDateString('en-US', { 
+    if (!this.clockDate) {
+      return '';
+    }
+
+    return this.clockDate.toLocaleDateString('en-US', {
       weekday: 'long', 
       year: 'numeric', 
       month: 'long', 
-      day: 'numeric' 
+      day: 'numeric',
+      timeZone: 'UTC'
     });
   }
 

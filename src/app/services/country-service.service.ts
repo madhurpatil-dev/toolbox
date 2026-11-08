@@ -53,8 +53,29 @@ export class CountryServiceService {
 
   getAllCountries(): Observable<any[]> {
     if (!this.countriesCache$) {
-      this.countriesCache$ = of(this.fallbackCountries).pipe(
-        map((countries) => countries.filter(Boolean)),
+      const offsets = [0, 100, 200];
+      const pages = offsets.map((offset) => {
+        const fields = 'names.common,codes.alpha_2,population';
+        const url = `${this.BASE_URL}?response_fields=${fields}&limit=100&offset=${offset}&api-key=${this.API_KEY}`;
+        return this.http.get<any>(url);
+      });
+
+      this.countriesCache$ = forkJoin(pages).pipe(
+        map((responses) =>
+          responses.flatMap((response) =>
+            Array.isArray(response?.data?.objects) ? response.data.objects : [],
+          ),
+        ),
+        map((countries) =>
+          countries.filter(
+            (country) =>
+              Boolean(country?.names?.common) &&
+              Boolean(country?.codes?.alpha_2) &&
+              Number.isFinite(country?.population),
+          ),
+        ),
+        map((countries) => countries.length > 0 ? countries : this.fallbackCountries),
+        catchError(() => of(this.fallbackCountries)),
         shareReplay(1),
       );
     }

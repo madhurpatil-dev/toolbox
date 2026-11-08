@@ -6,7 +6,7 @@ The application uses Angular 22, TypeScript, Angular Material, and RxJS. Unit te
 
 ## Development server
 
-Run `npm start` for a dev server. Navigate to `http://localhost:4200/`. The application automatically reloads when source files change. Use Node.js 22.15.1 or later.
+Use Node.js 26.13.0 or later. Run `npm start` for a dev server and navigate to `http://localhost:4200/`. The application automatically reloads when source files change.
 
 ## Code scaffolding
 

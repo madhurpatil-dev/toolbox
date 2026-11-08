@@ -1,32 +1,117 @@
-<section class="home-container">
-  <div class="hero">
-    <div class="hero-copy"><p class="eyebrow"><span class="material-icons">auto_awesome</span> Everyday utility suite</p><h1>Useful tools, <em>without the clutter.</em></h1><p class="subtitle">A focused collection of calculators, world data, and conversion tools—built to help you get answers quickly.</p></div>
-    <div class="hero-stat"><span class="material-icons">grid_view</span><strong>{{ allServices.length }}</strong><span>tools in one place</span></div>
-  </div>
-  <div class="section-heading"><div><p class="eyebrow">Tool library</p><h2>Choose a starting point</h2></div><span class="result-count" aria-live="polite">{{ filteredServices.length }} of {{ allServices.length }} tools</span></div>
-  <div class="tool-search">
-    <label for="tool-search">Find a tool</label>
-    <div class="tool-search-field">
-      <span class="material-icons" aria-hidden="true">search</span>
-      <input #toolSearch id="tool-search" type="search" autocomplete="off" placeholder="Search calculators, converters, and more" aria-keyshortcuts="Control+K Meta+K" (input)="onSearchInput($event)">
-      @if (searchTerm) {
-        <button type="button" class="clear-search" aria-label="Clear tool search" (click)="clearSearch()">×</button>
-      }
+<section class="home-container" aria-labelledby="home-title">
+  <header class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="material-icons" aria-hidden="true">auto_awesome</span> Your everyday toolkit</p>
+      <h1 id="home-title">Less busywork.<br><em>More getting done.</em></h1>
+      <p class="subtitle">Handy calculators, converters, and world tools, all together and ready when you need them.</p>
+      <a class="hero-action" href="#tool-library">Explore the tools <span class="material-icons" aria-hidden="true">arrow_downward</span></a>
     </div>
-    <span class="search-hint"><kbd>Ctrl</kbd>/<kbd>⌘</kbd> <kbd>K</kbd> to focus search</span>
-  </div>
-  @if (filteredServices.length > 0) {
-    <div class="services-grid">
-      @for (service of filteredServices; track service.route) {
-        <a class="service-card" [routerLink]="service.route" [style.--card-color]="service.color"><div class="card-icon"><img [src]="service.image" alt="" loading="lazy" decoding="async"></div><div class="card-content"><h3>{{ service.title }}</h3><p>{{ service.description }}</p></div><div class="card-footer"><span>Open tool</span><span class="material-icons" aria-hidden="true">arrow_forward</span></div></a>
-      }
+    <div class="hero-card" aria-label="{{ allServices.length }} free tools">
+      <span class="hero-card-icon material-icons" aria-hidden="true">grid_view</span>
+      <strong>{{ allServices.length }}</strong>
+      <span>free tools, one simple place</span>
+      <div class="hero-card-divider"></div>
+      <span class="hero-card-note"><span class="material-icons" aria-hidden="true">bookmark</span> Save favorites for next time</span>
     </div>
-  } @else {
-    <div class="tool-empty-state" role="status">
-      <span class="material-icons" aria-hidden="true">search_off</span>
-      <h3>No matching tools</h3>
-      <p>Try a different search, or clear the current query.</p>
-      <button type="button" (click)="clearSearch()">Clear search</button>
+  </header>
+
+  <section class="library" id="tool-library" aria-labelledby="library-title">
+    <div class="library-heading">
+      <div>
+        <p class="eyebrow">Tool library</p>
+        <h2 id="library-title">What can we help with?</h2>
+      </div>
+      <span class="result-count" aria-live="polite">{{ filteredServices.length }} {{ filteredServices.length === 1 ? 'tool' : 'tools' }}</span>
     </div>
-  }
+
+    <div class="tool-search">
+      <label class="visually-hidden" for="tool-search">Search the tool library</label>
+      <div class="tool-search-field">
+        <span class="material-icons" aria-hidden="true">search</span>
+        <input
+          #toolSearch
+          id="tool-search"
+          type="search"
+          autocomplete="off"
+          placeholder="Search calculators, colors, countries…"
+          aria-keyshortcuts="Control+K Meta+K /"
+          (input)="onSearchInput($event)">
+        @if (searchTerm) {
+          <button type="button" class="clear-search" aria-label="Clear tool search" (click)="clearSearch()">×</button>
+        }
+      </div>
+      <span class="search-hint"><kbd>⌘</kbd>/<kbd>Ctrl</kbd> <kbd>K</kbd> or <kbd>/</kbd></span>
+    </div>
+
+    <div class="catalog-controls">
+      <div class="view-filters" role="group" aria-label="Filter tools">
+        <button type="button" [class.active]="activeView === 'all'" [attr.aria-pressed]="activeView === 'all'" (click)="activeView = 'all'">
+          All tools <span>{{ allServices.length }}</span>
+        </button>
+        <button type="button" [class.active]="activeView === 'favorites'" [attr.aria-pressed]="activeView === 'favorites'" (click)="activeView = 'favorites'">
+          <span class="material-icons" aria-hidden="true">bookmark</span> Favorites <span>{{ favoriteCount }}</span>
+        </button>
+        <button type="button" [class.active]="activeView === 'recent'" [attr.aria-pressed]="activeView === 'recent'" (click)="activeView = 'recent'">
+          <span class="material-icons" aria-hidden="true">history</span> Recently used <span>{{ recentCount }}</span>
+        </button>
+      </div>
+      <div class="category-filters" role="group" aria-label="Filter by category">
+        @for (category of categories; track category) {
+          <button type="button" [class.active]="activeCategory === category" [attr.aria-pressed]="activeCategory === category" (click)="activeCategory = category">
+            {{ category }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (activeView === 'recent' && recentCount > 0) {
+      <button class="clear-recent" type="button" (click)="preferences.clearRecentTools()">Clear history</button>
+    }
+
+    @if (filteredServices.length > 0) {
+      <div class="services-grid">
+        @for (service of filteredServices; track service.route) {
+          <article class="service-card" [style.--card-color]="service.color">
+            <a class="service-card-link" [routerLink]="service.route" [attr.aria-label]="'Open ' + service.title">
+              <div class="card-topline">
+                <span class="card-icon"><img [src]="service.image" alt="" loading="lazy" decoding="async"></span>
+                <span class="category-label">{{ service.category }}</span>
+              </div>
+              <div class="card-content">
+                <h3>{{ service.title }}</h3>
+                <p>{{ service.description }}</p>
+              </div>
+              <div class="card-footer"><span>Open tool</span><span class="material-icons" aria-hidden="true">arrow_forward</span></div>
+            </a>
+            <button
+              type="button"
+              class="favorite-toggle"
+              [class.is-favorite]="preferences.isFavorite(service.route)"
+              [attr.aria-pressed]="preferences.isFavorite(service.route)"
+              [attr.aria-label]="preferences.isFavorite(service.route) ? 'Remove ' + service.title + ' from favorites' : 'Add ' + service.title + ' to favorites'"
+              (click)="toggleFavorite($event, service.route)">
+              <span class="material-icons" aria-hidden="true">{{ preferences.isFavorite(service.route) ? 'bookmark' : 'bookmark_border' }}</span>
+            </button>
+          </article>
+        }
+      </div>
+    } @else {
+      <div class="tool-empty-state" role="status">
+        <span class="material-icons" aria-hidden="true">{{ activeView === 'favorites' ? 'bookmark_border' : activeView === 'recent' ? 'history' : 'search_off' }}</span>
+        <h3>{{ activeView === 'favorites' ? 'No favorites yet' : activeView === 'recent' ? 'No recently used tools' : 'No matching tools' }}</h3>
+        <p>
+          @if (activeView === 'favorites') {
+            Save a tool with its bookmark button and it’ll be waiting here next time.
+          } @else if (activeView === 'recent') {
+            Tools you open will show up here for quick access.
+          } @else {
+            Try a different search or category.
+          }
+        </p>
+        @if (activeView !== 'all' || activeCategory !== 'All' || searchTerm) {
+          <button type="button" (click)="clearFilters()">Show all tools</button>
+        }
+      </div>
+    }
+  </section>
 </section>

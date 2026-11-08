@@ -4,7 +4,7 @@
     <a class="brand-v2" routerLink="/" (click)="closeAll()" aria-label="Toolbox home"><span class="brand-mark">T</span><span>Toolbox</span></a>
     <button *ngIf="isToolPage" class="back-button" type="button" (click)="goBack()" aria-label="Return to all tools"><span class="material-icons">arrow_back</span><span>Back to tools</span></button>
     <button class="theme-toggle-v2" type="button" [attr.aria-pressed]="themeService.isDark" [attr.aria-label]="themeService.isDark ? 'Switch to light theme' : 'Switch to dark theme'" (click)="themeService.toggle()"><span class="material-icons" aria-hidden="true">{{ themeService.isDark ? 'light_mode' : 'dark_mode' }}</span><span>{{ themeService.isDark ? 'Light' : 'Dark' }}</span></button>
-    <button class="menu-toggle-v2" (click)="toggleMenu()" [attr.aria-expanded]="isMenuOpen" aria-controls="primary-menu" aria-label="Toggle navigation"><span class="menu-icon-v2" [class.open]="isMenuOpen"></span></button>
+    <button class="menu-toggle-v2" type="button" (click)="toggleMenu()" [attr.aria-expanded]="isMenuOpen" aria-controls="primary-menu" [attr.aria-label]="isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'"><span class="menu-icon-v2" [class.open]="isMenuOpen"></span></button>
     <div class="nav-links-v2" id="primary-menu" [class.open]="isMenuOpen">
       <a routerLink="/" routerLinkActive="router-link-active" [routerLinkActiveOptions]="{exact: true}" (click)="closeAll()">All tools</a>
       <div class="tools-menu">

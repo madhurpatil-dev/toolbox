@@ -31,6 +31,7 @@ export class NavbarComponent implements OnInit {
       )
       .subscribe(() => {
         this.isToolPage = this.router.url !== '/';
+        this.closeAll();
       });
   }
 
@@ -51,8 +52,11 @@ export class NavbarComponent implements OnInit {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const target = event.target;
-    if (target instanceof Element && !target.closest('.tools-menu')) {
-      this.isToolsOpen = false;
+    if (target instanceof Element) {
+      if (!target.closest('.tools-menu')) this.isToolsOpen = false;
+      if (!target.closest('#primary-menu') && !target.closest('.menu-toggle-v2')) {
+        this.closeAll();
+      }
     }
   }
 
