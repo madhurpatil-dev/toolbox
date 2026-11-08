@@ -6,6 +6,7 @@ import {
   ElementRef,
   ChangeDetectorRef,
 } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { WeatherService, type WeatherData } from '../../services/weather.service';
 import { LocationService } from '../../services/location.service';
@@ -29,6 +30,8 @@ export class WeatherComponent implements OnInit, OnDestroy {
   cities: string[] = [];
   selectedCountry: string = '';
   selectedCity: string = '';
+  readonly countrySearchControl = new FormControl('', { nonNullable: true });
+  readonly citySearchControl = new FormControl('', { nonNullable: true });
   weatherData: WeatherData | null = null;
   error: string = '';
   cityLookupMessage: string = '';
@@ -61,6 +64,16 @@ export class WeatherComponent implements OnInit, OnDestroy {
     this.cityRequestId++;
     this.weatherRequestId++;
     this.chart?.destroy();
+  }
+
+  get filteredCountries(): string[] {
+    const query = this.countrySearchControl.value.trim().toLocaleLowerCase();
+    return this.countries.filter((country) => country.toLocaleLowerCase().includes(query));
+  }
+
+  get filteredCities(): string[] {
+    const query = this.citySearchControl.value.trim().toLocaleLowerCase();
+    return this.cities.filter((city) => city.toLocaleLowerCase().includes(query));
   }
 
   private checkDarkModePreference() {
@@ -101,6 +114,8 @@ export class WeatherComponent implements OnInit, OnDestroy {
 
   onCountryChange(): void {
     const requestId = ++this.cityRequestId;
+    this.countrySearchControl.setValue('');
+    this.citySearchControl.setValue('');
     this.cities = [];
     this.selectedCity = '';
     this.isCitiesLoading = false;
@@ -144,6 +159,7 @@ export class WeatherComponent implements OnInit, OnDestroy {
   }
 
   onCityChange(): void {
+    this.citySearchControl.setValue('');
     if (!this.selectedCity) {
       this.clearWeatherData();
       this.cdr.detectChanges();

@@ -12,9 +12,16 @@
         <div class="select-container">
           <mat-form-field appearance="outline" class="location-field">
             <mat-label>Country</mat-label>
-            <mat-select [(ngModel)]="selectedCountry" (selectionChange)="onCountryChange()" aria-label="Select country">
-              <mat-option [value]="" disabled>Select a country</mat-option>
-              @for (country of countries; track country) {
+            <mat-select [(ngModel)]="selectedCountry" (selectionChange)="onCountryChange()" aria-label="Select country" panelClass="weather-select-panel">
+              <mat-option>
+                <ngx-mat-select-search
+                  [formControl]="countrySearchControl"
+                  placeholderLabel="Search countries..."
+                  noEntriesFoundLabel="No countries found"
+                  ariaLabel="Search countries"
+                ></ngx-mat-select-search>
+              </mat-option>
+              @for (country of filteredCountries; track country) {
                 <mat-option [value]="country">{{ country }}</mat-option>
               }
             </mat-select>
@@ -25,11 +32,19 @@
             <mat-label>City</mat-label>
             <mat-select
               [(ngModel)]="selectedCity"
-              [disabled]="!selectedCountry || !cities.length"
+              [disabled]="!selectedCountry || !cities.length || isCitiesLoading"
               (selectionChange)="onCityChange()"
-              aria-label="Select city">
-              <mat-option [value]="" disabled>Select a city</mat-option>
-              @for (city of cities; track city) {
+              aria-label="Select city"
+              panelClass="weather-select-panel">
+              <mat-option>
+                <ngx-mat-select-search
+                  [formControl]="citySearchControl"
+                  placeholderLabel="Search cities..."
+                  noEntriesFoundLabel="No cities found"
+                  ariaLabel="Search cities"
+                ></ngx-mat-select-search>
+              </mat-option>
+              @for (city of filteredCities; track city) {
                 <mat-option [value]="city">{{ city }}</mat-option>
               }
             </mat-select>

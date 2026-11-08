@@ -1,5 +1,6 @@
-import { WeatherComponent } from './weather.component';
+import { FormControl } from '@angular/forms';
 import type { WeatherData } from '../../services/weather.service';
+import { WeatherComponent } from './weather.component';
 
 describe('WeatherComponent', () => {
   let component: WeatherComponent;
@@ -8,6 +9,10 @@ describe('WeatherComponent', () => {
     component = Object.create(WeatherComponent.prototype);
     component.temperatureUnit = 'C';
     component.weatherDetails = [];
+    Object.defineProperties(component, {
+      countrySearchControl: { value: new FormControl('', { nonNullable: true }) },
+      citySearchControl: { value: new FormControl('', { nonNullable: true }) },
+    });
     component.weatherData = {
       temperature: 20,
       feelsLike: 19,
@@ -36,5 +41,15 @@ describe('WeatherComponent', () => {
     expect(component.uvRiskLevel).toBe('High');
     component.weatherData!.uvIndex = 9;
     expect(component.uvRiskLevel).toBe('Very high');
+  });
+
+  it('filters countries and cities by a case-insensitive search term', () => {
+    component.countries = ['Canada', 'India', 'United States'];
+    component.cities = ['New Delhi', 'New York', 'Toronto'];
+    component.countrySearchControl.setValue('  INd ');
+    component.citySearchControl.setValue('new');
+
+    expect(component.filteredCountries).toEqual(['India']);
+    expect(component.filteredCities).toEqual(['New Delhi', 'New York']);
   });
 });
