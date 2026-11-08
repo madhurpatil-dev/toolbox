@@ -22,12 +22,15 @@
                 (selectionChange)="onCountrySelected()"
                 panelClass="custom-select-panel"
                 >
-                <mat-option value="" disabled>
-                  <div class="select-placeholder">
-                    <span>Search for a country</span>
-                  </div>
+                <mat-option>
+                  <ngx-mat-select-search
+                    [formControl]="countrySearchControl"
+                    placeholderLabel="Search countries..."
+                    noEntriesFoundLabel="No countries found"
+                    ariaLabel="Search countries"
+                  ></ngx-mat-select-search>
                 </mat-option>
-                @for (country of countries; track country) {
+                @for (country of filteredCountries; track country.value) {
                   <mat-option [value]="country.value">
                     <div class="country-option">
                       <span class="country-name">{{ country.display }}</span>

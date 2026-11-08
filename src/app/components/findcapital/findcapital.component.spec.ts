@@ -17,7 +17,7 @@ describe('FindcapitalComponent', () => {
       { findCapital: vi.fn().mockReturnValue(of(null)), fetchCountryNames: vi.fn().mockReturnValue(of([])) } as any,
       { observe: vi.fn().mockReturnValue(of({ breakpoints: {} })) } as any,
       { open: vi.fn() } as any,
-      { markForCheck: vi.fn() } as any,
+      { markForCheck: vi.fn(), detectChanges: vi.fn() } as any,
     );
   });
 
@@ -37,5 +37,16 @@ describe('FindcapitalComponent', () => {
     expect(component.countryInfo).toBeNull();
     expect(component.error).toBe('');
     expect(component.showResults).toBe(false);
+  });
+
+  it('filters countries without changing the capital search selection flow', () => {
+    component.countryNames = ['Canada', 'India', 'United States'];
+    component.countrySearchControl.setValue('  ind ');
+
+    expect(component.filteredCountryNames).toEqual(['India']);
+
+    component.onCountrySelected('India');
+    expect(component.selectedCountry).toBe('India');
+    expect(component.countrySearchControl.value).toBe('');
   });
 });

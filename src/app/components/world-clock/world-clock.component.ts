@@ -4,6 +4,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { WorldTimeService } from '../../services/world-service.service';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { FormControl } from '@angular/forms';
 
 @Component({
     selector: 'app-world-clock',
@@ -15,6 +16,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 })
 export class WorldClockComponent implements OnInit, OnDestroy {
   countries = countries;
+  readonly countrySearchControl = new FormControl('', { nonNullable: true });
   selectedCountryCode: string = '';
   errorMessage: string = '';
 
@@ -28,6 +30,11 @@ export class WorldClockComponent implements OnInit, OnDestroy {
   private countryChangeSubject = new Subject<string>();
   private intervalId: any; // Store the interval ID
   private clockDate: Date | null = null;
+
+  get filteredCountries(): typeof countries {
+    const query = this.countrySearchControl.value.trim().toLocaleLowerCase();
+    return this.countries.filter((country) => country.name.toLocaleLowerCase().includes(query));
+  }
 
   constructor(
     private worldTimeService: WorldTimeService,
@@ -57,6 +64,7 @@ export class WorldClockComponent implements OnInit, OnDestroy {
   }
 
   onCountryChange() {
+    this.countrySearchControl.setValue('');
     if (!this.selectedCountryCode) {
       return;
     }

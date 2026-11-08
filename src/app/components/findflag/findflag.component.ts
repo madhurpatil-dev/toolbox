@@ -5,6 +5,7 @@ import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from '
 import { Observable, of, Subject } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { FormControl } from '@angular/forms';
 @Component({
     selector: 'app-findflag',
     templateUrl: './findflag.component.html',
@@ -13,6 +14,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class FindflagComponent implements OnInit {
   selectedCountry: string = '';
+  readonly countrySearchControl = new FormControl('', { nonNullable: true });
   countries: { value: string; display: string }[] = [
     { value: 'Bharat', display: 'India/Bharat' },
     { value: 'United States', display: 'United States' },
@@ -218,6 +220,11 @@ export class FindflagComponent implements OnInit {
   
   private searchTerm$ = new Subject<string>();
 
+  get filteredCountries(): { value: string; display: string }[] {
+    const query = this.countrySearchControl.value.trim().toLocaleLowerCase();
+    return this.countries.filter((country) => country.display.toLocaleLowerCase().includes(query));
+  }
+
   constructor(
     private http: HttpClient,
     private breakpointObserver: BreakpointObserver,
@@ -288,6 +295,7 @@ export class FindflagComponent implements OnInit {
   }
 
   onCountrySelected(): void {
+    this.countrySearchControl.setValue('');
     if (!this.selectedCountry) {
       this.flagUrl = '';
       this.isLoading = false;

@@ -23,4 +23,24 @@ describe('WorldClockComponent', () => {
     expect(component.getCurrentDate()).toBe('Wednesday, January 3, 2024');
     component.ngOnDestroy();
   });
+
+  it('filters locations by country name and clears search after selection', () => {
+    const component = new WorldClockComponent(
+      {} as any,
+      {} as any,
+      { markForCheck: vi.fn() } as any
+    );
+    component.countrySearchControl.setValue('  united ');
+
+    expect(component.filteredCountries.map((country) => country.name)).toEqual([
+      'United States',
+      'United Kingdom',
+      'United Arab Emirates',
+    ]);
+
+    component.selectedCountryCode = 'US';
+    component.onCountryChange();
+    expect(component.countrySearchControl.value).toBe('');
+    component.ngOnDestroy();
+  });
 });

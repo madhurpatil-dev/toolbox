@@ -6,6 +6,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { trigger, transition, style, animate, state, query, stagger } from '@angular/animations';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSelect } from '@angular/material/select';
+import { FormControl } from '@angular/forms';
 import { countries as fallbackCountries } from '../../constants/countries';
 
 @Component({
@@ -48,6 +49,7 @@ export class FindcapitalComponent implements OnInit {
   @ViewChild('countrySelect') countrySelect?: MatSelect;
 
   selectedCountry: string = '';
+  readonly countrySearchControl = new FormControl('', { nonNullable: true });
   capital: string = '';
   error: string = '';
   countryNames: string[] = [];
@@ -65,6 +67,11 @@ export class FindcapitalComponent implements OnInit {
   searchInputFocused: boolean = false;
   
   protected searchTerm$ = new Subject<string>();
+
+  get filteredCountryNames(): string[] {
+    const query = this.countrySearchControl.value.trim().toLocaleLowerCase();
+    return this.countryNames.filter((country) => country.toLocaleLowerCase().includes(query));
+  }
 
   constructor(
     private findCapitalService: FindCapitalService, 
@@ -164,6 +171,7 @@ fetchCountryNames(): void {
     if (country !== undefined) {
       this.selectedCountry = country;
     }
+    this.countrySearchControl.setValue('');
 
     if (!this.selectedCountry) {
       this.resetSearch();
@@ -298,6 +306,7 @@ fetchCountryNames(): void {
   }
 
     resetSearch(): void {
+    this.countrySearchControl.setValue('');
     this.selectedCountry = '';
     this.capital = '';
     this.countryFlag = '';
