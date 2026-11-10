@@ -329,6 +329,40 @@ mat-card {
 :root[data-theme='dark'] .cdk-overlay-pane .mat-calendar-table-header {
   color: var(--ink);
 }
+:root[data-theme='dark'] .cdk-overlay-pane .mat-calendar-body-disabled > .mat-calendar-body-cell-content {
+  color: var(--muted) !important;
+  opacity: .8;
+}
+:root[data-theme='dark'] .cdk-overlay-pane .mat-calendar-body-disabled > .mat-calendar-body-cell-content:hover {
+  background: transparent;
+}
+:root[data-theme='dark'] .cdk-overlay-pane .mat-calendar-table-header th,
+:root[data-theme='dark'] .cdk-overlay-pane .mat-calendar-table-header span,
+:root[data-theme='dark'] .cdk-overlay-pane .mat-calendar-previous-button,
+:root[data-theme='dark'] .cdk-overlay-pane .mat-calendar-next-button {
+  color: var(--muted) !important;
+}
+:root[data-theme='dark'] .cdk-overlay-pane .mat-calendar-period-button {
+  color: var(--ink) !important;
+}
+
+:root[data-theme='dark'] app-world-clock .empty-card {
+  background: var(--surface);
+  border-color: var(--line);
+}
+:root[data-theme='dark'] app-world-clock .empty-card p,
+:root[data-theme='dark'] app-world-clock .example-text,
+:root[data-theme='dark'] app-world-clock .timezone-display,
+:root[data-theme='dark'] app-world-clock .date-display {
+  color: var(--muted);
+}
+:root[data-theme='dark'] app-world-clock .digital-clock {
+  background: var(--surface);
+  color: var(--ink);
+}
+:root[data-theme='dark'] app-world-clock .time-display {
+  color: var(--ink);
+}
 :root .weather-container.dark-mode .title,
 :root .weather-container.dark-mode .loading-message,
 :root .weather-container.dark-mode .forecast-section h3,
