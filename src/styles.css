@@ -2,6 +2,11 @@
   color-scheme: light;
   --ink: #172033;
   --muted: #667085;
+  --text-primary: var(--ink);
+  --text-secondary: var(--muted);
+  --text-disabled: #667085;
+  --theme-text-primary: var(--text-primary);
+  --theme-text-secondary: var(--text-secondary);
   --subtle: #98a2b3;
   --line: #e7eaf0;
   --surface: #ffffff;
@@ -28,8 +33,14 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --ink: #eef2f8;
-  --muted: #aab5c5;
+  --text-primary: #f3f4f6;
+  --text-secondary: #cbd5e1;
+  --text-disabled: #9ca3af;
+  --text-on-action: #ffffff;
+  --theme-text-primary: var(--text-primary);
+  --theme-text-secondary: var(--text-secondary);
+  --ink: var(--text-primary);
+  --muted: var(--text-secondary);
   --subtle: #8491a3;
   --line: #334154;
   --surface: #172131;
@@ -39,6 +50,16 @@
   --brand-soft: #262f4c;
   --success: #8bd6b4;
   --danger: #ffb4a9;
+  --action-basic: #087f5b;
+  --action-basic-hover: #066649;
+  --action-modify: #1d4ed8;
+  --action-modify-hover: #1e40af;
+  --action-encode: #7e22ce;
+  --action-encode-hover: #6b21a8;
+  --action-analyze: #b45309;
+  --action-analyze-hover: #92400e;
+  --action-misc: #475569;
+  --action-misc-hover: #334155;
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, .22);
   --shadow-md: 0 14px 36px rgba(0, 0, 0, .34);
 }
@@ -116,6 +137,22 @@ mat-card {
   background: var(--surface);
   color: var(--ink);
   border-color: var(--line);
+}
+:root[data-theme='dark'] .tools-popover a,
+:root[data-theme='dark'] .nav-links-v2 > a,
+:root[data-theme='dark'] .tools-trigger,
+:root[data-theme='dark'] .back-button {
+  color: var(--text-secondary) !important;
+}
+:root[data-theme='dark'] .tools-popover a:hover,
+:root[data-theme='dark'] .tools-popover a:focus-visible,
+:root[data-theme='dark'] .tools-popover a.router-link-active,
+:root[data-theme='dark'] .tools-popover a[aria-current='page'],
+:root[data-theme='dark'] .nav-links-v2 > a:hover,
+:root[data-theme='dark'] .nav-links-v2 > a.router-link-active,
+:root[data-theme='dark'] .tools-trigger:hover {
+  background: var(--brand-soft);
+  color: var(--text-primary) !important;
 }
 :root[data-theme='dark'] .service-card h3,
 :root[data-theme='dark'] .service-card .card-content,
@@ -203,7 +240,21 @@ mat-card {
   color: var(--ink) !important;
 }
 :root[data-theme='dark'] .mat-mdc-input-element::placeholder {
-  color: var(--muted);
+  color: var(--text-secondary);
+  opacity: 1;
+}
+:root[data-theme='dark'] .mat-mdc-input-element:disabled,
+:root[data-theme='dark'] .mat-mdc-select-disabled .mat-mdc-select-value {
+  color: var(--text-disabled) !important;
+  -webkit-text-fill-color: var(--text-disabled);
+}
+:root[data-theme='dark'] .mat-mdc-button:disabled,
+:root[data-theme='dark'] .mat-mdc-raised-button:disabled,
+:root[data-theme='dark'] .mat-mdc-outlined-button:disabled {
+  --mdc-text-button-label-text-color: var(--text-disabled);
+  --mdc-protected-button-label-text-color: var(--text-disabled);
+  --mdc-outlined-button-label-text-color: var(--text-disabled);
+  color: var(--text-disabled) !important;
   opacity: 1;
 }
 :root[data-theme='dark'] .cdk-overlay-pane .mat-mdc-select-panel,
@@ -220,6 +271,10 @@ mat-card {
 :root[data-theme='dark'] .cdk-overlay-pane .mat-calendar-period-button,
 :root[data-theme='dark'] .cdk-overlay-pane .mat-calendar-arrow {
   color: var(--ink);
+}
+:root[data-theme='dark'] .cdk-overlay-pane .mat-mdc-option.mdc-list-item--disabled {
+  color: var(--text-disabled) !important;
+  opacity: 1;
 }
 
 :root[data-theme='dark'] app-age-calculator .calculator-container,
@@ -307,6 +362,216 @@ mat-card {
   color: var(--muted);
 }
 
+:root[data-theme='dark'] app-findcapital .app-container {
+  --primary-color: var(--brand);
+  --light-text: var(--text-primary);
+  --light-hover: var(--brand-soft);
+}
+:root[data-theme='dark'] app-findcapital .search-card,
+:root[data-theme='dark'] app-findflag .search-card {
+  background: var(--surface) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--line) !important;
+}
+:root[data-theme='dark'] app-findcapital .mat-mdc-card-subtitle,
+:root[data-theme='dark'] app-findcapital .item-details p,
+:root[data-theme='dark'] app-findcapital .navigate-icon,
+:root[data-theme='dark'] app-findflag .mat-mdc-card-subtitle,
+:root[data-theme='dark'] app-findflag .flag-info,
+:root[data-theme='dark'] app-findflag .loading-container,
+:root[data-theme='dark'] app-findflag .empty-state,
+:root[data-theme='dark'] app-findflag .empty-state p {
+  color: var(--text-secondary) !important;
+}
+:root[data-theme='dark'] app-findcapital .result-card.success,
+:root[data-theme='dark'] app-findcapital .result-card.error {
+  background: var(--surface) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--line);
+}
+:root[data-theme='dark'] app-findcapital .result-title,
+:root[data-theme='dark'] app-findcapital .capital-name,
+:root[data-theme='dark'] app-findcapital .detail-row,
+:root[data-theme='dark'] app-findcapital .detail-row strong {
+  color: var(--text-primary) !important;
+}
+:root[data-theme='dark'] app-findcapital .result-icon,
+:root[data-theme='dark'] app-findcapital .detail-row mat-icon {
+  color: var(--brand) !important;
+}
+:root[data-theme='dark'] app-findcapital .verified-icon {
+  color: var(--success) !important;
+}
+:root[data-theme='dark'] app-findcapital .recent-item:hover {
+  background: var(--brand-soft);
+}
+:root[data-theme='dark'] app-findcapital .mat-mdc-input-element,
+:root[data-theme='dark'] app-findcapital .mat-mdc-select-value,
+:root[data-theme='dark'] app-findflag .mat-mdc-input-element,
+:root[data-theme='dark'] app-findflag .mat-mdc-select-value {
+  color: var(--text-primary) !important;
+  -webkit-text-fill-color: var(--text-primary);
+}
+:root[data-theme='dark'] app-findflag .app-container,
+:root[data-theme='dark'] app-findflag .app-content {
+  color: var(--text-primary);
+}
+:root[data-theme='dark'] app-findflag .flag-actions a,
+:root[data-theme='dark'] app-findflag .app-content a {
+  color: var(--brand);
+}
+
+:root[data-theme='dark'] app-world-clock .empty-card,
+:root[data-theme='dark'] app-world-clock .digital-clock,
+:root[data-theme='dark'] app-world-clock .clock {
+  background: var(--surface) !important;
+  color: var(--text-primary) !important;
+}
+:root[data-theme='dark'] app-world-clock .clock-number,
+:root[data-theme='dark'] app-world-clock .time-display {
+  color: var(--text-primary) !important;
+}
+:root[data-theme='dark'] app-world-clock .timezone-display,
+:root[data-theme='dark'] app-world-clock .date-display,
+:root[data-theme='dark'] app-world-clock .empty-card p,
+:root[data-theme='dark'] app-world-clock .example-text {
+  color: var(--text-secondary) !important;
+}
+:root[data-theme='dark'] app-world-clock .hour-hand,
+:root[data-theme='dark'] app-world-clock .minute-hand,
+:root[data-theme='dark'] app-world-clock .minute-tick:nth-child(5n)::before {
+  background: var(--brand);
+}
+:root[data-theme='dark'] app-world-clock .clock {
+  border-color: var(--line);
+}
+:root[data-theme='dark'] app-world-clock .center-dot::after {
+  background: var(--surface);
+}
+
+:root[data-theme='dark'] app-string-manipulator .mat-mdc-tab .mdc-tab__text-label {
+  color: var(--text-secondary) !important;
+}
+:root[data-theme='dark'] app-string-manipulator .mat-mdc-tab:hover .mdc-tab__text-label,
+:root[data-theme='dark'] app-string-manipulator .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+  color: var(--text-primary) !important;
+}
+:root[data-theme='dark'] app-string-manipulator .mat-mdc-tab:disabled .mdc-tab__text-label {
+  color: var(--text-disabled) !important;
+}
+:root[data-theme='dark'] app-string-manipulator .button-grid button:disabled {
+  background: var(--surface);
+  color: var(--text-disabled);
+}
+:root[data-theme='dark'] app-string-manipulator .button-grid .basic-btn {
+  --mdc-protected-button-container-color: var(--action-basic);
+  --mdc-protected-button-label-text-color: var(--text-on-action);
+  background-color: var(--action-basic) !important;
+  color: var(--text-on-action) !important;
+}
+:root[data-theme='dark'] app-string-manipulator .button-grid .basic-btn:hover:not(:disabled) {
+  background-color: var(--action-basic-hover) !important;
+}
+:root[data-theme='dark'] app-string-manipulator .button-grid .modify-btn {
+  --mdc-protected-button-container-color: var(--action-modify);
+  --mdc-protected-button-label-text-color: var(--text-on-action);
+  background-color: var(--action-modify) !important;
+  color: var(--text-on-action) !important;
+}
+:root[data-theme='dark'] app-string-manipulator .button-grid .modify-btn:hover:not(:disabled) {
+  background-color: var(--action-modify-hover) !important;
+}
+:root[data-theme='dark'] app-string-manipulator .button-grid .encode-btn {
+  --mdc-protected-button-container-color: var(--action-encode);
+  --mdc-protected-button-label-text-color: var(--text-on-action);
+  background-color: var(--action-encode) !important;
+  color: var(--text-on-action) !important;
+}
+:root[data-theme='dark'] app-string-manipulator .button-grid .encode-btn:hover:not(:disabled) {
+  background-color: var(--action-encode-hover) !important;
+}
+:root[data-theme='dark'] app-string-manipulator .button-grid .analyze-btn {
+  --mdc-protected-button-container-color: var(--action-analyze);
+  --mdc-protected-button-label-text-color: var(--text-on-action);
+  background-color: var(--action-analyze) !important;
+  color: var(--text-on-action) !important;
+}
+:root[data-theme='dark'] app-string-manipulator .button-grid .analyze-btn:hover:not(:disabled) {
+  background-color: var(--action-analyze-hover) !important;
+}
+:root[data-theme='dark'] app-string-manipulator .button-grid .misc-btn {
+  --mdc-protected-button-container-color: var(--action-misc);
+  --mdc-protected-button-label-text-color: var(--text-on-action);
+  background-color: var(--action-misc) !important;
+  color: var(--text-on-action) !important;
+}
+:root[data-theme='dark'] app-string-manipulator .button-grid .misc-btn:hover:not(:disabled) {
+  background-color: var(--action-misc-hover) !important;
+}
+
+:root[data-theme='dark'] app-fonts .font-explorer-app {
+  --primary-color: var(--brand-soft);
+  --primary-light: var(--brand-soft);
+  --primary-dark: var(--theme-text-primary);
+  --text-primary: var(--theme-text-primary);
+  --text-secondary: var(--theme-text-secondary);
+  --text-tertiary: var(--theme-text-secondary);
+  --bg-color: var(--canvas);
+  --bg-secondary: var(--surface);
+  --bg-tertiary: var(--brand-soft);
+  --border-color: var(--line);
+  color: var(--theme-text-primary) !important;
+  background: var(--canvas) !important;
+}
+:root[data-theme='dark'] app-fonts .font-explorer-app input,
+:root[data-theme='dark'] app-fonts .font-explorer-app textarea,
+:root[data-theme='dark'] app-fonts .font-explorer-app select,
+:root[data-theme='dark'] app-fonts .font-explorer-app .font-name,
+:root[data-theme='dark'] app-fonts .font-explorer-app .preview-text:not(.placeholder),
+:root[data-theme='dark'] app-fonts .font-explorer-app .heading-sample,
+:root[data-theme='dark'] app-fonts .font-explorer-app .body-sample,
+:root[data-theme='dark'] app-fonts .font-explorer-app .footer-links a {
+  color: var(--theme-text-primary);
+}
+:root[data-theme='dark'] app-fonts .font-explorer-app input::placeholder,
+:root[data-theme='dark'] app-fonts .font-explorer-app textarea::placeholder,
+:root[data-theme='dark'] app-fonts .font-explorer-app .app-subtitle,
+:root[data-theme='dark'] app-fonts .font-explorer-app .font-stats,
+:root[data-theme='dark'] app-fonts .font-explorer-app .section-description,
+:root[data-theme='dark'] app-fonts .font-explorer-app .footer-content p,
+:root[data-theme='dark'] app-fonts .font-explorer-app .preview-text.placeholder {
+  color: var(--theme-text-secondary) !important;
+  opacity: 1;
+}
+:root[data-theme='dark'] app-fonts .font-explorer-app .font-tag {
+  background: var(--brand-soft);
+  color: var(--text-primary);
+}
+:root[data-theme='dark'] app-fonts .font-explorer-app .category-tabs button {
+  color: var(--theme-text-secondary) !important;
+}
+:root[data-theme='dark'] app-fonts .font-explorer-app .category-tabs button:hover,
+:root[data-theme='dark'] app-fonts .font-explorer-app .category-tabs button.active {
+  color: var(--theme-text-primary) !important;
+}
+:root[data-theme='dark'] app-fonts .font-explorer-app .action-button:disabled {
+  --mdc-protected-button-container-color: var(--brand-soft);
+  --mdc-protected-button-label-text-color: var(--text-disabled);
+  background: var(--brand-soft);
+  color: var(--text-disabled) !important;
+}
+:root[data-theme='dark'] app-fonts .font-explorer-app .mat-mdc-button {
+  --mdc-text-button-label-text-color: var(--brand);
+  color: var(--brand) !important;
+}
+:root[data-theme='dark'] app-fonts .font-explorer-app .combination-header {
+  background: var(--brand-soft);
+  color: var(--theme-text-primary);
+}
+:root[data-theme='dark'] app-fonts .font-explorer-app .combination-header h3 {
+  color: var(--theme-text-primary);
+}
+
 :root[data-theme='dark'] .weather-container .description,
 :root[data-theme='dark'] .weather-container .feels-like,
 :root[data-theme='dark'] .weather-container .forecast-day small,
@@ -363,19 +628,24 @@ mat-card {
 :root[data-theme='dark'] app-world-clock .time-display {
   color: var(--ink);
 }
+:root .weather-container.dark-mode {
+  --text-primary: #f3f4f6;
+  --text-secondary: #cbd5e1;
+  --text-disabled: #9ca3af;
+}
 :root .weather-container.dark-mode .title,
 :root .weather-container.dark-mode .loading-message,
 :root .weather-container.dark-mode .forecast-section h3,
 :root .weather-container.dark-mode .weather-main .temperature,
 :root .weather-container.dark-mode .theme-toggle,
 :root .weather-container.dark-mode .unit-toggle {
-  color: #a7b3ff;
+  color: var(--text-primary);
 }
 :root .weather-container.dark-mode .description,
 :root .weather-container.dark-mode .feels-like,
 :root .weather-container.dark-mode .forecast-day small,
 :root .weather-container.dark-mode .city-lookup-message {
-  color: #aab5c5;
+  color: var(--text-secondary) !important;
 }
 :root .weather-container.dark-mode .forecast-day {
   background: #1e1e1e;

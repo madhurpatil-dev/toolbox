@@ -1,5 +1,5 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Component, OnInit, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -32,9 +32,11 @@ interface FontCategoriesInterface {
     ],
     standalone: false
 })
-export class FontsComponent implements OnInit, AfterViewInit {
+export class FontsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('previewArea') previewArea!: ElementRef;
   @ViewChild('previewText') previewTextElement!: ElementRef;
+  private themeObserver?: MutationObserver;
+  private hasCustomTextColor = false;
   
   inputText: string = '';
   showPlaceholder: boolean = true;
@@ -90,6 +92,13 @@ export class FontsComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
+    this.updateDefaultTextColor();
+    this.themeObserver = new MutationObserver(() => this.updateDefaultTextColor());
+    this.themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+
     const storedFonts = localStorage.getItem('recentFonts');
     if (storedFonts) {
       this.recentlyUsedFonts = JSON.parse(storedFonts);
@@ -116,6 +125,21 @@ export class FontsComponent implements OnInit, AfterViewInit {
       }
     }, 500);
   }
+
+  ngOnDestroy(): void {
+    this.themeObserver?.disconnect();
+  }
+
+  private updateDefaultTextColor(): void {
+    if (this.hasCustomTextColor) {
+      return;
+    }
+
+    this.textColor = document.documentElement.dataset['theme'] === 'dark'
+      ? getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim() || '#f3f4f6'
+      : '#333333';
+  }
+
   getCategoryName(category: string): string {
   const categoryNames: {[key: string]: string} = {
     'all': 'All Fonts',
@@ -202,6 +226,7 @@ export class FontsComponent implements OnInit, AfterViewInit {
 
   setTextColor(color: string) {
     this.textColor = color;
+    this.hasCustomTextColor = true;
   }
 
   toggleDarkMode() {

@@ -25,7 +25,10 @@
   --warn-light: #ff8a50;
   --warn-dark: #c41c00;
   --background-color: #303030;
-  --text-color: white;
+  --text-primary: #f3f4f6;
+  --text-secondary: #cbd5e1;
+  --text-disabled: #9ca3af;
+  --text-color: var(--text-primary);
 }
 
 
@@ -42,7 +45,7 @@
 
 .app-container.dark-theme {
   background-color: #303030;
-  color: white;
+  color: var(--text-primary);
 }
 
 .app-header {
@@ -236,17 +239,17 @@
 
 .dark-theme .app-footer {
   background: #424242;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary);
 }
 
 .dark-theme .search-card {
   background: #424242;
-  color: white;
+  color: var(--text-primary);
 }
 
 .dark-theme .flag-info,
 .dark-theme .empty-state {
-  color: rgba(255, 255, 255, 0.7) !important;
+  color: var(--text-secondary) !important;
 }
 
 .dark-theme .flag-image {
