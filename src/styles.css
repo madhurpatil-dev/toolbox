@@ -193,6 +193,161 @@ mat-card {
   color: var(--ink);
 }
 
+:root[data-theme='dark'] .mat-mdc-form-field,
+:root[data-theme='dark'] .mat-mdc-input-element,
+:root[data-theme='dark'] .mat-mdc-select-value,
+:root[data-theme='dark'] .mat-mdc-select-arrow,
+:root[data-theme='dark'] .mat-mdc-floating-label,
+:root[data-theme='dark'] .mat-mdc-form-field-hint,
+:root[data-theme='dark'] .mat-mdc-form-field-error {
+  color: var(--ink) !important;
+}
+:root[data-theme='dark'] .mat-mdc-input-element::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+:root[data-theme='dark'] .cdk-overlay-pane .mat-mdc-select-panel,
+:root[data-theme='dark'] .cdk-overlay-pane .mat-mdc-autocomplete-panel,
+:root[data-theme='dark'] .cdk-overlay-pane .mat-mdc-menu-panel,
+:root[data-theme='dark'] .cdk-overlay-pane .mat-datepicker-content,
+:root[data-theme='dark'] .cdk-overlay-pane .mat-mdc-dialog-surface {
+  background: var(--surface);
+  color: var(--ink);
+}
+:root[data-theme='dark'] .cdk-overlay-pane .mat-mdc-option,
+:root[data-theme='dark'] .cdk-overlay-pane .mat-calendar-body,
+:root[data-theme='dark'] .cdk-overlay-pane .mat-calendar-body-label,
+:root[data-theme='dark'] .cdk-overlay-pane .mat-calendar-period-button,
+:root[data-theme='dark'] .cdk-overlay-pane .mat-calendar-arrow {
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] app-age-calculator .calculator-container,
+:root[data-theme='dark'] app-calculator .calculator-wrapper {
+  background: var(--canvas);
+  color: var(--ink);
+}
+:root[data-theme='dark'] app-age-calculator .header,
+:root[data-theme='dark'] app-age-calculator .current-time,
+:root[data-theme='dark'] app-age-calculator .current-time mat-icon,
+:root[data-theme='dark'] app-age-calculator .time-item mat-icon,
+:root[data-theme='dark'] app-age-calculator .empty-icon,
+:root[data-theme='dark'] app-age-calculator .empty-state h3 {
+  color: var(--brand);
+}
+:root[data-theme='dark'] app-age-calculator .subtitle,
+:root[data-theme='dark'] app-age-calculator .time-label,
+:root[data-theme='dark'] app-age-calculator .empty-state,
+:root[data-theme='dark'] app-age-calculator .date-hint {
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] app-color-display .app-header h1 {
+  color: var(--ink);
+}
+:root[data-theme='dark'] app-color-display .tab-button {
+  color: var(--muted);
+}
+:root[data-theme='dark'] app-color-display .tab-button:hover:not(.active),
+:root[data-theme='dark'] app-color-display .format-label {
+  color: var(--muted);
+}
+:root[data-theme='dark'] app-color-display .tab-button.active {
+  color: var(--brand);
+}
+:root[data-theme='dark'] app-color-display .tab-container,
+:root[data-theme='dark'] app-color-display .format-header {
+  border-color: var(--line);
+}
+:root[data-theme='dark'] app-color-display .copy-button:hover {
+  background: var(--brand-soft);
+}
+
+:root[data-theme='dark'] app-currencyconverter .result-container {
+  background: var(--brand-soft);
+}
+:root[data-theme='dark'] app-currencyconverter .result-value {
+  color: var(--brand-strong);
+}
+:root[data-theme='dark'] app-currencyconverter .result-rate {
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] app-string-manipulator .container,
+:root[data-theme='dark'] app-findcapital .app-container,
+:root[data-theme='dark'] app-findflag .app-container {
+  background: var(--canvas);
+  color: var(--ink);
+}
+:root[data-theme='dark'] app-string-manipulator .main-card,
+:root[data-theme='dark'] app-string-manipulator .action-inputs,
+:root[data-theme='dark'] app-findcapital .recent-card,
+:root[data-theme='dark'] app-findflag .search-card {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+:root[data-theme='dark'] app-string-manipulator .no-results,
+:root[data-theme='dark'] app-findcapital .item-details p,
+:root[data-theme='dark'] app-findcapital .navigate-icon,
+:root[data-theme='dark'] app-findflag .flag-info,
+:root[data-theme='dark'] app-findflag .loading-container,
+:root[data-theme='dark'] app-findflag .empty-state {
+  color: var(--muted);
+}
+:root[data-theme='dark'] app-string-manipulator .action-inputs input,
+:root[data-theme='dark'] app-string-manipulator .action-inputs textarea,
+:root[data-theme='dark'] app-string-manipulator .action-inputs select {
+  background: var(--canvas);
+  color: var(--ink);
+}
+:root[data-theme='dark'] app-findcapital .app-footer,
+:root[data-theme='dark'] app-findflag .app-footer {
+  background: var(--surface);
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] .weather-container .description,
+:root[data-theme='dark'] .weather-container .feels-like,
+:root[data-theme='dark'] .weather-container .forecast-day small,
+:root[data-theme='dark'] .weather-container .city-lookup-message {
+  color: var(--muted);
+}
+:root[data-theme='dark'] .weather-container .title,
+:root[data-theme='dark'] .weather-container .loading-message,
+:root[data-theme='dark'] .weather-container .forecast-section h3,
+:root[data-theme='dark'] .weather-container .weather-main .temperature,
+:root[data-theme='dark'] .weather-container .theme-toggle,
+:root[data-theme='dark'] .weather-container .unit-toggle {
+  color: var(--brand);
+}
+:root[data-theme='dark'] .weather-container .forecast-day {
+  background: var(--canvas);
+  border-color: var(--line);
+}
+:root[data-theme='dark'] .cdk-overlay-pane .mat-calendar-body-cell-content,
+:root[data-theme='dark'] .cdk-overlay-pane .mat-calendar-table-header {
+  color: var(--ink);
+}
+:root .weather-container.dark-mode .title,
+:root .weather-container.dark-mode .loading-message,
+:root .weather-container.dark-mode .forecast-section h3,
+:root .weather-container.dark-mode .weather-main .temperature,
+:root .weather-container.dark-mode .theme-toggle,
+:root .weather-container.dark-mode .unit-toggle {
+  color: #a7b3ff;
+}
+:root .weather-container.dark-mode .description,
+:root .weather-container.dark-mode .feels-like,
+:root .weather-container.dark-mode .forecast-day small,
+:root .weather-container.dark-mode .city-lookup-message {
+  color: #aab5c5;
+}
+:root .weather-container.dark-mode .forecast-day {
+  background: #1e1e1e;
+  border-color: #334154;
+}
+
 .population-actions { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0 8px; }
 .population-actions .secondary-action { min-height:44px; padding:0 12px; border:1px solid var(--line); border-radius:9px; background:var(--surface); color:var(--brand-strong); font-size:13px; font-weight:700; cursor:pointer; }
 .population-actions .secondary-action:hover { background:var(--brand-soft); }
