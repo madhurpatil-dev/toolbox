@@ -37,6 +37,9 @@
   --text-secondary: #cbd5e1;
   --text-disabled: #9ca3af;
   --text-on-action: #ffffff;
+  --dropdown-search-bg: var(--surface);
+  --dropdown-search-text: var(--text-primary);
+  --dropdown-search-placeholder: var(--text-secondary);
   --theme-text-primary: var(--text-primary);
   --theme-text-secondary: var(--text-secondary);
   --ink: var(--text-primary);
@@ -219,6 +222,14 @@ mat-card {
 :root[data-theme='dark'] app-root .menu-toggle-v2 {
   border-color: var(--line);
 }
+:root[data-theme='dark'] app-root .site-header {
+  border-bottom-color: transparent;
+}
+@media (min-width: 721px) {
+  :root[data-theme='dark'] .nav-links-v2 {
+    background: transparent;
+  }
+}
 :root[data-theme='dark'] .color-app input,
 :root[data-theme='dark'] .color-app .color-name,
 :root[data-theme='dark'] .color-app .gradient-name {
@@ -240,8 +251,33 @@ mat-card {
   color: var(--ink) !important;
 }
 :root[data-theme='dark'] .mat-mdc-input-element::placeholder {
-  color: var(--text-secondary);
-  opacity: 1;
+  color: var(--text-secondary) !important;
+  -webkit-text-fill-color: var(--text-secondary);
+  opacity: 1 !important;
+}
+:root[data-theme='dark'] input:not([type='color'])::placeholder,
+:root[data-theme='dark'] textarea::placeholder {
+  color: var(--text-secondary) !important;
+  -webkit-text-fill-color: var(--text-secondary);
+  opacity: 1 !important;
+}
+:root[data-theme='dark'] .cdk-overlay-pane .mat-select-search-inner,
+:root[data-theme='dark'] .cdk-overlay-pane .mat-select-search-inner-row {
+  background: var(--dropdown-search-bg) !important;
+  color: var(--dropdown-search-text) !important;
+}
+:root[data-theme='dark'] .cdk-overlay-pane .mat-select-search-input {
+  background: var(--dropdown-search-bg) !important;
+  color: var(--dropdown-search-text) !important;
+  -webkit-text-fill-color: var(--dropdown-search-text);
+}
+:root[data-theme='dark'] .cdk-overlay-pane .mat-select-search-input::placeholder {
+  color: var(--dropdown-search-placeholder) !important;
+  -webkit-text-fill-color: var(--dropdown-search-placeholder);
+  opacity: 1 !important;
+}
+:root[data-theme='dark'] .cdk-overlay-pane .mat-select-search-clear {
+  color: var(--text-secondary) !important;
 }
 :root[data-theme='dark'] .mat-mdc-input-element:disabled,
 :root[data-theme='dark'] .mat-mdc-select-disabled .mat-mdc-select-value {
@@ -275,6 +311,29 @@ mat-card {
 :root[data-theme='dark'] .cdk-overlay-pane .mat-mdc-option.mdc-list-item--disabled {
   color: var(--text-disabled) !important;
   opacity: 1;
+}
+:root .cdk-overlay-pane .weather-select-panel-dark {
+  --dropdown-search-bg: #1e1e1e;
+  --dropdown-search-text: #f3f4f6;
+  --dropdown-search-placeholder: #cbd5e1;
+}
+:root .cdk-overlay-pane .weather-select-panel-dark .mat-select-search-inner,
+:root .cdk-overlay-pane .weather-select-panel-dark .mat-select-search-inner-row {
+  background: var(--dropdown-search-bg) !important;
+  color: var(--dropdown-search-text) !important;
+}
+:root .cdk-overlay-pane .weather-select-panel-dark .mat-select-search-input {
+  background: var(--dropdown-search-bg) !important;
+  color: var(--dropdown-search-text) !important;
+  -webkit-text-fill-color: var(--dropdown-search-text);
+}
+:root .cdk-overlay-pane .weather-select-panel-dark .mat-select-search-input::placeholder {
+  color: var(--dropdown-search-placeholder) !important;
+  -webkit-text-fill-color: var(--dropdown-search-placeholder);
+  opacity: 1 !important;
+}
+:root .cdk-overlay-pane .weather-select-panel-dark .mat-select-search-clear {
+  color: var(--dropdown-search-placeholder) !important;
 }
 
 :root[data-theme='dark'] app-age-calculator .calculator-container,
@@ -388,6 +447,10 @@ mat-card {
   background: var(--surface) !important;
   color: var(--text-primary) !important;
   border-color: var(--line);
+}
+:root[data-theme='dark'] app-findcapital .capital-display {
+  background: var(--brand-soft) !important;
+  color: var(--text-primary);
 }
 :root[data-theme='dark'] app-findcapital .result-title,
 :root[data-theme='dark'] app-findcapital .capital-name,

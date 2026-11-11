@@ -12,7 +12,7 @@
         <div class="select-container">
           <mat-form-field appearance="outline" class="location-field">
             <mat-label>Country</mat-label>
-            <mat-select [(ngModel)]="selectedCountry" (selectionChange)="onCountryChange()" aria-label="Select country" panelClass="weather-select-panel">
+            <mat-select [(ngModel)]="selectedCountry" (selectionChange)="onCountryChange()" aria-label="Select country" [panelClass]="isDarkMode ? ['weather-select-panel', 'weather-select-panel-dark'] : 'weather-select-panel'">
               <mat-option>
                 <ngx-mat-select-search
                   [formControl]="countrySearchControl"
@@ -35,7 +35,7 @@
               [disabled]="!selectedCountry || !cities.length || isCitiesLoading"
               (selectionChange)="onCityChange()"
               aria-label="Select city"
-              panelClass="weather-select-panel">
+              [panelClass]="isDarkMode ? ['weather-select-panel', 'weather-select-panel-dark'] : 'weather-select-panel'">
               <mat-option>
                 <ngx-mat-select-search
                   [formControl]="citySearchControl"
