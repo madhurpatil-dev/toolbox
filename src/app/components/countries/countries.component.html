@@ -6,16 +6,6 @@
         <h1>Population Finder</h1>
         <p class="page-intro">Explore population and geography at a glance.</p>
       </div>
-      <button
-        class="theme-toggle"
-        type="button"
-        [attr.aria-pressed]="theme === 'dark'"
-        [attr.aria-label]="theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'"
-        (click)="toggleTheme()"
-      >
-        <span aria-hidden="true">{{ theme === 'dark' ? '☼' : '◐' }}</span>
-        {{ theme === 'dark' ? 'Light' : 'Dark' }}
-      </button>
     </header>
 
     <section class="search-panel" aria-label="Country search and filters">
@@ -24,14 +14,22 @@
         [regions]="regions"
         [recentCountries]="recentCountries"
         [selectedRegion]="selectedRegion"
+        [selectedLanguage]="selectedLanguage"
+        [selectedCurrency]="selectedCurrency"
         [sortBy]="sortBy"
         [hasDensity]="hasDensityData"
-        [hasGrowth]="hasGrowthData"
+        [languages]="languages"
+        [currencies]="currencies"
         (countrySelected)="selectCountry($event)"
         (regionChange)="selectedRegion = $event"
+        (languageChange)="selectedLanguage = $event"
+        (currencyChange)="selectedCurrency = $event"
         (sortChange)="sortBy = $event"
       ></app-country-search>
     </section>
+    @if (countryService.isUsingCachedData) {
+      <p class="offline-data-note" role="status">Showing saved country data because the live data service is unavailable.</p>
+    }
 
     @if (isCountriesLoading) {
       <section class="loading-section" aria-live="polite" aria-busy="true">
@@ -65,9 +63,6 @@
             <app-stat-card label="Population density" [value]="selectedDensity" [numericValue]="selectedDensityValue" numericFormat="full" detail="people per sq. km"></app-stat-card>
             <app-stat-card label="Land area" [value]="getCountryInfo('area')" detail="square kilometers"></app-stat-card>
             <app-stat-card label="Population rank" [value]="'#' + selectedCountryRank" detail="within loaded countries"></app-stat-card>
-            <app-stat-card label="Growth rate" value="Not available" detail="Not provided by source"></app-stat-card>
-            <app-stat-card label="Median age" value="Not available" detail="Not provided by source"></app-stat-card>
-            <app-stat-card label="Life expectancy" value="Not available" detail="Not provided by source"></app-stat-card>
           </section>
 
           <section class="chart-layout" aria-label="Population charts and country information">
@@ -89,10 +84,22 @@
               <div class="section-heading"><div><h2 id="details-title">Country details</h2><p>More context for this profile</p></div></div>
               <dl class="details-list">
                 <div><dt>Continent</dt><dd>{{ getCountryInfo('continents') }}</dd></div>
-                <div><dt>Capital</dt><dd>{{ getCountryInfo('capital') }}</dd></div>
+                <div><dt>Capital</dt><dd>{{ getCountryInfo('capitals') }}</dd></div>
                 <div><dt>Languages</dt><dd>{{ getCountryInfo('languages') }}</dd></div>
                 <div><dt>Currency</dt><dd>{{ getCountryInfo('currencies') }}</dd></div>
+                <div><dt>Calling codes</dt><dd>{{ formatList(additionalInfo.calling_codes) }}</dd></div>
+                <div><dt>Time zones</dt><dd>{{ formatList(additionalInfo.timezones) }}</dd></div>
               </dl>
+              @if (additionalInfo.borders?.length) {
+                <div class="border-countries">
+                  <h3>Border countries</h3>
+                  <div class="border-list">
+                    @for (code of additionalInfo.borders; track code) {
+                      <button type="button" (click)="selectBorderCountry(code)">{{ countryNameFor(code) }}</button>
+                    }
+                  </div>
+                </div>
+              }
               <div class="coverage-note">
                 <strong>Dataset coverage</strong>
                 <p>Urban split and historical population series are not provided. Source: configured country dataset; no reference year is supplied.</p>

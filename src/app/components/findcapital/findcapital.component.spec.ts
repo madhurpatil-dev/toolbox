@@ -18,6 +18,7 @@ describe('FindcapitalComponent', () => {
       { observe: vi.fn().mockReturnValue(of({ breakpoints: {} })) } as any,
       { open: vi.fn() } as any,
       { markForCheck: vi.fn(), detectChanges: vi.fn() } as any,
+      { theme: 'light', toggle: vi.fn() } as any,
     );
   });
 

@@ -1,39 +1,37 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
+import { CountryRecord, CountryServiceService } from './country-service.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class FindCapitalService {
-  private readonly BASE_URL = 'https://api.restcountries.com/countries/v5';
-  private readonly API_KEY = 'rc_live_960b8d0b0dc84a30b10577a8f29dbc9c';
-  private countryNamesCache: string[] = [];
+  constructor(private readonly countryService: CountryServiceService) {}
 
-  constructor(private http: HttpClient) { }
-
-  findCapital(countryName: string): Observable<any> {
-    const url = `${this.BASE_URL}/names.common/${encodeURIComponent(countryName)}?api-key=${this.API_KEY}`;
-    return this.http.get<any>(url);
+  findCapital(countryName: string): Observable<{ data: { objects: CountryRecord[] } }> {
+    const normalizedName = countryName.trim().toLocaleLowerCase();
+    return this.countryService.getAllCountries().pipe(
+      switchMap((countries) => {
+        const country = countries.find(
+          (item) => item.names?.common?.toLocaleLowerCase() === normalizedName,
+        );
+        if (!country?.codes?.alpha_2 || country.capitals?.length) {
+          return of({ data: { objects: country ? [country] : [] } });
+        }
+        return this.countryService.getCountryByCode(country.codes.alpha_2).pipe(
+          map((details) => ({ data: { objects: [details] } })),
+        );
+      }),
+    );
   }
 
   fetchCountryNames(): Observable<string[]> {
-    if (this.countryNamesCache.length > 0) {
-      return of(this.countryNamesCache);
-    }
-
-    const url = `${this.BASE_URL}?response_fields=names.common&limit=100&api-key=${this.API_KEY}`;
-    return this.http.get<any>(url).pipe(
-      map(response => {
-        const names: string[] = response.data.objects.map(
-          (country: any) => country.names.common
-        );
-        names.unshift('India/Bharat');
-        this.countryNamesCache = names;
-        return names;
-      }),
-      catchError(() => of([]))
+    return this.countryService.getAllCountries().pipe(
+      map((countries) => [
+        'India/Bharat',
+        ...countries
+          .map((country) => country.names?.common)
+          .filter((name): name is string => Boolean(name)),
+      ]),
     );
   }
 }

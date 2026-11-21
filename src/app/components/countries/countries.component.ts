@@ -6,7 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import type { Chart as ChartInstance, ChartType } from 'chart.js';
 import { finalize } from 'rxjs/operators';
-import { CountryServiceService } from '../../services/country-service.service';
+import { CountryRecord, CountryServiceService } from '../../services/country-service.service';
 import { ThemeService } from '../../services/theme.service';
 import {
   ChartCardComponent,
@@ -38,7 +38,7 @@ import {
   ],
 })
 export class CountriesComponent implements OnInit, OnDestroy {
-  countries: any[] = [];
+  countries: CountryRecord[] = [];
   selectedCountryCode: string = '';
   selectedCountryName: string = '';
   countryPopulation: number | undefined;
@@ -52,6 +52,8 @@ export class CountriesComponent implements OnInit, OnDestroy {
   isCountriesLoading: boolean = false;
   isCountryDetailsLoading: boolean = false;
   selectedRegion = '';
+  selectedLanguage = '';
+  selectedCurrency = '';
   sortBy = 'population';
   comparedCodes: string[] = [];
   recentCodes: string[] = [];
@@ -67,10 +69,11 @@ export class CountriesComponent implements OnInit, OnDestroy {
   private chartModulePromise?: Promise<typeof import('chart.js/auto')>;
   private detailRequestId = 0;
   private queryParamSubscription?: Subscription;
+  private themeSubscription?: Subscription;
   private requestedCountryCode = '';
 
   constructor(
-    private countryService: CountryServiceService,
+    public countryService: CountryServiceService,
     private route: ActivatedRoute,
     private router: Router,
     public themeService: ThemeService,
@@ -84,11 +87,16 @@ export class CountriesComponent implements OnInit, OnDestroy {
       this.selectSharedCountry();
       this.cdr.markForCheck();
     });
+    this.themeSubscription = this.themeService.changes$.subscribe(() => {
+      if (this.countryPopulation !== undefined) setTimeout(() => this.renderChart(), 0);
+      if (this.isPopulationGraphModalOpen) setTimeout(() => this.renderPopulationChart(), 0);
+    });
     this.loadCountries();
   }
 
   ngOnDestroy(): void {
     this.queryParamSubscription?.unsubscribe();
+    this.themeSubscription?.unsubscribe();
     this.chart?.destroy();
     this.modalChart?.destroy();
   }
@@ -123,7 +131,8 @@ export class CountriesComponent implements OnInit, OnDestroy {
       this.recentCodes = Array.isArray(storedRecent)
         ? storedRecent.filter((code): code is string => typeof code === 'string').slice(0, 4)
         : [];
-    } catch {
+    } catch (error) {
+      console.warn('Unable to load recent population-country history.', error);
       this.recentCodes = [];
     }
   }
@@ -145,6 +154,8 @@ export class CountriesComponent implements OnInit, OnDestroy {
       population: country.population,
       region: country.region ?? country.continents?.[0],
       continents: country.continents,
+      languages: this.listNames(country.languages),
+      currencies: this.listCurrencies(country.currencies),
     })).filter((country) => country.code);
   }
 
@@ -153,11 +164,20 @@ export class CountriesComponent implements OnInit, OnDestroy {
   }
 
   get hasDensityData(): boolean {
-    return this.countries.some((country) => Number(country.area?.kilometers ?? country.area) > 0);
+    return this.countries.some((country) => {
+      const area = typeof country.area === 'object' && country.area !== null
+        ? country.area.kilometers
+        : country.area;
+      return Number(area) > 0;
+    });
   }
 
-  get hasGrowthData(): boolean {
-    return this.countries.some((country) => Number.isFinite(Number(country.growthRate ?? country.populationGrowth)));
+  get languages(): string[] {
+    return [...new Set(this.countryOptions.flatMap((country) => country.languages ?? []))].sort();
+  }
+
+  get currencies(): string[] {
+    return [...new Set(this.countryOptions.flatMap((country) => country.currencies ?? []))].sort();
   }
 
   get recentCountries(): CountryOption[] {
@@ -165,16 +185,24 @@ export class CountriesComponent implements OnInit, OnDestroy {
   }
 
   get filteredSortedCountries(): any[] {
-    const filtered = this.countries.filter((country) => !this.selectedRegion || (country.region ?? country.continents?.[0]) === this.selectedRegion);
+    const optionsByCode = new Map(this.countryOptions.map((option) => [option.code, option]));
+    const filtered = this.countries.filter((country) => {
+      const option = optionsByCode.get(country.codes?.alpha_2 ?? '');
+      return (!this.selectedRegion || (country.region ?? country.continents?.[0]) === this.selectedRegion)
+        && (!this.selectedLanguage || option?.languages?.includes(this.selectedLanguage))
+        && (!this.selectedCurrency || option?.currencies?.includes(this.selectedCurrency));
+    });
     const metric = (country: any): number => {
       if (this.sortBy === 'density') {
         const area = Number(country.area?.kilometers ?? country.area);
-        return area > 0 ? country.population / area : Number.NEGATIVE_INFINITY;
+        return area > 0 ? Number(country.population ?? 0) / area : Number.NEGATIVE_INFINITY;
       }
-      if (this.sortBy === 'growth') return Number(country.growthRate ?? country.populationGrowth ?? Number.NEGATIVE_INFINITY);
+      if (this.sortBy === 'area') return Number(country.area?.kilometers ?? country.area ?? 0);
       return Number(country.population ?? 0);
     };
-    return [...filtered].sort((first, second) => metric(second) - metric(first));
+    return [...filtered].sort((first, second) => this.sortBy === 'name'
+      ? (first.names?.common ?? '').localeCompare(second.names?.common ?? '')
+      : metric(second) - metric(first));
   }
 
   get top5HighPopulation(): any[] {
@@ -229,8 +257,15 @@ export class CountriesComponent implements OnInit, OnDestroy {
     return value === undefined ? 'Not available' : new Intl.NumberFormat().format(value);
   }
 
-  selectCountry(code: string): void {
+  selectCountry(code: string | undefined): void {
+    if (!code) return;
     this.selectedCountryCode = code;
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { country: code },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
     this.detailRequestId++;
     const selectedCountry = this.countries.find((country) => country.codes?.alpha_2 === code);
     if (selectedCountry) {
@@ -246,12 +281,6 @@ export class CountriesComponent implements OnInit, OnDestroy {
     }
     this.cdr.markForCheck();
     this.fetchCountryPopulation();
-  }
-
-  toggleTheme(): void {
-    this.themeService.toggle();
-    if (this.countryPopulation !== undefined) setTimeout(() => this.renderChart(), 0);
-    if (this.isPopulationGraphModalOpen) setTimeout(() => this.renderPopulationChart(), 0);
   }
 
   async shareSelectedCountry(): Promise<void> {
@@ -348,9 +377,47 @@ export class CountriesComponent implements OnInit, OnDestroy {
     return code ? `https://flagcdn.com/w40/${code.toLowerCase()}.png` : '';
   }
 
+  formatList(values: unknown): string {
+    return Array.isArray(values) && values.length ? values.join(', ') : 'Not available';
+  }
+
+  countryNameFor(code: string): string {
+    return this.countries.find((country) =>
+      country.codes?.alpha_2 === code || country.codes?.alpha_3 === code,
+    )?.names?.common ?? code;
+  }
+
+  selectBorderCountry(code: string): void {
+    const country = this.countries.find((item) =>
+      item.codes?.alpha_2 === code || item.codes?.alpha_3 === code,
+    );
+    if (country?.codes?.alpha_2) this.selectCountry(country.codes.alpha_2);
+  }
+
+  private listNames(value: CountryRecord['languages']): string[] {
+    if (Array.isArray(value)) {
+      return value.map((language) => typeof language === 'string' ? language : language.name ?? '')
+        .filter(Boolean);
+    }
+    return value ? Object.values(value) : [];
+  }
+
+  private listCurrencies(value: CountryRecord['currencies']): string[] {
+    if (Array.isArray(value)) {
+      return value.map((currency) => currency.code ?? currency.name ?? '').filter(Boolean);
+    }
+    return value ? Object.keys(value) : [];
+  }
+
   private loadChartModule(): Promise<typeof import('chart.js/auto')> {
     this.chartModulePromise ??= import('chart.js/auto');
     return this.chartModulePromise;
+  }
+
+  private showChartError(error: unknown): void {
+    console.error('Unable to render the population chart.', error);
+    this.errorMessage = 'The population chart could not be displayed.';
+    this.cdr.markForCheck();
   }
 
   // Add this to track if the chart should be visible
@@ -380,7 +447,11 @@ export class CountriesComponent implements OnInit, OnDestroy {
 
     this.selectedCountryName = selectedCountry.names?.common ?? '';
     this.recentCodes = [requestedCode, ...this.recentCodes.filter((code) => code !== requestedCode)].slice(0, 4);
-    try { localStorage.setItem('population-finder-recent', JSON.stringify(this.recentCodes)); } catch { /* Storage is optional. */ }
+    try {
+      localStorage.setItem('population-finder-recent', JSON.stringify(this.recentCodes));
+    } catch (error) {
+      console.warn('Unable to save recent population-country history.', error);
+    }
     this.errorMessage = undefined;
 
     this.countryService.getCountryByCode(requestedCode).pipe(
@@ -432,7 +503,13 @@ export class CountriesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const chartModule = await this.loadChartModule();
+    let chartModule: Awaited<ReturnType<typeof this.loadChartModule>>;
+    try {
+      chartModule = await this.loadChartModule();
+    } catch (error) {
+      this.showChartError(error);
+      return;
+    }
     const ChartConstructor = chartModule.default;
     const chartCountries = this.comparedCountries.length
       ? this.comparedCountries
@@ -554,7 +631,9 @@ export class CountriesComponent implements OnInit, OnDestroy {
         data: chartData,
         options: chartOptions,
       });
-    } catch (error) {}
+    } catch (error) {
+      this.showChartError(error);
+    }
   }
 
   // Also add this method to handle chart type changes
@@ -591,50 +670,56 @@ export class CountriesComponent implements OnInit, OnDestroy {
 
       case 'currencies':
         if (Array.isArray(data)) {
-          // Array format: [{code, name, symbol}]
           return data.length === 0
             ? 'N/A'
             : data
-                .map((c: any) => `${c.name} (${c.symbol || c.code})`)
-                .join(', ');
+                .map((currency: any) => currency
+                  ? `${currency.name ?? currency.code ?? 'Unknown'} (${currency.symbol || currency.code || '—'})`
+                  : '')
+                .filter(Boolean)
+                .join(', ') || 'N/A';
         } else if (typeof data === 'object') {
-          // Object format: {"USD": {name, symbol}}
           return Object.values(data)
-            .map((c: any) => `${c.name} (${c.symbol || ''})`)
-            .join(', ');
+            .map((currency: any) => currency
+              ? `${currency.name ?? 'Unknown'} (${currency.symbol || '—'})`
+              : '')
+            .filter(Boolean)
+            .join(', ') || 'N/A';
         }
         return 'N/A';
 
       case 'languages':
         if (Array.isArray(data)) {
-          // Array format: [{name, iso639_1}]
           return data.length === 0
             ? 'N/A'
-            : data.map((l: any) => l.name).join(', ');
+            : data.map((language: any) => typeof language === 'string' ? language : language?.name ?? '')
+              .filter(Boolean)
+              .join(', ') || 'N/A';
         } else if (typeof data === 'object') {
-          // Object format: {"eng": "English"}
-          return Object.values(data).join(', ');
+          return Object.values(data).filter(Boolean).join(', ') || 'N/A';
         }
         return 'N/A';
 
-      case 'capital':
-        // v5: capitals is array of objects with .name
+      case 'capitals':
         if (Array.isArray(data)) {
           return data.length === 0
             ? 'N/A'
-            : data.map((c: any) => c.name || c).join(', ');
+            : data.map((capital: any) => typeof capital === 'string' ? capital : capital?.name ?? '')
+              .filter(Boolean)
+              .join(', ') || 'N/A';
         }
         return data || 'N/A';
       case 'continents':
         if (Array.isArray(data)) {
-          return data.length === 0 ? 'N/A' : data.join(', ');
+          return data.length === 0 ? 'N/A' : data.filter(Boolean).join(', ') || 'N/A';
         }
         return data || 'N/A';
 
       case 'area':
-        return data?.kilometers ? data.kilometers.toLocaleString() : 'Not available';
+        const area = typeof data === 'number' ? data : data?.kilometers;
+        return Number.isFinite(area) && area > 0 ? area.toLocaleString() : 'Not available';
       default:
-        if (typeof data === 'object') return Object.values(data).join(', ');
+        if (typeof data === 'object') return Object.values(data).filter(Boolean).join(', ') || 'N/A';
         return data ?? 'N/A';
     }
   }
@@ -660,7 +745,7 @@ export class CountriesComponent implements OnInit, OnDestroy {
     );
 
     const labels = validCountries.map((country) => country.names?.common ?? 'Unknown');
-    const populations = validCountries.map((country) => country.population);
+    const populations = validCountries.map((country) => country.population ?? 0);
 
     const canvas = this.populationChart?.nativeElement as HTMLCanvasElement | undefined;
     if (!canvas) return;
@@ -668,7 +753,13 @@ export class CountriesComponent implements OnInit, OnDestroy {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const chartModule = await this.loadChartModule();
+    let chartModule: Awaited<ReturnType<typeof this.loadChartModule>>;
+    try {
+      chartModule = await this.loadChartModule();
+    } catch (error) {
+      this.showChartError(error);
+      return;
+    }
     const ChartConstructor = chartModule.default;
 
     if (this.modalChart) {
@@ -680,51 +771,55 @@ export class CountriesComponent implements OnInit, OnDestroy {
     gradient.addColorStop(0, this.chartToken('--chart-1', '#3157c8'));
     gradient.addColorStop(1, this.chartToken('--chart-2', '#087f8c'));
 
-    this.modalChart = new ChartConstructor(ctx, {
-      type: this.modalChartType as ChartType,
-      data: {
-        labels,
-        datasets: [
-          {
-            label: 'Population',
-            data: populations,
-            backgroundColor:
-              this.modalChartType === 'bar' || this.modalChartType === 'line'
-                ? gradient
-                : this.chartColors,
+    try {
+      this.modalChart = new ChartConstructor(ctx, {
+        type: this.modalChartType as ChartType,
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Population',
+              data: populations,
+              backgroundColor:
+                this.modalChartType === 'bar' || this.modalChartType === 'line'
+                  ? gradient
+                  : this.chartColors,
               borderColor: this.chartToken('--chart-8', '#364152'),
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: { duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 220, easing: 'easeOutQuart' },
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: { color: this.chartToken('--line', '#e2e7f0') },
-            ticks: { color: this.chartToken('--ink', '#172033'), font: { size: 11 } },
-          },
-          x: {
-            grid: { display: false },
-            ticks: { color: this.chartToken('--ink', '#172033'), font: { size: 11 } },
-          },
+              borderWidth: 1,
+            },
+          ],
         },
-        plugins: {
-          legend: {
-            display: true,
-            labels: {
-              color: this.chartToken('--ink', '#172033'),
-              font: { size: 11 },
-              filter: () =>
-                this.modalChartType !== 'polarArea' &&
-                this.modalChartType !== 'doughnut',
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 220, easing: 'easeOutQuart' },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: this.chartToken('--line', '#e2e7f0') },
+              ticks: { color: this.chartToken('--ink', '#172033'), font: { size: 11 } },
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: this.chartToken('--ink', '#172033'), font: { size: 11 } },
+            },
+          },
+          plugins: {
+            legend: {
+              display: true,
+              labels: {
+                color: this.chartToken('--ink', '#172033'),
+                font: { size: 11 },
+                filter: () =>
+                  this.modalChartType !== 'polarArea' &&
+                  this.modalChartType !== 'doughnut',
+              },
             },
           },
         },
-      },
-    });
+      });
+    } catch (error) {
+      this.showChartError(error);
+    }
   }
 }

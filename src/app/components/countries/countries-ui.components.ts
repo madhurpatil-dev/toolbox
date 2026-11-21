@@ -7,6 +7,8 @@ export interface CountryOption {
   population?: number;
   region?: string;
   continents?: string[];
+  languages?: string[];
+  currencies?: string[];
 }
 
 @Component({
@@ -74,7 +76,26 @@ export interface CountryOption {
           <select id="country-sort" [value]="sortBy" (change)="sortChange.emit($any($event.target).value)">
             <option value="population">Population</option>
             <option value="density" [disabled]="!hasDensity">Density</option>
-            <option value="growth" [disabled]="!hasGrowth">Growth rate</option>
+            <option value="area">Land area</option>
+            <option value="name">Name</option>
+          </select>
+        </label>
+        <label class="select-wrap" for="country-language">
+          <span class="sr-only">Filter by language</span>
+          <select id="country-language" [value]="selectedLanguage" (change)="languageChange.emit($any($event.target).value)">
+            <option value="">All languages</option>
+            @for (language of languages; track language) {
+              <option [value]="language">{{ language }}</option>
+            }
+          </select>
+        </label>
+        <label class="select-wrap" for="country-currency">
+          <span class="sr-only">Filter by currency</span>
+          <select id="country-currency" [value]="selectedCurrency" (change)="currencyChange.emit($any($event.target).value)">
+            <option value="">All currencies</option>
+            @for (currency of currencies; track currency) {
+              <option [value]="currency">{{ currency }}</option>
+            }
           </select>
         </label>
       </div>
@@ -94,7 +115,7 @@ export interface CountryOption {
     :host { display:block; min-width:0; }
     .search-control { position:relative; }
     .search-control > label { display:block; margin:0 0 8px; color:var(--ink); font-size:14px; font-weight:700; }
-    .search-row { display:grid; grid-template-columns:minmax(180px,1fr) 160px 160px; gap:8px; }
+    .search-row { display:grid; grid-template-columns:minmax(180px,1fr) repeat(4,minmax(120px,150px)); gap:8px; }
     .search-input-wrap { position:relative; min-width:0; }
     input, select { width:100%; min-height:48px; border:1px solid var(--line); border-radius:10px; background:var(--surface); color:var(--ink); }
     input { padding:0 44px 0 42px; }
@@ -112,6 +133,7 @@ export interface CountryOption {
     .recent-searches > span { color:var(--muted); font-size:12px; font-weight:700; }
     .recent-searches button { display:flex; align-items:center; gap:6px; min-height:44px; padding:4px 9px; border:1px solid var(--line); border-radius:20px; background:var(--surface); color:var(--ink); font-size:12px; cursor:pointer; }
     .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    @media(max-width:960px) { .search-row { grid-template-columns:minmax(180px,1fr) repeat(2,minmax(120px,150px)); } .search-input-wrap { grid-column:1/-1; } }
     @media(max-width:640px) { .search-row { grid-template-columns:1fr 1fr; } .search-input-wrap { grid-column:1/-1; } }
   `],
 })
@@ -120,11 +142,16 @@ export class CountrySearchComponent {
   @Input() regions: string[] = [];
   @Input() recentCountries: CountryOption[] = [];
   @Input() selectedRegion = '';
+  @Input() selectedLanguage = '';
+  @Input() selectedCurrency = '';
   @Input() sortBy = 'population';
   @Input() hasDensity = false;
-  @Input() hasGrowth = false;
+  @Input() languages: string[] = [];
+  @Input() currencies: string[] = [];
   @Output() countrySelected = new EventEmitter<string>();
   @Output() regionChange = new EventEmitter<string>();
+  @Output() languageChange = new EventEmitter<string>();
+  @Output() currencyChange = new EventEmitter<string>();
   @Output() sortChange = new EventEmitter<string>();
 
   query = '';
@@ -135,6 +162,9 @@ export class CountrySearchComponent {
     const normalizedQuery = this.query.trim().toLocaleLowerCase();
     return this.countries
       .filter((country) => !normalizedQuery || country.name.toLocaleLowerCase().includes(normalizedQuery))
+      .filter((country) => !this.selectedRegion || country.region === this.selectedRegion)
+      .filter((country) => !this.selectedLanguage || country.languages?.includes(this.selectedLanguage))
+      .filter((country) => !this.selectedCurrency || country.currencies?.includes(this.selectedCurrency))
       .slice(0, 8);
   }
 

@@ -1,18 +1,47 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { forkJoin, Observable, of, throwError } from 'rxjs';
-import { catchError, map, shareReplay, tap } from 'rxjs/operators';
+import { DOCUMENT } from '@angular/common';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { Inject, Injectable } from '@angular/core';
+import { forkJoin, Observable, of, throwError, timer } from 'rxjs';
+import { catchError, map, retry, shareReplay, switchMap, tap } from 'rxjs/operators';
 
-@Injectable({
-  providedIn: 'root'
-})
+export interface CountryRecord {
+  names?: { common?: string; official?: string };
+  codes?: { alpha_2?: string; alpha_3?: string };
+  population?: number;
+  flag?: { url_png?: string; url_svg?: string; emoji?: string };
+  area?: { kilometers?: number; miles?: number } | number;
+  capitals?: Array<{ name?: string } | string>;
+  languages?: Array<{ name?: string }> | Record<string, string>;
+  currencies?: Array<{ code?: string; name?: string; symbol?: string }> | Record<string, { name?: string; symbol?: string }>;
+  region?: string;
+  subregion?: string;
+  continents?: string[];
+  borders?: string[];
+  calling_codes?: string[];
+  timezones?: string[];
+}
+
+interface CountriesResponse {
+  data?: {
+    objects?: CountryRecord[];
+    meta?: { total?: number; more?: boolean };
+  };
+}
+
+interface CacheEntry<T> {
+  cachedAt: number;
+  value: T;
+}
+
+const API_ENDPOINT = '/.netlify/functions/countries';
+const LIST_CACHE_KEY = 'toolbox-country-list-v1';
+const DETAIL_CACHE_KEY = 'toolbox-country-details-v1';
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+@Injectable({ providedIn: 'root' })
 export class CountryServiceService {
-  private readonly BASE_URL = 'https://api.restcountries.com/countries/v5';
-  private readonly API_KEY = 'rc_live_960b8d0b0dc84a30b10577a8f29dbc9c';
-  private countriesCache$: Observable<any[]> | undefined;
-  private countryDetailCache: Map<string, any> = new Map(); // cache per country code
-
-  private readonly fallbackCountries = [
+  private countriesCache$?: Observable<CountryRecord[]>;
+  private readonly countryDetailCache = new Map<string, CountryRecord>();
+  private readonly fallbackCountries: CountryRecord[] = [
     { names: { common: 'India' }, codes: { alpha_2: 'IN' }, population: 1428627663 },
     { names: { common: 'United States' }, codes: { alpha_2: 'US' }, population: 331893745 },
     { names: { common: 'China' }, codes: { alpha_2: 'CN' }, population: 1411778724 },
@@ -40,72 +69,155 @@ export class CountryServiceService {
     { names: { common: 'Bhutan' }, codes: { alpha_2: 'BT' }, population: 787425 },
     { names: { common: 'Maldives' }, codes: { alpha_2: 'MV' }, population: 523787 },
   ];
-
-  private readonly fallbackCountryDetails: Record<string, any> = {
-    IN: { names: { common: 'India' }, codes: { alpha_2: 'IN' }, population: 1428627663, flag: { url_png: 'https://flagcdn.com/w320/in.png' }, area: { kilometers: 3287263, miles: 1269000 }, capitals: [{ name: 'New Delhi' }], languages: [{ name: 'Hindi' }, { name: 'English' }], currencies: [{ name: 'Indian Rupee', symbol: '₹', code: 'INR' }], continents: ['Asia'] },
-    US: { names: { common: 'United States' }, codes: { alpha_2: 'US' }, population: 331893745, flag: { url_png: 'https://flagcdn.com/w320/us.png' }, area: { kilometers: 9372610, miles: 3618783.5 }, capitals: [{ name: 'Washington, D.C.' }], languages: [{ name: 'English' }], currencies: [{ name: 'United States dollar', symbol: '$', code: 'USD' }], continents: ['North America'] },
-    CN: { names: { common: 'China' }, codes: { alpha_2: 'CN' }, population: 1411778724, flag: { url_png: 'https://flagcdn.com/w320/cn.png' }, area: { kilometers: 9596960, miles: 3705400 }, capitals: [{ name: 'Beijing' }], languages: [{ name: 'Chinese' }], currencies: [{ name: 'Renminbi', symbol: '¥', code: 'CNY' }], continents: ['Asia'] },
-    BR: { names: { common: 'Brazil' }, codes: { alpha_2: 'BR' }, population: 216422446, flag: { url_png: 'https://flagcdn.com/w320/br.png' }, area: { kilometers: 8515767, miles: 3287597 }, capitals: [{ name: 'Brasília' }], languages: [{ name: 'Portuguese' }], currencies: [{ name: 'Brazilian real', symbol: 'R$', code: 'BRL' }], continents: ['South America'] },
-    GB: { names: { common: 'United Kingdom' }, codes: { alpha_2: 'GB' }, population: 67736802, flag: { url_png: 'https://flagcdn.com/w320/gb.png' }, area: { kilometers: 243610, miles: 94200 }, capitals: [{ name: 'London' }], languages: [{ name: 'English' }], currencies: [{ name: 'Pound sterling', symbol: '£', code: 'GBP' }], continents: ['Europe'] },
+  private readonly fallbackCountryDetails: Record<string, CountryRecord> = {
+    IN: { names: { common: 'India' }, codes: { alpha_2: 'IN' }, population: 1428627663, flag: { url_png: 'https://flagcdn.com/w320/in.png' }, area: { kilometers: 3287263 }, capitals: [{ name: 'New Delhi' }], languages: [{ name: 'Hindi' }, { name: 'English' }], currencies: [{ name: 'Indian Rupee', symbol: '₹', code: 'INR' }], continents: ['Asia'] },
+    US: { names: { common: 'United States' }, codes: { alpha_2: 'US' }, population: 331893745, flag: { url_png: 'https://flagcdn.com/w320/us.png' }, area: { kilometers: 9372610 }, capitals: [{ name: 'Washington, D.C.' }], languages: [{ name: 'English' }], currencies: [{ name: 'United States dollar', symbol: '$', code: 'USD' }], continents: ['North America'] },
+    CN: { names: { common: 'China' }, codes: { alpha_2: 'CN' }, population: 1411778724, flag: { url_png: 'https://flagcdn.com/w320/cn.png' }, area: { kilometers: 9596960 }, capitals: [{ name: 'Beijing' }], languages: [{ name: 'Chinese' }], currencies: [{ name: 'Renminbi', symbol: '¥', code: 'CNY' }], continents: ['Asia'] },
+    BR: { names: { common: 'Brazil' }, codes: { alpha_2: 'BR' }, population: 216422446, flag: { url_png: 'https://flagcdn.com/w320/br.png' }, area: { kilometers: 8515767 }, capitals: [{ name: 'Brasília' }], languages: [{ name: 'Portuguese' }], currencies: [{ name: 'Brazilian real', symbol: 'R$', code: 'BRL' }], continents: ['South America'] },
+    GB: { names: { common: 'United Kingdom' }, codes: { alpha_2: 'GB' }, population: 67736802, flag: { url_png: 'https://flagcdn.com/w320/gb.png' }, area: { kilometers: 243610 }, capitals: [{ name: 'London' }], languages: [{ name: 'English' }], currencies: [{ name: 'Pound sterling', symbol: '£', code: 'GBP' }], continents: ['Europe'] },
   };
+  isUsingCachedData = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient,
+    @Inject(DOCUMENT) private readonly document: Document,
+  ) {}
 
-  getAllCountries(): Observable<any[]> {
-    if (!this.countriesCache$) {
-      const offsets = [0, 100, 200];
-      const pages = offsets.map((offset) => {
-        const fields = 'names.common,codes.alpha_2,population';
-        const url = `${this.BASE_URL}?response_fields=${fields}&limit=100&offset=${offset}&api-key=${this.API_KEY}`;
-        return this.http.get<any>(url);
-      });
+  getAllCountries(): Observable<CountryRecord[]> {
+    if (this.countriesCache$) return this.countriesCache$;
 
-      this.countriesCache$ = forkJoin(pages).pipe(
-        map((responses) =>
-          responses.flatMap((response) =>
-            Array.isArray(response?.data?.objects) ? response.data.objects : [],
-          ),
-        ),
-        map((countries) =>
-          countries.filter(
-            (country) =>
-              Boolean(country?.names?.common) &&
-              Boolean(country?.codes?.alpha_2) &&
-              Number.isFinite(country?.population),
-          ),
-        ),
-        map((countries) => countries.length > 0 ? countries : this.fallbackCountries),
-        catchError(() => of(this.fallbackCountries)),
-        shareReplay(1),
-      );
-    }
+    const cachedCountries = this.readCache<CountryRecord[]>(LIST_CACHE_KEY);
+    this.isUsingCachedData = Boolean(cachedCountries);
+
+    this.countriesCache$ = this.fetchAllCountries().pipe(
+      retry({
+        count: 2,
+        delay: (error: unknown, retryCount) => error instanceof HttpErrorResponse
+          && (error.status === 0 || error.status >= 500)
+          ? timer(retryCount * 400)
+          : throwError(() => error),
+      }),
+      tap((countries) => {
+        this.isUsingCachedData = false;
+        this.writeCache(LIST_CACHE_KEY, countries);
+      }),
+      catchError((error: unknown) => {
+        if (cachedCountries?.length) {
+          console.warn('Using cached country data after the API request failed.', error);
+          return of(cachedCountries);
+        }
+
+        console.warn('Using the bundled country fallback after the API request failed.', error);
+        this.isUsingCachedData = true;
+        return of(this.fallbackCountries);
+      }),
+      shareReplay({ bufferSize: 1, refCount: false }),
+    );
+
     return this.countriesCache$;
   }
 
-  getCountryByCode(code: string): Observable<any> {
-    const normalizedCode = code.toUpperCase();
-
-    if (this.countryDetailCache.has(normalizedCode)) {
-      return of(this.countryDetailCache.get(normalizedCode));
+  getCountryByCode(code: string): Observable<CountryRecord> {
+    const normalizedCode = code.trim().toUpperCase();
+    const cachedDetail = this.countryDetailCache.get(normalizedCode)
+      ?? this.readDetailCache()[normalizedCode];
+    if (cachedDetail) {
+      this.countryDetailCache.set(normalizedCode, cachedDetail);
+      return of(cachedDetail);
     }
 
-    const fallbackDetail = this.fallbackCountryDetails[normalizedCode] ?? this.fallbackCountries.find((country) => country.codes.alpha_2 === normalizedCode);
-    if (fallbackDetail) {
-      this.countryDetailCache.set(normalizedCode, fallbackDetail);
-      return of(fallbackDetail);
-    }
+    const fallbackDetail = this.fallbackCountryDetails[normalizedCode]
+      ?? this.fallbackCountries.find((country) => country.codes?.alpha_2 === normalizedCode);
+    const params = new HttpParams()
+      .set('action', 'detail')
+      .set('code', normalizedCode);
 
-    const fields = 'names.common,codes.alpha_2,population,flag,area,capitals,languages,currencies,continents,coat_of_arms';
-    const url = `${this.BASE_URL}/codes.alpha_2/${normalizedCode}?response_fields=${fields}&api-key=${this.API_KEY}`;
-
-    return this.http.get<any>(url).pipe(
-      map((response) => {
-        const detail = response?.data?.objects?.[0] ?? fallbackDetail;
+    return this.http.get<CountriesResponse>(API_ENDPOINT, { params }).pipe(
+      retry({
+        count: 2,
+        delay: (error: unknown, retryCount) => error instanceof HttpErrorResponse
+          && (error.status === 0 || error.status >= 500)
+          ? timer(retryCount * 400)
+          : throwError(() => error),
+      }),
+      map((response) => response.data?.objects?.[0]),
+      map((detail) => {
         if (!detail) throw new Error(`No details were returned for country ${normalizedCode}.`);
         return detail;
       }),
-      tap((detail) => this.countryDetailCache.set(normalizedCode, detail)),
-      catchError((error) => fallbackDetail ? of(fallbackDetail) : throwError(() => error)),
+      tap((detail) => this.saveDetail(normalizedCode, detail)),
+      catchError((error: unknown) => {
+        if (fallbackDetail) {
+          console.warn(`Using bundled country details for ${normalizedCode}.`, error);
+          return of(fallbackDetail);
+        }
+        return throwError(() => error);
+      }),
     );
+  }
+
+  private fetchAllCountries(): Observable<CountryRecord[]> {
+    const getPage = (offset: number) => this.http.get<CountriesResponse>(API_ENDPOINT, {
+      params: new HttpParams()
+        .set('action', 'list')
+        .set('limit', '100')
+        .set('offset', String(offset)),
+    });
+
+    return getPage(0).pipe(
+      switchMap((firstPage) => {
+        const total = firstPage.data?.meta?.total;
+        const offsets = Number.isFinite(total)
+          ? Array.from({ length: Math.ceil((total ?? 0) / 100) - 1 }, (_value, index) => (index + 1) * 100)
+          : [100, 200];
+        return (offsets.length ? forkJoin(offsets.map(getPage)) : of([])).pipe(
+          map((remainingPages) => [firstPage, ...remainingPages]),
+        );
+      }),
+      map((pages) => pages.flatMap((page) => page.data?.objects ?? [])),
+      map((countries) => countries.filter(
+        (country) => Boolean(country.names?.common && country.codes?.alpha_2),
+      )),
+      map((countries) => {
+        if (!countries.length) throw new Error('The country API returned no usable records.');
+        return countries;
+      }),
+    );
+  }
+
+  private readCache<T>(key: string): T | undefined {
+    try {
+      const rawValue = this.document.defaultView?.localStorage.getItem(key);
+      if (!rawValue) return undefined;
+      const entry = JSON.parse(rawValue) as CacheEntry<T>;
+      if (!entry || !Number.isFinite(entry.cachedAt) || Date.now() - entry.cachedAt > CACHE_TTL_MS) {
+        this.document.defaultView?.localStorage.removeItem(key);
+        return undefined;
+      }
+      return entry.value;
+    } catch (error) {
+      console.warn('Unable to read cached country data.', error);
+      return undefined;
+    }
+  }
+
+  private writeCache<T>(key: string, value: T): void {
+    try {
+      this.document.defaultView?.localStorage.setItem(
+        key,
+        JSON.stringify({ cachedAt: Date.now(), value } satisfies CacheEntry<T>),
+      );
+    } catch (error) {
+      console.warn('Unable to persist cached country data.', error);
+    }
+  }
+
+  private readDetailCache(): Record<string, CountryRecord> {
+    return this.readCache<Record<string, CountryRecord>>(DETAIL_CACHE_KEY) ?? {};
+  }
+
+  private saveDetail(code: string, detail: CountryRecord): void {
+    this.countryDetailCache.set(code, detail);
+    this.writeCache(DETAIL_CACHE_KEY, { ...this.readDetailCache(), [code]: detail });
   }
 }
