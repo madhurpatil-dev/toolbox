@@ -20,6 +20,7 @@ export class CalculatorComponent implements OnInit {
   isSmallScreen: boolean | undefined;
   isLargeScreen: boolean = false;
   history: string[] = []; // Added calculation history
+  copyStatus = '';
 
   calculatorButtons: CalculatorButton[] = [
     { label: 'C', value: 'C', type: 'function' },
@@ -63,12 +64,12 @@ export class CalculatorComponent implements OnInit {
     this.isSmallScreen = window.innerWidth <= 768; // Adjusted breakpoint
   }
   
-  handleButtonClick(value: string, type: string): void {
+  handleButtonClick(value: string, type: CalculatorButton['type']): void {
     if (value === '=') {
       const currentExpression = this.currentInput;
       this.calculateResult();
       if (this.result !== 'Error') {
-        this.history.unshift(`${currentExpression} = ${this.result}`);
+        this.history = [`${currentExpression} = ${this.result}`, ...this.history].slice(0, 20);
         this.currentInput = this.result;
       }
     } else if (value === 'C') {
@@ -113,5 +114,47 @@ export class CalculatorComponent implements OnInit {
 
   clearHistory(): void {
     this.history = [];
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  handleKeyboardInput(event: KeyboardEvent): void {
+    const target = event.target;
+    if (
+      target instanceof HTMLInputElement ||
+      target instanceof HTMLTextAreaElement ||
+      target instanceof HTMLSelectElement ||
+      (target instanceof HTMLElement && target.isContentEditable)
+    ) {
+      return;
+    }
+
+    if (/^\d$/.test(event.key) || event.key === '.') {
+      event.preventDefault();
+      this.handleButtonClick(event.key, 'number');
+    } else if (['+', '-', '*', '/', '%'].includes(event.key)) {
+      event.preventDefault();
+      this.handleButtonClick(event.key, 'operator');
+    } else if (event.key === 'Enter' || event.key === '=') {
+      event.preventDefault();
+      this.handleButtonClick('=', 'function');
+    } else if (event.key === 'Backspace') {
+      event.preventDefault();
+      this.handleButtonClick('backspace', 'function');
+    } else if (event.key === 'Escape') {
+      this.clear();
+    }
+  }
+
+  async copyResult(): Promise<void> {
+    if (!this.result || this.result === 'Error') return;
+
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('Clipboard access is unavailable.');
+      await navigator.clipboard.writeText(this.result);
+      this.copyStatus = 'Result copied.';
+    } catch (error) {
+      this.copyStatus = 'Could not copy. Select the result and copy it manually.';
+      console.warn('Unable to copy the calculator result.', error);
+    }
   }
 }

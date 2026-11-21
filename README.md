@@ -16,6 +16,10 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 Run `npm run build` to build the project. Build artifacts are stored in `dist/`.
 
+## Netlify deployment
+
+Configure `REST_COUNTRIES_API_KEY` as a Netlify environment variable for the country-data function. Do not put this key in Angular source or client-side environment files. The country tools use cached/bundled data until the function can reach the REST Countries API.
+
 ## Running unit tests
 
 Run `npm test` to execute the Vitest unit tests.

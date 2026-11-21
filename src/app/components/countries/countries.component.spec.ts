@@ -32,6 +32,7 @@ describe('CountriesComponent', () => {
   const router = {
     createUrlTree: vi.fn(),
     serializeUrl: vi.fn(() => '/population?country=IN'),
+    navigate: vi.fn(),
   };
 
   beforeEach(async () => {
@@ -54,7 +55,7 @@ describe('CountriesComponent', () => {
         { provide: CountryServiceService, useValue: countryService },
         { provide: ActivatedRoute, useValue: { queryParamMap: of(convertToParamMap({})) } },
         { provide: Router, useValue: router },
-        { provide: ThemeService, useValue: { theme: 'light', isDark: false, toggle: vi.fn() } },
+        { provide: ThemeService, useValue: { theme: 'light', isDark: false, changes$: of() } },
       ],
     })
     .compileComponents();
@@ -76,6 +77,29 @@ describe('CountriesComponent', () => {
 
     expect(component.comparedCodes).toEqual(['IN', 'US', 'CN']);
     expect(component.comparisonMessage).toContain('up to three');
+  });
+
+  it('resolves alpha-3 border codes and renders missing country fields safely', () => {
+    component.countries = [{
+      names: { common: 'United States' },
+      codes: { alpha_2: 'US', alpha_3: 'USA' },
+    }];
+    const selectCountry = vi.spyOn(component, 'selectCountry');
+    component.selectBorderCountry('USA');
+
+    expect(component.countryNameFor('USA')).toBe('United States');
+    expect(selectCountry).toHaveBeenCalledWith('US');
+
+    component.additionalInfo = {
+      capitals: [null],
+      currencies: { USD: null },
+      languages: { eng: null },
+      area: null,
+    };
+    expect(component.getCountryInfo('capitals')).toBe('N/A');
+    expect(component.getCountryInfo('currencies')).toBe('N/A');
+    expect(component.getCountryInfo('languages')).toBe('N/A');
+    expect(component.getCountryInfo('area')).toBe('N/A');
   });
 
   it('shows the selected country summary while its full details load', () => {
@@ -114,6 +138,20 @@ describe('CountriesComponent', () => {
 
     expect(selected).toHaveBeenCalledWith('IN');
     expect(search.isOpen).toBe(false);
+  });
+
+  it('filters countries by language and currency and supports alphabetical sorting', () => {
+    component.countries = [
+      { names: { common: 'Zedland' }, codes: { alpha_2: 'ZE' }, population: 10, region: 'West', languages: [{ name: 'English' }], currencies: [{ code: 'ZED' }] },
+      { names: { common: 'Aland' }, codes: { alpha_2: 'AL' }, population: 100, region: 'West', languages: [{ name: 'English' }], currencies: [{ code: 'ALD' }] },
+      { names: { common: 'Otherland' }, codes: { alpha_2: 'OT' }, population: 1000, region: 'East', languages: [{ name: 'French' }], currencies: [{ code: 'OTR' }] },
+    ];
+    component.selectedRegion = 'West';
+    component.selectedLanguage = 'English';
+    component.selectedCurrency = 'ZED';
+    component.sortBy = 'name';
+
+    expect(component.filteredSortedCountries.map((country) => country.names.common)).toEqual(['Zedland']);
   });
 
   it('creates escaped CSV data for the selected country', () => {

@@ -1,16 +1,8 @@
 import { Component, HostListener, OnInit } from '@angular/core';
+import { finalize } from 'rxjs/operators';
 import { CurrencyConverterService } from '../../services/currency-converter.service';
+import type { ConversionRatesResponse } from '../../services/currency-converter.service';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-
-// Define CurrencyRate interface
-interface CurrencyRate {
-  key: string;
-  value: number;
-}
-
-interface CountryNames {
-  [key: string]: string;
-}
 
 @Component({
     selector: 'app-currencyconverter',
@@ -19,13 +11,16 @@ interface CountryNames {
     standalone: false
 })
 export class CurrencyconverterComponent implements OnInit {
-  conversionRates: CurrencyRate[] = []; // Updated type to CurrencyRate
+  conversionRates: Record<string, number> = {};
   fromCurrency: string = 'USD';
   toCurrency: string = 'INR';
   amount: number = 1;
   result: number = 0;
   isMobile: boolean | undefined;
   isLargeScreen: boolean = false;
+  isLoadingRates = false;
+  errorMessage = '';
+  copyStatus = '';
   today: Date = new Date();
   swapCurrencies(): void {
     const temp = this.fromCurrency;
@@ -286,29 +281,63 @@ export class CurrencyconverterComponent implements OnInit {
 
 
   fetchConversionRates(): void {
-    this.converterService.getConversionRates().subscribe(
-      (data: { rates: any }) => {
-        if (data && data.rates) {
-          this.conversionRates = data.rates;
-          this.convert();
+    this.isLoadingRates = true;
+    this.converterService.getConversionRates().pipe(
+      finalize(() => this.isLoadingRates = false),
+    ).subscribe({
+      next: (data: ConversionRatesResponse) => {
+        if (!data?.rates || Object.keys(data.rates).length === 0) {
+          this.errorMessage = 'Exchange rates are currently unavailable. Try again later.';
+          return;
         }
+        this.errorMessage = '';
+        this.conversionRates = data.rates;
+        this.convert();
       },
-      (error: any) => {
-      }
-    );
+      error: (error: unknown) => {
+        console.error('Currency rates could not be loaded.', error);
+        this.errorMessage = 'Exchange rates are currently unavailable. Try again later.';
+      },
+    });
   }
 
   convert(): void {
-    if (this.conversionRates) {
+    this.copyStatus = '';
+    if (this.hasRates) {
       this.result = this.converterService.convert(
         this.amount,
         this.fromCurrency,
         this.toCurrency,
         this.conversionRates
       );
-      if (isNaN(this.result)) {
+      if (!Number.isFinite(this.result)) {
         this.result = 0;
       }
+    }
+  }
+
+  get hasRates(): boolean {
+    return Object.keys(this.conversionRates).length > 0;
+  }
+
+  reset(): void {
+    this.fromCurrency = 'USD';
+    this.toCurrency = 'INR';
+    this.amount = 1;
+    this.copyStatus = '';
+    this.convert();
+  }
+
+  async copyResult(): Promise<void> {
+    if (!this.hasRates) return;
+
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('Clipboard access is unavailable.');
+      await navigator.clipboard.writeText(`${this.result.toFixed(2)} ${this.toCurrency}`);
+      this.copyStatus = 'Conversion result copied.';
+    } catch (error) {
+      console.warn('Currency conversion result could not be copied.', error);
+      this.copyStatus = 'Could not copy the result. Select it and copy it manually.';
     }
   }
 

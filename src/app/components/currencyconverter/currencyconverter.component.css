@@ -2,8 +2,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Inter', sans-serif;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  font-family: var(--font-sans);
+  background: var(--canvas);
   min-height: calc(100vh - 132px);
   width: 100%;
   padding: 24px 16px;
@@ -38,7 +38,8 @@
 
 /* Converter card styles */
 .currency-converter {
-  background-color: white;
+  background-color: var(--surface);
+  color: var(--ink);
   border-radius: 8px;
   padding: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -105,6 +106,43 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.converter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.currency-status {
+  margin: 8px 0;
+  color: var(--muted);
+  text-align: center;
+}
+
+.currency-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--danger) 8%, var(--surface));
+  color: var(--danger);
+}
+
+.currency-error button {
+  min-height: 40px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 /* Make form fields more compact */

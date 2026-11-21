@@ -1,5 +1,7 @@
 :root {
   color-scheme: light;
+  --font-sans: 'DM Sans', Arial, sans-serif;
+  --font-mono: 'DM Mono', monospace;
   --ink: #172033;
   --muted: #667085;
   --text-primary: var(--ink);
@@ -16,8 +18,15 @@
   --brand-soft: #eef0ff;
   --success: #067647;
   --danger: #b42318;
+  --focus-ring: #4656d8;
+  --on-brand: #ffffff;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
   --shadow-sm: 0 1px 2px rgba(16, 24, 40, .05);
   --shadow-md: 0 12px 28px rgba(16, 24, 40, .08);
+  --shadow-lg: 0 20px 48px rgba(16, 24, 40, .12);
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -29,6 +38,8 @@
   --type-base: 1rem;
   --type-lg: 1.25rem;
   --type-xl: 1.5rem;
+  --type-2xl: 2rem;
+  --type-display: clamp(2.5rem, 6vw, 4.5rem);
 }
 
 :root[data-theme='dark'] {
@@ -51,6 +62,8 @@
   --brand: #a7b3ff;
   --brand-strong: #c4ccff;
   --brand-soft: #262f4c;
+  --focus-ring: #b7c1ff;
+  --on-brand: #101525;
   --success: #8bd6b4;
   --danger: #ffb4a9;
   --action-basic: #087f5b;
@@ -76,7 +89,7 @@ body {
   margin: 0;
   background: var(--canvas);
   color: var(--ink);
-  font-family: 'DM Sans', Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: var(--type-base);
   line-height: 1.5;
   transition: background-color .18s ease, color .18s ease;
@@ -89,7 +102,7 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 3px solid rgba(112, 126, 255, .75);
+  outline: 3px solid color-mix(in srgb, var(--focus-ring) 78%, transparent);
   outline-offset: 3px;
 }
 
@@ -122,6 +135,25 @@ mat-card {
 .mat-mdc-form-field { font-family: inherit !important; }
 .mat-mdc-text-field-wrapper { border-radius: 10px !important; }
 .mat-mdc-snack-bar-container { --mdc-snackbar-container-color: #172033; }
+
+button,
+input,
+select,
+textarea,
+mat-card {
+  border-radius: var(--radius-md);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
 
 :root[data-theme='dark'] body { background: var(--canvas); color: var(--ink); }
 :root[data-theme='dark'] .site-header { background: rgba(14, 22, 35, .94); }

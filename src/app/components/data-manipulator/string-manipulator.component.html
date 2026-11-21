@@ -202,6 +202,11 @@
               cdkAutosizeMaxRows="10"
             ></textarea>
           </mat-form-field>
+          <div class="result-actions">
+            <button type="button" mat-raised-button color="primary" (click)="copyToClipboard()">Copy result</button>
+            <button type="button" mat-stroked-button (click)="saveAsFile()">Download .txt</button>
+            @if (copyStatus) { <span role="status" aria-live="polite">{{ copyStatus }}</span> }
+          </div>
         </div>
       }
     </mat-card-content>

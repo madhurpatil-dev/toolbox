@@ -1,11 +1,11 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { saveAs } from 'file-saver';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from 'rxjs/operators';
 import { Observable, of, Subject } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormControl } from '@angular/forms';
+import { CountryServiceService } from '../../services/country-service.service';
 @Component({
     selector: 'app-findflag',
     templateUrl: './findflag.component.html',
@@ -215,7 +215,6 @@ export class FindflagComponent implements OnInit {
   flagUrl: string = '';
   isLoading: boolean = false;
   isLargeScreen: boolean = false;
-  themeMode: 'light' | 'dark' = 'light';
   currentYear: number = new Date().getFullYear();
   
   private searchTerm$ = new Subject<string>();
@@ -226,20 +225,28 @@ export class FindflagComponent implements OnInit {
   }
 
   constructor(
-    private http: HttpClient,
+    private countryService: CountryServiceService,
     private breakpointObserver: BreakpointObserver,
     private snackBar: MatSnackBar,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
-    // Check system preference for dark mode
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    this.themeMode = prefersDark ? 'dark' : 'light';
-    this.applyTheme();
-
     // Setup search pipeline
     this.setupSearchPipeline();
+    this.countryService.getAllCountries().subscribe((countries) => {
+      const countryOptions = countries
+        .map((country) => country.names?.common)
+        .filter((name): name is string => Boolean(name))
+        .map((name) => ({ value: name, display: name }));
+      const optionsByName = new Map(
+        [...countryOptions, ...this.countries].map((country) => [country.value.toLocaleLowerCase(), country]),
+      );
+      this.countries = [...optionsByName.values()].sort((first, second) =>
+        first.display.localeCompare(second.display),
+      );
+      this.cdr.markForCheck();
+    });
 
     // Responsive breakpoint observer
     this.breakpointObserver.observe([
@@ -286,14 +293,6 @@ export class FindflagComponent implements OnInit {
     });
   }
 
-  private applyTheme(): void {
-    if (this.themeMode === 'dark') {
-      document.body.classList.add('dark-theme');
-    } else {
-      document.body.classList.remove('dark-theme');
-    }
-  }
-
   onCountrySelected(): void {
     this.countrySearchControl.setValue('');
     if (!this.selectedCountry) {
@@ -307,31 +306,19 @@ export class FindflagComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-private readonly API_KEY = 'rc_live_960b8d0b0dc84a30b10577a8f29dbc9c';
-
 private fetchFlagUrl(countryName: string): Observable<string> {
   const resolvedName = countryName === 'Bharat' ? 'India' : countryName;
-  const url = `https://api.restcountries.com/countries/v5/names.common/${encodeURIComponent(resolvedName)}?response_fields=flag&api-key=${this.API_KEY}`;
-
-  return this.http.get<any>(url).pipe(
-    map(response => {
-      const objects = response?.data?.objects;
-      if (Array.isArray(objects) && objects.length > 0) {
-        return objects[0]?.flag?.url_png || objects[0]?.flag?.url_svg || '';
-      }
-
-      const fallbackList = Array.isArray(response) ? response : [];
-      const fallbackEntry = fallbackList[0];
-      if (fallbackEntry?.flags?.png) {
-        return fallbackEntry.flags.png;
-      }
-
-      if (fallbackEntry?.flag?.png) {
-        return fallbackEntry.flag.png;
-      }
-
-      return '';
-    })
+  return this.countryService.getAllCountries().pipe(
+    map((countries) => {
+      const country = countries.find(
+        (item) => item.names?.common?.toLocaleLowerCase() === resolvedName.toLocaleLowerCase(),
+      );
+      return country?.flag?.url_png
+        || country?.flag?.url_svg
+        || (country?.codes?.alpha_2
+          ? `https://flagcdn.com/w320/${country.codes.alpha_2.toLowerCase()}.png`
+          : '');
+    }),
   );
 }
   private handleError(error: any): void {
@@ -352,8 +339,4 @@ private fetchFlagUrl(countryName: string): Observable<string> {
     }
   }
 
-  toggleTheme(): void {
-    this.themeMode = this.themeMode === 'light' ? 'dark' : 'light';
-    this.applyTheme();
-  }
 }

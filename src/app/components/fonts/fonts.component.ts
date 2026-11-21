@@ -1,7 +1,8 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Subscription } from 'rxjs';
 
 interface FontCategoriesInterface {
   sans: string[];
@@ -32,22 +33,20 @@ interface FontCategoriesInterface {
     ],
     standalone: false
 })
-export class FontsComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('previewArea') previewArea!: ElementRef;
-  @ViewChild('previewText') previewTextElement!: ElementRef;
+export class FontsComponent implements OnInit, OnDestroy {
   private themeObserver?: MutationObserver;
   private hasCustomTextColor = false;
+  private breakpointSubscription?: Subscription;
   
   inputText: string = '';
   showPlaceholder: boolean = true;
-  copiedTimeout: any;
+  copiedTimeout?: ReturnType<typeof setTimeout>;
   recentlyUsedFonts: string[] = [];
   isCopied: boolean = false;
   fontSize: number = 16;
   fontWeight: string = 'normal';
   fontStyle: string = 'normal';
   textColor: string = '#333333';
-  isDarkMode: boolean = false;
   isLargeScreen: boolean = false;
   currentCategory: string = 'all';
   currentYear: number = new Date().getFullYear();
@@ -99,12 +98,21 @@ export class FontsComponent implements OnInit, AfterViewInit, OnDestroy {
       attributeFilter: ['data-theme'],
     });
 
-    const storedFonts = localStorage.getItem('recentFonts');
-    if (storedFonts) {
-      this.recentlyUsedFonts = JSON.parse(storedFonts);
+    try {
+      const storedFonts = localStorage.getItem('recentFonts');
+      if (storedFonts) {
+        const recentFonts: unknown = JSON.parse(storedFonts);
+        if (Array.isArray(recentFonts)) {
+          this.recentlyUsedFonts = recentFonts.filter(
+            (font): font is string => typeof font === 'string' && this.fonts.includes(font),
+          ).slice(0, 5);
+        }
+      }
+    } catch (error) {
+      console.warn('Recent fonts could not be loaded.', error);
     }
     
-    this.breakpointObserver.observe([
+    this.breakpointSubscription = this.breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small,
       Breakpoints.Medium,
@@ -118,16 +126,10 @@ export class FontsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.convertText();
   }
 
-  ngAfterViewInit(): void {
-    setTimeout(() => {
-      if (this.previewArea) {
-        this.previewArea.nativeElement.focus();
-      }
-    }, 500);
-  }
-
   ngOnDestroy(): void {
     this.themeObserver?.disconnect();
+    this.breakpointSubscription?.unsubscribe();
+    if (this.copiedTimeout) clearTimeout(this.copiedTimeout);
   }
 
   private updateDefaultTextColor(): void {
@@ -153,6 +155,10 @@ export class FontsComponent implements OnInit, AfterViewInit, OnDestroy {
   return categoryNames[category] || category;
 }
 
+get isDarkMode(): boolean {
+  return document.documentElement.dataset['theme'] === 'dark';
+}
+
   convertText() {
     this.convertedText = this.inputText;
     this.showPlaceholder = !this.inputText;
@@ -162,43 +168,51 @@ export class FontsComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.recentlyUsedFonts.length > 5) {
         this.recentlyUsedFonts.pop();
       }
-      localStorage.setItem('recentFonts', JSON.stringify(this.recentlyUsedFonts));
+      try {
+        localStorage.setItem('recentFonts', JSON.stringify(this.recentlyUsedFonts));
+      } catch (error) {
+        console.warn('Recent fonts could not be saved.', error);
+      }
     }
   }
 
-  copyConvertedText() {
+  async copyConvertedText(): Promise<void> {
     try {
-      // Get the preview text element
-      const previewElement = this.previewTextElement.nativeElement;
-      
-      // Create a range and select the text
-      const range = document.createRange();
-      range.selectNode(previewElement);
-      window.getSelection()?.removeAllRanges();
-      window.getSelection()?.addRange(range);
-      
-      // Execute the copy command
-      document.execCommand('copy');
-      
-      // Clear the selection
-      window.getSelection()?.removeAllRanges();
-      
-      // Show success message
+      const clipboard = navigator.clipboard;
+      if (!clipboard) throw new Error('Clipboard access is unavailable.');
+
+      const styledText = document.createElement('span');
+      styledText.textContent = this.convertedText;
+      styledText.style.fontFamily = this.selectedFont;
+      styledText.style.fontSize = `${this.fontSize}px`;
+      styledText.style.fontWeight = this.fontWeight;
+      styledText.style.fontStyle = this.fontStyle;
+      styledText.style.color = this.textColor;
+
+      let copiedWithStyle = false;
+      if (typeof ClipboardItem !== 'undefined' && clipboard.write) {
+        const html = new Blob([styledText.outerHTML], { type: 'text/html' });
+        const text = new Blob([this.convertedText], { type: 'text/plain' });
+        await clipboard.write([new ClipboardItem({ 'text/html': html, 'text/plain': text })]);
+        copiedWithStyle = true;
+      } else {
+        await clipboard.writeText(this.convertedText);
+      }
+
       this.isCopied = true;
-      this.snackBar.open('Styled text copied to clipboard!', 'Dismiss', {
+      this.snackBar.open(copiedWithStyle ? 'Styled text copied to clipboard!' : 'Text copied without formatting.', 'Dismiss', {
         duration: 2000,
         horizontalPosition: 'center',
         verticalPosition: 'bottom',
         panelClass: this.isDarkMode ? 'dark-snackbar' : 'light-snackbar'
       });
-      
-      // Reset the copy button after a delay
       clearTimeout(this.copiedTimeout);
       this.copiedTimeout = setTimeout(() => {
         this.isCopied = false;
       }, 2000);
-      
-    } catch (err) {
+
+    } catch (error) {
+      console.warn('Styled text could not be copied.', error);
       this.snackBar.open('Failed to copy styled text. Please try selecting and copying manually.', 'Dismiss', {
         duration: 3000,
         horizontalPosition: 'center',
@@ -227,10 +241,6 @@ export class FontsComponent implements OnInit, AfterViewInit, OnDestroy {
   setTextColor(color: string) {
     this.textColor = color;
     this.hasCustomTextColor = true;
-  }
-
-  toggleDarkMode() {
-    this.isDarkMode = !this.isDarkMode;
   }
 
   filterByCategory(category: string) {

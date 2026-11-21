@@ -8,6 +8,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSelect } from '@angular/material/select';
 import { FormControl } from '@angular/forms';
 import { countries as fallbackCountries } from '../../constants/countries';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
     selector: 'app-findcapital',
@@ -61,7 +62,6 @@ export class FindcapitalComponent implements OnInit {
   recentSearches: {country: string, capital: string, flag: string}[] = [];
   countryFlag: string = '';
   countryInfo: any = null;
-  themeMode: 'light' | 'dark' = 'light';
   currentYear: number = new Date().getFullYear();
   rotateState: string = 'inactive';
   searchInputFocused: boolean = false;
@@ -77,11 +77,12 @@ export class FindcapitalComponent implements OnInit {
     private findCapitalService: FindCapitalService, 
     private breakpointObserver: BreakpointObserver,
     private snackBar: MatSnackBar,
-    private cdr: ChangeDetectorRef
-  ) { 
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    this.themeMode = prefersDark ? 'dark' : 'light';
-    this.applyTheme();
+    private cdr: ChangeDetectorRef,
+    private readonly themeService: ThemeService,
+  ) {}
+
+  get themeMode(): 'light' | 'dark' {
+    return this.themeService.theme;
   }
 
   ngOnInit(): void {
@@ -130,14 +131,6 @@ export class FindcapitalComponent implements OnInit {
         this.cdr.detectChanges();
       }
     );
-  }
-
-  private applyTheme(): void {
-    if (this.themeMode === 'dark') {
-      document.body.classList.add('dark-theme');
-    } else {
-      document.body.classList.remove('dark-theme');
-    }
   }
 
 fetchCountryNames(): void {
@@ -300,11 +293,6 @@ fetchCountryNames(): void {
     this.onCountrySelected();
   }
   
-  toggleTheme(): void {
-    this.themeMode = this.themeMode === 'light' ? 'dark' : 'light';
-    this.applyTheme();
-  }
-
     resetSearch(): void {
     this.countrySearchControl.setValue('');
     this.selectedCountry = '';

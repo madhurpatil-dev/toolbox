@@ -76,15 +76,6 @@
   border-radius: 3px;
 }
 
-.theme-toggle {
-  color: #3f51b5;
-  transition: all 0.3s ease;
-}
-
-.theme-toggle:hover {
-  transform: rotate(30deg);
-}
-
 .location-selection {
   margin: 24px 0;
 }

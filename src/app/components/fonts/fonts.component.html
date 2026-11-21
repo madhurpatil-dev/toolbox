@@ -18,7 +18,6 @@
           <mat-form-field appearance="fill" class="full-width">
             <mat-label>Your text</mat-label>
             <textarea
-              #previewArea
               matInput
               [(ngModel)]="inputText"
               (input)="convertText()"
@@ -145,7 +144,7 @@
 
           <div class="preview-content">
 
-            <div class="preview-text" #previewText [ngClass]="{'placeholder': showPlaceholder}"
+            <div class="preview-text" [ngClass]="{'placeholder': showPlaceholder}"
               [style.font-family]="selectedFont"
               [style.font-size.px]="fontSize"
               [style.font-weight]="fontWeight"

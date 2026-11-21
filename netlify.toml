@@ -1,2 +1,5 @@
 [[plugins]]
 package = "@netlify/angular-runtime"
+
+[functions]
+directory = "netlify/functions"

@@ -99,9 +99,8 @@
 .eyebrow { margin:0 0 7px; color:var(--teal); font-size:11px; font-weight:700; line-height:1.4; }
 .page-header h1 { margin:0; font-size:32px; font-weight:700; line-height:1.2; }
 .page-intro { margin:8px 0 0; color:var(--muted); font-size:15px; }
-.theme-toggle { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-width:92px; min-height:44px; border:1px solid var(--line); border-radius:10px; background:var(--surface); color:var(--ink); font-size:13px; font-weight:700; cursor:pointer; }
-.theme-toggle span { color:var(--brand); font-size:18px; }
 .search-panel { position:sticky; top:0; z-index:8; margin-bottom:24px; padding:16px 18px; border:1px solid var(--line); border-radius:14px; background:var(--surface); box-shadow:var(--shadow-sm); }
+.offline-data-note { margin:-12px 0 16px; color:var(--muted); font-size:13px; }
 .dashboard { display:grid; gap:16px; min-width:0; }
 .profile-panel { padding:20px 22px; border:1px solid var(--line); border-radius:14px; background:var(--surface); box-shadow:var(--shadow-sm); }
 .stats-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
@@ -120,6 +119,11 @@
 .details-list > div { display:grid; grid-template-columns:100px minmax(0,1fr); gap:12px; padding:11px 0; border-bottom:1px solid var(--line); }
 .details-list dt { color:var(--muted); font-size:13px; }
 .details-list dd { overflow-wrap:anywhere; margin:0; color:var(--ink); font-size:13px; font-weight:600; text-align:right; }
+.border-countries { margin:16px 0; }
+.border-countries h3 { margin:0 0 8px; font-size:13px; }
+.border-list { display:flex; flex-wrap:wrap; gap:6px; }
+.border-list button { min-height:36px; padding:0 10px; border:1px solid var(--line); border-radius:18px; background:var(--surface); color:var(--brand-strong); font-size:12px; font-weight:700; cursor:pointer; }
+.border-list button:hover { background:var(--brand-soft); }
 .coverage-note { margin:16px 0; padding:12px; border-left:3px solid var(--teal); border-radius:0 8px 8px 0; background:var(--brand-soft); }
 .coverage-note strong { font-size:12px; }
 .coverage-note p { margin:4px 0 0; color:var(--muted); font-size:12px; line-height:1.5; }
@@ -174,7 +178,6 @@
   .page-header { gap:12px; margin-bottom:18px; }
   .page-header h1 { font-size:26px; }
   .page-intro { max-width:250px; font-size:14px; }
-  .theme-toggle { min-width:44px; padding:0 10px; }
   .search-panel { top:0; margin-right:-12px; margin-left:-12px; padding:12px; }
   .stats-grid { gap:8px; }
   .profile-panel,.details-panel,.ranking-panel,.compare-strip { padding:15px; }

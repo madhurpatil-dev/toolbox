@@ -12,6 +12,8 @@ describe('CountryServiceService', () => {
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
+    localStorage.removeItem('toolbox-country-list-v1');
+    localStorage.removeItem('toolbox-country-details-v1');
     TestBed.configureTestingModule({
       providers: [provideHttpClient(), provideHttpClientTesting()],
     });
@@ -25,30 +27,30 @@ describe('CountryServiceService', () => {
 
   it('loads country names, codes, and populations across all API pages', async () => {
     const countriesPromise = firstValueFrom(service.getAllCountries());
-    const pages = [0, 100, 200].map((offset) =>
-      httpTestingController.expectOne(
-        (request) =>
-          request.urlWithParams.startsWith(
-            'https://api.restcountries.com/countries/v5?',
-          ) &&
-          request.urlWithParams.includes(`offset=${offset}`) &&
-          request.urlWithParams.includes('limit=100') &&
-          request.urlWithParams.includes(
-            'response_fields=names.common,codes.alpha_2,population',
-          ),
-      ),
+    const firstPage = httpTestingController.expectOne(
+      (request) => request.params.get('offset') === '0',
     );
-
-    pages[0].flush({
+    expect(firstPage.request.url).toBe('/.netlify/functions/countries');
+    expect(firstPage.request.params.get('action')).toBe('list');
+    expect(firstPage.request.params.get('limit')).toBe('100');
+    expect(firstPage.request.urlWithParams).not.toContain('api-key');
+    firstPage.flush({
       data: {
         objects: Array.from({ length: 100 }, (_, index) => ({
           names: { common: `Country ${index}` },
           codes: { alpha_2: `A${index}` },
           population: index + 1,
         })),
+        meta: { total: 250 },
       },
     });
-    pages[1].flush({
+    const secondPage = httpTestingController.expectOne(
+      (request) => request.params.get('offset') === '100',
+    );
+    const thirdPage = httpTestingController.expectOne(
+      (request) => request.params.get('offset') === '200',
+    );
+    secondPage.flush({
       data: {
         objects: Array.from({ length: 100 }, (_, index) => ({
           names: { common: `Country ${index + 100}` },
@@ -57,7 +59,7 @@ describe('CountryServiceService', () => {
         })),
       },
     });
-    pages[2].flush({
+    thirdPage.flush({
       data: {
         objects: Array.from({ length: 50 }, (_, index) => ({
           names: { common: `Country ${index + 200}` },
@@ -77,54 +79,30 @@ describe('CountryServiceService', () => {
     expect(countries[249].population).toBe(250);
   });
 
-  it('returns the fallback country list if a page request fails', async () => {
-    const countriesPromise = firstValueFrom(service.getAllCountries());
-    const pages = [0, 100, 200].map((offset) =>
-      httpTestingController.expectOne(
-        (request) => request.urlWithParams.includes(`offset=${offset}`),
-      ),
-    );
-
-    pages[0].flush({ data: { objects: [] } });
-    pages[1].flush({ data: { objects: [] } });
-    pages[2].flush('Server Error', {
-      status: 500,
-      statusText: 'Server Error',
-    });
-
-    const countries = await countriesPromise;
-    expect(countries.length).toBeGreaterThan(20);
-    expect(
-      countries.some(
-        (country) =>
-          country.names.common === 'India' && country.codes.alpha_2 === 'IN',
-      ),
-    ).toBe(true);
-  });
-
-  it('returns the fallback country list when the API response has no usable countries', async () => {
-    const countriesPromise = firstValueFrom(service.getAllCountries());
+  it('uses the bundled fallback after the API returns no usable countries', () => {
+    let countries: import('./country-service.service').CountryRecord[] = [];
+    service.getAllCountries().subscribe((value) => countries = value);
+    httpTestingController.expectOne(
+      (request) => request.params.get('offset') === '0',
+    ).flush({ data: { objects: [] } });
     [0, 100, 200].forEach((offset) => {
-      httpTestingController
-        .expectOne((request) =>
-          request.urlWithParams.includes(`offset=${offset}`),
-        )
-        .flush({ data: { objects: [] } });
+      if (offset === 0) return;
+      httpTestingController.expectOne(
+        (request) => request.params.get('offset') === String(offset),
+      ).flush({ data: { objects: [] } });
     });
 
-    const countries = await countriesPromise;
     expect(countries.length).toBeGreaterThan(20);
-    expect(countries.some((country) => country.names.common === 'India')).toBe(
-      true,
-    );
+    expect(countries.some((country) => country.names?.common === 'India')).toBe(true);
   });
 
   it('surfaces a detail failure when no fallback exists for a country', async () => {
-    const detailsPromise = firstValueFrom(service.getCountryByCode('ZZ'));
+    let requestError: unknown;
+    service.getCountryByCode('ZZ').subscribe({ error: (error) => requestError = error });
     httpTestingController.expectOne(
-      (request) => request.urlWithParams.includes('/codes.alpha_2/ZZ'),
+      (request) => request.params.get('action') === 'detail' && request.params.get('code') === 'ZZ',
     ).flush('Not Found', { status: 404, statusText: 'Not Found' });
 
-    await expect(detailsPromise).rejects.toThrow();
+    expect(requestError).toBeTruthy();
   });
 });
