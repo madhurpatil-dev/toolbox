@@ -8,6 +8,7 @@ import { Component, HostListener } from '@angular/core';
 })
 export class ColorDisplayComponent {
   selectedColor: string | null = null;
+  copyStatus = '';
   searchTerm = '';
   activeTab: 'normal' | 'gradient' = 'normal';
   formatLeft = 0;
@@ -271,6 +272,7 @@ export class ColorDisplayComponent {
   onColorBoxClick(event: MouseEvent, color: string): void {
     event.stopPropagation();
     this.selectedColor = color;
+    this.copyStatus = '';
     
     // Position the format box
     const x = event.clientX;
@@ -282,22 +284,17 @@ export class ColorDisplayComponent {
     this.formatTop = y + 200 > windowHeight ? windowHeight - 200 : y;
   }
 
-  copyToClipboard(text: string): void {
+  async copyToClipboard(text: string): Promise<void> {
     if (!text) return;
-    
-    navigator.clipboard.writeText(text).then(() => {
-      const tooltip = document.createElement('div');
-      tooltip.className = 'copy-tooltip';
-      tooltip.textContent = 'Copied!';
-      tooltip.style.position = 'fixed';
-      tooltip.style.left = `${this.formatLeft + 20}px`;
-      tooltip.style.top = `${this.formatTop - 30}px`;
-      document.body.appendChild(tooltip);
-      
-      setTimeout(() => {
-        document.body.removeChild(tooltip);
-      }, 1000);
-    });
+
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('Clipboard access is unavailable.');
+      await navigator.clipboard.writeText(text);
+      this.copyStatus = `${text} copied to clipboard.`;
+    } catch (error) {
+      console.warn('Color value could not be copied.', error);
+      this.copyStatus = 'Could not copy the color value. Select it and copy it manually.';
+    }
   }
 
   getColorName(color: string): string {

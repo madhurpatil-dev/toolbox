@@ -120,6 +120,9 @@
             </div>
           }
         </div>
+        @if (copyStatus) {
+          <p class="copy-status" role="status" aria-live="polite">{{ copyStatus }}</p>
+        }
       </div>
     }
   </div>

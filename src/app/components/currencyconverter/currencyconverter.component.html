@@ -9,6 +9,16 @@
   }
 
   <div class="currency-converter mat-elevation-z3">
+    @if (isLoadingRates) {
+      <p class="currency-status" role="status" aria-live="polite">Loading exchange rates...</p>
+    }
+    @if (errorMessage) {
+      <div class="currency-error" role="alert">
+        <span>{{ errorMessage }}</span>
+        <button type="button" (click)="fetchConversionRates()" [disabled]="isLoadingRates">Try again</button>
+      </div>
+    }
+
     <!-- From Currency -->
     <mat-form-field appearance="fill" class="custom-width" [ngClass]="{ 'mobile-width': isMobile }">
       <mat-label>From Currency</mat-label>
@@ -71,15 +81,16 @@
         }
       </div>
 
-      <!-- Convert Button -->
-      <button
-        mat-raised-button
-        color="primary"
-        class="convert-button"
-        (click)="convert()"
-        >
-        <span class="material-icons icon-space">autorenew</span>
-        Convert
-      </button>
+      <div class="converter-actions">
+        <button type="button" mat-raised-button color="primary" class="convert-button" (click)="convert()" [disabled]="!hasRates || isLoadingRates">
+          <span class="material-icons icon-space" aria-hidden="true">autorenew</span>
+          Convert
+        </button>
+        <button type="button" mat-button (click)="reset()">Reset</button>
+        <button type="button" mat-button (click)="copyResult()" [disabled]="!hasRates || isLoadingRates">Copy result</button>
+      </div>
+      @if (copyStatus) {
+        <p class="currency-status" role="status" aria-live="polite">{{ copyStatus }}</p>
+      }
     </div>
   </div>

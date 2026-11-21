@@ -8,9 +8,11 @@ import {
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { WeatherService, type WeatherData } from '../../services/weather.service';
 import { LocationService } from '../../services/location.service';
-import { Chart, registerables, type Chart as ChartInstance } from 'chart.js';
+import type { Chart as ChartInstance } from 'chart.js';
+import { ThemeService } from '../../services/theme.service';
 
 interface WeatherDetail {
   label: string;
@@ -35,7 +37,6 @@ export class WeatherComponent implements OnInit, OnDestroy {
   weatherData: WeatherData | null = null;
   error: string = '';
   cityLookupMessage: string = '';
-  isDarkMode: boolean = false;
   weatherDetails: WeatherDetail[] = [];
   isCitiesLoading = false;
   isWeatherLoading = false;
@@ -46,23 +47,27 @@ export class WeatherComponent implements OnInit, OnDestroy {
   @ViewChild('weatherChart') weatherChart!: ElementRef;
   private cityRequestId = 0;
   private weatherRequestId = 0;
+  private chartModulePromise?: Promise<typeof import('chart.js/auto')>;
+  private themeSubscription?: Subscription;
 
   constructor(
     private weatherService: WeatherService,
     private locationService: LocationService,
     private cdr: ChangeDetectorRef,
-  ) {
-    Chart.register(...registerables);
-  }
+    public themeService: ThemeService,
+  ) {}
 
   ngOnInit(): void {
+    this.themeSubscription = this.themeService.changes$.subscribe(() => {
+      if (this.weatherData) void this.updateChart();
+    });
     this.fetchCountries();
-    this.checkDarkModePreference();
   }
 
   ngOnDestroy(): void {
     this.cityRequestId++;
     this.weatherRequestId++;
+    this.themeSubscription?.unsubscribe();
     this.chart?.destroy();
   }
 
@@ -76,20 +81,8 @@ export class WeatherComponent implements OnInit, OnDestroy {
     return this.cities.filter((city) => city.toLocaleLowerCase().includes(query));
   }
 
-  private checkDarkModePreference() {
-    const darkModePref = localStorage.getItem('darkMode');
-    if (darkModePref !== null) {
-      this.isDarkMode = darkModePref === 'true';
-    } else {
-      this.isDarkMode =
-        window.matchMedia &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches;
-    }
-  }
-
-  toggleTheme(): void {
-    this.isDarkMode = !this.isDarkMode;
-    localStorage.setItem('darkMode', this.isDarkMode.toString());
+  get isDarkMode(): boolean {
+    return this.themeService.isDark;
   }
 
   fetchCountries(): void {
@@ -275,12 +268,15 @@ export class WeatherComponent implements OnInit, OnDestroy {
     this.updateChart();
   }
 
-  updateChart(): void {
+  async updateChart(): Promise<void> {
     if (this.weatherData && this.weatherChart) {
       this.chart?.destroy();
 
       const ctx = this.weatherChart.nativeElement.getContext('2d');
       if (!ctx) return;
+      this.chartModulePromise ??= import('chart.js/auto');
+      const ChartConstructor = (await this.chartModulePromise).default;
+
       const data = [
         this.formatTemperature(this.weatherData.temperature),
         this.formatTemperature(this.weatherData.feelsLike),
@@ -296,7 +292,7 @@ export class WeatherComponent implements OnInit, OnDestroy {
         'UV Index',
       ];
 
-      this.chart = new Chart(ctx, {
+      this.chart = new ChartConstructor(ctx, {
         type: 'bar',
         data: {
           labels: labels,

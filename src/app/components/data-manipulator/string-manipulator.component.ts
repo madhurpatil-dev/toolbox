@@ -18,6 +18,7 @@ export class StringManipulatorComponent implements OnInit {
   voices: SpeechSynthesisVoice[] = [];
   selectedVoice: SpeechSynthesisVoice | null = null;
   isSpeaking: boolean = false;
+  copyStatus = '';
 
   searchQuery: string = '';
   selectedTabIndex: number = 0;
@@ -172,21 +173,27 @@ export class StringManipulatorComponent implements OnInit {
     this.insertPosition = 0;
   }
 
-  copyToClipboard() {
-    navigator.clipboard.writeText(this.resultString).then(
-      () => alert('Result copied to clipboard!'),
-      () => alert('Failed to copy result.')
-    );
+  async copyToClipboard(): Promise<void> {
+    if (!this.resultString) return;
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('Clipboard access is unavailable.');
+      await navigator.clipboard.writeText(this.resultString);
+      this.copyStatus = 'Result copied.';
+    } catch (error) {
+      this.copyStatus = 'Could not copy. Select the result and copy it manually.';
+      console.warn('Unable to copy the text result.', error);
+    }
   }
 
   saveAsFile() {
+    if (!this.resultString) return;
     const blob = new Blob([this.resultString], { type: 'text/plain' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `result_${new Date().toISOString().slice(0, 10)}.txt`;
     a.click();
-    window.URL.revokeObjectURL(url);
+    window.setTimeout(() => window.URL.revokeObjectURL(url), 1000);
   }
 
   exportResult() {

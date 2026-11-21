@@ -43,7 +43,13 @@ export class AgeCalculatorComponent implements OnDestroy {
   }
 
   calculateAge() {
-    if (this.birthDate) {
+    if (!this.birthDate) {
+      this.age = {};
+      this.showResults = false;
+      return;
+    }
+
+    {
       const today = new Date();
       const birthDate = new Date(this.birthDate);
 

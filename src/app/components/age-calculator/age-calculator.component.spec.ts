@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AgeCalculatorComponent } from './age-calculator.component';
-import { ToolsModule } from '../../tools.module';
+import { AgeCalculatorModule } from '../../tools/age-calculator.module';
 
 describe('AgeCalculatorComponent', () => {
   let component: AgeCalculatorComponent;
@@ -12,7 +12,7 @@ describe('AgeCalculatorComponent', () => {
     vi.setSystemTime(new Date(2025, 4, 17, 12));
 
     await TestBed.configureTestingModule({
-      imports: [BrowserAnimationsModule, ToolsModule]
+      imports: [BrowserAnimationsModule, AgeCalculatorModule]
     })
     .compileComponents();
 

@@ -11,6 +11,10 @@
           <div class="output" aria-live="polite" aria-atomic="true">{{ result || '0' }}</div>
         </div>
       </div>
+      <div class="calculator-actions">
+        <button type="button" class="copy-result" [disabled]="!result || result === 'Error'" (click)="copyResult()">Copy result</button>
+        @if (copyStatus) { <span role="status" aria-live="polite">{{ copyStatus }}</span> }
+      </div>
 
       <div class="buttons-container">
         @for (button of calculatorButtons; track button) {

@@ -1,6 +1,7 @@
 /* Main app styling */
 .color-app {
-  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: var(--font-sans);
+  color: var(--ink);
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
@@ -14,7 +15,7 @@
 .app-header h1 {
   font-size: 2.5rem;
   font-weight: 300;
-  color: #2c3e50;
+  color: var(--ink);
   margin-bottom: 1rem;
 }
 
@@ -161,6 +162,13 @@
   align-items: center;
   padding: 1rem;
   border-bottom: 1px solid #eee;
+}
+
+.copy-status {
+  margin: 0;
+  padding: 0 1rem 1rem;
+  color: var(--muted);
+  font-size: var(--type-sm);
 }
 
 .format-header h3 {
