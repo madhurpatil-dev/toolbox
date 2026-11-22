@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import QRCode from 'qrcode';
 import jsQR from 'jsqr';
 
@@ -35,6 +35,8 @@ export class QrStudioComponent implements OnDestroy {
   private scanFrame?: number;
   private imageDecodeId = 0;
 
+  constructor(private readonly changeDetectorRef?: ChangeDetectorRef) {}
+
   ngOnDestroy(): void {
     this.stopCamera();
   }
@@ -42,6 +44,7 @@ export class QrStudioComponent implements OnDestroy {
   setTab(tab: 'generate' | 'scan'): void {
     this.activeTab = tab;
     if (tab === 'scan') this.scanStatus = '';
+    this.refreshView();
   }
 
   get payload(): string {
@@ -108,6 +111,7 @@ export class QrStudioComponent implements OnDestroy {
     input.value = '';
     if (!file.type.startsWith('image/') && file.type !== '') {
       this.scanStatus = 'Please select a valid image file.';
+      this.refreshView();
       return;
     }
 
@@ -123,21 +127,25 @@ export class QrStudioComponent implements OnDestroy {
       const image = await this.loadImage(imageUrl);
       if (decodeId !== this.imageDecodeId) return;
       this.scanStatus = 'Scanning image...';
+      this.refreshView();
       await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 
       const result = await this.decodeImageElement(image);
       if (decodeId !== this.imageDecodeId) return;
       this.scannedValue = result?.data ?? '';
       this.scanStatus = result ? 'QR code found.' : 'No QR code found in this image.';
+      this.refreshView();
     } catch (error) {
       if (decodeId === this.imageDecodeId) {
         this.scanStatus = 'The image could not be read.';
         console.warn('Unable to scan uploaded QR image.', error);
+        this.refreshView();
       }
     } finally {
       if (imageUrl) URL.revokeObjectURL(imageUrl);
       if (decodeId === this.imageDecodeId) {
         this.isDecodingImage = false;
+        this.refreshView();
       }
     }
   }
@@ -156,12 +164,14 @@ export class QrStudioComponent implements OnDestroy {
       if (this.videoElement) {
         this.videoElement.nativeElement.srcObject = this.stream;
         await this.videoElement.nativeElement.play();
+        this.refreshView();
         this.scanCameraFrame();
       }
     } catch (error) {
       this.isScanning = false;
       this.scanStatus = 'Camera access was blocked or unavailable.';
       console.warn('Unable to start QR camera.', error);
+      this.refreshView();
     }
   }
 
@@ -171,6 +181,7 @@ export class QrStudioComponent implements OnDestroy {
     this.stream?.getTracks().forEach((track) => track.stop());
     this.stream = undefined;
     this.isScanning = false;
+    this.refreshView();
   }
 
   copyScannedValue(): void {
@@ -199,6 +210,7 @@ export class QrStudioComponent implements OnDestroy {
         this.scannedValue = result.data;
         this.scanStatus = 'QR code found.';
         this.stopCamera();
+        this.refreshView();
         return;
       }
     }
@@ -236,7 +248,11 @@ export class QrStudioComponent implements OnDestroy {
     const sourceWidth = image.naturalWidth;
     const sourceHeight = image.naturalHeight;
     const longestSide = Math.max(sourceWidth, sourceHeight);
+    const nativeResult = await this.decodeWithBrowserDetector(image);
+    if (nativeResult) return nativeResult;
+
     const scales = [
+      longestSide,
       Math.min(longestSide, 1600),
       Math.min(longestSide, 1200),
       Math.min(longestSide, 800),
@@ -264,6 +280,33 @@ export class QrStudioComponent implements OnDestroy {
     }
 
     return undefined;
+  }
+
+  private async decodeWithBrowserDetector(
+    image: HTMLImageElement,
+  ): Promise<{ data: string } | undefined> {
+    const barcodeDetectorApi = (
+      window as unknown as {
+        BarcodeDetector?: new (options: { formats: string[] }) => {
+          detect(source: CanvasImageSource): Promise<Array<{ rawValue?: string }>>;
+        };
+      }
+    ).BarcodeDetector;
+    if (!barcodeDetectorApi) return undefined;
+
+    try {
+      const detector = new barcodeDetectorApi({ formats: ['qr_code'] });
+      const results = await detector.detect(image);
+      const value = results.find((result) => result.rawValue)?.rawValue;
+      return value ? { data: value } : undefined;
+    } catch {
+      return undefined;
+    }
+  }
+
+  private refreshView(): void {
+    this.changeDetectorRef?.markForCheck();
+    this.changeDetectorRef?.detectChanges();
   }
 
   private normalizeUrl(value: string): string {
