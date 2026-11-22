@@ -36,6 +36,7 @@ export class QrStudioComponent implements OnDestroy {
   private scanFrame?: number;
   private imageDecodeId = 0;
   private isCameraDetecting = false;
+  private cameraFallbackFrame = 0;
   private barcodeDetector?: {
     detect(source: CanvasImageSource): Promise<Array<{ rawValue?: string }>>;
   };
@@ -246,31 +247,18 @@ export class QrStudioComponent implements OnDestroy {
       return;
     }
 
-    const scale = Math.min(1, 480 / Math.max(video.videoWidth, video.videoHeight));
-    const width = Math.max(1, Math.round(video.videoWidth * scale));
-    const height = Math.max(1, Math.round(video.videoHeight * scale));
-    canvas.width = width;
-    canvas.height = height;
-    const context = canvas.getContext('2d', { willReadFrequently: true });
-    if (context) {
-      context.drawImage(video, 0, 0, width, height);
-      void this.decodeCameraFrame(canvas, width, height);
-    }
-    this.scanFrame = window.setTimeout(() => this.scanCameraFrame(), 120) as unknown as number;
+    void this.decodeCameraFrame(video, canvas);
+    this.scanFrame = window.setTimeout(() => this.scanCameraFrame(), 80) as unknown as number;
   }
 
   private async decodeCameraFrame(
+    video: HTMLVideoElement,
     canvas: HTMLCanvasElement,
-    width: number,
-    height: number,
   ): Promise<void> {
     if (!this.isScanning || this.isCameraDetecting) return;
     this.isCameraDetecting = true;
     try {
-      const context = canvas.getContext('2d', { willReadFrequently: true });
-      if (!context) return;
-
-      const nativeResult = await this.decodeWithBrowserDetector(canvas);
+      const nativeResult = await this.decodeWithBrowserDetector(video);
       if (nativeResult?.data) {
         this.scannedValue = nativeResult.data;
         this.scanStatus = 'QR code found.';
@@ -279,6 +267,21 @@ export class QrStudioComponent implements OnDestroy {
         return;
       }
 
+      if (this.barcodeDetector) {
+        return;
+      }
+
+      this.cameraFallbackFrame++;
+      if (this.cameraFallbackFrame % 3 !== 0) return;
+
+      const scale = Math.min(1, 320 / Math.max(video.videoWidth, video.videoHeight));
+      const width = Math.max(1, Math.round(video.videoWidth * scale));
+      const height = Math.max(1, Math.round(video.videoHeight * scale));
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext('2d', { willReadFrequently: true });
+      if (!context) return;
+      context.drawImage(video, 0, 0, width, height);
       const imageData = context.getImageData(0, 0, width, height);
       const result = jsQR(imageData.data, width, height, { inversionAttempts: 'dontInvert' });
       if (result?.data) {
@@ -345,8 +348,8 @@ export class QrStudioComponent implements OnDestroy {
     if (nativeResult) return nativeResult;
 
     const scales = [
-      Math.min(longestSide, 1200),
-      Math.min(longestSide, 800),
+      Math.min(longestSide, 900),
+      Math.min(longestSide, 600),
     ];
 
     for (const targetSize of [...new Set(scales)].filter((size) => size > 0)) {
