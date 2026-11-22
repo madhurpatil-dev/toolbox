@@ -2,15 +2,16 @@
 :host {
   display: block;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+  background: var(--canvas);
+  font-family: var(--font-sans);
+  color: var(--ink);
 }
 
 /* ===== Main Container ===== */
 .world-clock-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: var(--space-6) var(--space-5);
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -22,8 +23,8 @@
   text-align: center;
   margin-bottom: 2.5rem;
   padding: 1.5rem;
-  background: linear-gradient(135deg, #3a4a6b 0%, #2c3e50 100%);
-  color: white;
+  background: var(--brand);
+  color: var(--on-brand);
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }

@@ -2,9 +2,9 @@
 .color-app {
   font-family: var(--font-sans);
   color: var(--ink);
-  max-width: 1200px;
+  max-width: var(--page-width);
   margin: 0 auto;
-  padding: 2rem;
+  padding: var(--space-6) var(--space-4);
 }
 
 .app-header {

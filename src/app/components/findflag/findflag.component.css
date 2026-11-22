@@ -1,16 +1,16 @@
 /* Light theme variables (approximated from Angular Material indigo palette) */
 :root {
-  --primary-color: #3f51b5;
-  --primary-light: #757de8;
-  --primary-dark: #002984;
-  --accent-color: #ff4081;
-  --accent-light: #ff80ab;
-  --accent-dark: #f50057;
-  --warn-color: #f44336;
+  --primary-color: var(--brand);
+  --primary-light: var(--brand-soft);
+  --primary-dark: var(--brand-strong);
+  --accent-color: var(--secondary);
+  --accent-light: var(--secondary);
+  --accent-dark: var(--secondary);
+  --warn-color: var(--danger);
   --warn-light: #ff7961;
   --warn-dark: #ba000d;
-  --background-color: #f5f5f5;
-  --text-color: rgba(0, 0, 0, 0.87);
+  --background-color: var(--canvas);
+  --text-color: var(--ink);
 }
 
 /* Dark theme variables (approximated from Angular Material blue-grey palette) */
@@ -36,10 +36,10 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f5f5f5;
-  transition: background-color 0.3s ease;
+  background-color: var(--canvas);
+  transition: background-color var(--transition-base);
   overflow: hidden;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: var(--canvas);
 
 }
 

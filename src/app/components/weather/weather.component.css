@@ -1,9 +1,9 @@
 /* Base Styles */
 .weather-container {
-  font-family: 'Roboto', 'Helvetica Neue', sans-serif;
-  padding: 24px;
+  font-family: var(--font-sans);
+  padding: var(--space-6) var(--space-4);
   min-height: 100vh;
-  background: #f5f5f7;
+  background: var(--canvas);
   transition: background-color 0.3s ease;
 }
 
@@ -34,14 +34,16 @@
 }
 
 .card {
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   max-width: 1200px;
   margin: 0 auto;
-  background: white;
-  padding: 24px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  padding: var(--space-5);
 }
 
 .card:hover {

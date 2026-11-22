@@ -3,27 +3,27 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem;
-  font-family: 'Roboto', sans-serif;
+  padding: var(--space-6) var(--space-4);
+  font-family: var(--font-sans);
   min-height: 80vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: var(--canvas);
 }
 
 .header {
   text-align: center;
   margin-bottom: 2rem;
-  color: #3f51b5;
+  color: var(--brand);
 }
 
 .title {
-  font-size: 2.5rem;
-  font-weight: 500;
+  font-size: var(--type-2xl);
+  font-weight: 700;
   margin-bottom: 0.5rem;
 }
 
 .subtitle {
   font-size: 1.1rem;
-  color: #666;
+  color: var(--muted);
   margin-top: 0;
 }
 

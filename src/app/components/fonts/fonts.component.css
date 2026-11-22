@@ -1,21 +1,21 @@
 /* Base Styles */
 .font-explorer-app {
-  --primary-color: #4361ee;
-  --primary-light: #e0e7ff;
-  --primary-dark: #3a0ca3;
-  --secondary-color: #3f37c9;
-  --accent-color: #4895ef;
-  --text-primary: #2b2d42;
-  --text-secondary: #4a4e69;
-  --text-tertiary: #8e9aaf;
-  --bg-color: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --bg-tertiary: #e9ecef;
-  --border-color: #dee2e6;
-  --success-color: #4bb543;
-  --error-color: #ff3333;
-  --warning-color: #ffcc00;
-  --font-base: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --primary-color: var(--brand);
+  --primary-light: var(--brand-soft);
+  --primary-dark: var(--brand-strong);
+  --secondary-color: var(--secondary);
+  --accent-color: var(--brand);
+  --text-primary: var(--ink);
+  --text-secondary: var(--muted);
+  --text-tertiary: var(--subtle);
+  --bg-color: var(--surface);
+  --bg-secondary: var(--canvas);
+  --bg-tertiary: var(--surface);
+  --border-color: var(--line);
+  --success-color: var(--success);
+  --error-color: var(--danger);
+  --warning-color: #865500;
+  --font-base: var(--font-sans);
   --font-mono: 'Consolas', monospace;
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
