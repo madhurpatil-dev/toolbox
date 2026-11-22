@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnInit } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { CurrencyConverterService } from '../../services/currency-converter.service';
 import type { ConversionRatesResponse } from '../../services/currency-converter.service';
@@ -268,13 +268,19 @@ export class CurrencyconverterComponent implements OnInit {
   };
 
 
-  constructor(private converterService: CurrencyConverterService, private breakpointObserver: BreakpointObserver) {}
+  constructor(
+    private converterService: CurrencyConverterService,
+    private breakpointObserver: BreakpointObserver,
+    private changeDetectorRef: ChangeDetectorRef,
+  ) {}
 
   ngOnInit(): void {
+    this.checkScreenSize();
     this.fetchConversionRates();
     this.breakpointObserver.observe([Breakpoints.Large, Breakpoints.XLarge])
     .subscribe(result => {
       this.isLargeScreen = result.matches;
+      this.changeDetectorRef.markForCheck();
     });
   }
 
@@ -282,21 +288,28 @@ export class CurrencyconverterComponent implements OnInit {
 
   fetchConversionRates(): void {
     this.isLoadingRates = true;
+    this.changeDetectorRef.markForCheck();
     this.converterService.getConversionRates().pipe(
-      finalize(() => this.isLoadingRates = false),
+      finalize(() => {
+        this.isLoadingRates = false;
+        this.changeDetectorRef.markForCheck();
+      }),
     ).subscribe({
       next: (data: ConversionRatesResponse) => {
         if (!data?.rates || Object.keys(data.rates).length === 0) {
           this.errorMessage = 'Exchange rates are currently unavailable. Try again later.';
+          this.changeDetectorRef.markForCheck();
           return;
         }
         this.errorMessage = '';
         this.conversionRates = data.rates;
         this.convert();
+        this.changeDetectorRef.markForCheck();
       },
       error: (error: unknown) => {
         console.error('Currency rates could not be loaded.', error);
         this.errorMessage = 'Exchange rates are currently unavailable. Try again later.';
+        this.changeDetectorRef.markForCheck();
       },
     });
   }

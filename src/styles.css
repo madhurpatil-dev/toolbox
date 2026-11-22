@@ -120,8 +120,25 @@ router-outlet + * {
 
 mat-card {
   border: 1px solid var(--line) !important;
-  border-radius: 16px !important;
+  border-radius: var(--radius-lg) !important;
   box-shadow: var(--shadow-sm) !important;
+}
+
+.mat-mdc-card,
+.mat-mdc-dialog-container,
+.mat-mdc-menu-panel,
+.mat-mdc-select-panel {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border-color: var(--line) !important;
+}
+
+.mat-mdc-form-field {
+  --mdc-filled-text-field-container-color: var(--surface);
+  --mdc-filled-text-field-label-text-color: var(--text-secondary);
+  --mdc-filled-text-field-input-text-color: var(--text-primary);
+  --mdc-filled-text-field-active-indicator-color: var(--brand);
+  --mdc-filled-text-field-focus-active-indicator-color: var(--brand);
 }
 
 .mat-mdc-raised-button,
