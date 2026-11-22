@@ -108,7 +108,7 @@
               <button type="button" mat-stroked-button (click)="stopCamera()">Stop camera</button>
             }
 
-            <video #videoElement class="camera-preview" [class.visible]="isScanning" muted playsinline></video>
+            <video #videoElement class="camera-preview" [class.visible]="isScanning" autoplay muted playsinline></video>
             <canvas #scanCanvas class="scan-canvas" aria-hidden="true"></canvas>
           </section>
 

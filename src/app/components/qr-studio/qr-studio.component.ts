@@ -31,9 +31,11 @@ export class QrStudioComponent implements OnDestroy {
   scanStatus = '';
   isScanning = false;
   isDecodingImage = false;
+  isCameraStarting = false;
   private stream?: MediaStream;
   private scanFrame?: number;
   private imageDecodeId = 0;
+  private isCameraDetecting = false;
 
   constructor(private readonly changeDetectorRef?: ChangeDetectorRef) {}
 
@@ -151,36 +153,77 @@ export class QrStudioComponent implements OnDestroy {
   }
 
   async startCamera(): Promise<void> {
+    if (this.isCameraStarting || this.isScanning) return;
+    if (!window.isSecureContext) {
+      this.scanStatus = 'Camera access requires HTTPS or localhost.';
+      this.refreshView();
+      return;
+    }
     if (!navigator.mediaDevices?.getUserMedia) {
       this.scanStatus = 'Camera scanning is not supported by this browser.';
+      this.refreshView();
       return;
     }
 
+    this.isCameraStarting = true;
+    this.isScanning = false;
+    this.scannedValue = '';
+    this.scanStatus = 'Starting camera...';
+    this.refreshView();
+
     try {
-      this.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      const streamPromise = navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false,
+      });
+      const stream = await Promise.race([
+        streamPromise,
+        new Promise<never>((_resolve, reject) =>
+          window.setTimeout(() => reject(new Error('Camera permission timed out.')), 15000),
+        ),
+      ]);
+      this.stream = stream;
       this.isScanning = true;
       this.scanStatus = 'Point your camera at a QR code.';
-      await this.waitForVideo();
-      if (this.videoElement) {
-        this.videoElement.nativeElement.srcObject = this.stream;
-        await this.videoElement.nativeElement.play();
-        this.refreshView();
-        this.scanCameraFrame();
-      }
+      this.refreshView();
+
+      const video = this.videoElement?.nativeElement;
+      if (!video) throw new Error('Camera preview is unavailable.');
+
+      video.srcObject = stream;
+      video.muted = true;
+      video.playsInline = true;
+      await Promise.race([
+        this.waitForVideoReady(video),
+        new Promise<never>((_resolve, reject) =>
+          window.setTimeout(() => reject(new Error('Camera preview timed out.')), 10000),
+        ),
+      ]);
+      await video.play();
+      this.isCameraStarting = false;
+      this.refreshView();
+      this.scanCameraFrame();
     } catch (error) {
       this.isScanning = false;
-      this.scanStatus = 'Camera access was blocked or unavailable.';
+      this.isCameraStarting = false;
+      this.stream?.getTracks().forEach((track) => track.stop());
+      this.stream = undefined;
+      this.scanStatus = error instanceof DOMException && error.name === 'NotAllowedError'
+        ? 'Camera permission was denied. Allow camera access and try again.'
+        : 'Camera could not start. Check browser permissions and try again.';
       console.warn('Unable to start QR camera.', error);
       this.refreshView();
     }
   }
 
   stopCamera(): void {
-    if (this.scanFrame) cancelAnimationFrame(this.scanFrame);
+    if (this.scanFrame) window.clearTimeout(this.scanFrame);
     this.scanFrame = undefined;
     this.stream?.getTracks().forEach((track) => track.stop());
     this.stream = undefined;
     this.isScanning = false;
+    this.isCameraStarting = false;
+    this.isCameraDetecting = false;
     this.refreshView();
   }
 
@@ -191,34 +234,78 @@ export class QrStudioComponent implements OnDestroy {
   private scanCameraFrame(): void {
     const video = this.videoElement?.nativeElement;
     const canvas = this.scanCanvas?.nativeElement;
-    if (!video || !canvas || video.readyState !== video.HAVE_ENOUGH_DATA) {
+    if (!this.isScanning || !video || !canvas) return;
+    if (video.readyState < video.HAVE_CURRENT_DATA || video.videoWidth === 0) {
       this.scanFrame = requestAnimationFrame(() => this.scanCameraFrame());
       return;
     }
 
-    const size = Math.min(video.videoWidth, video.videoHeight, 640);
-    canvas.width = size;
-    canvas.height = size;
+    const scale = Math.min(1, 640 / Math.max(video.videoWidth, video.videoHeight));
+    const width = Math.max(1, Math.round(video.videoWidth * scale));
+    const height = Math.max(1, Math.round(video.videoHeight * scale));
+    canvas.width = width;
+    canvas.height = height;
     const context = canvas.getContext('2d', { willReadFrequently: true });
     if (context) {
-      const x = (video.videoWidth - size) / 2;
-      const y = (video.videoHeight - size) / 2;
-      context.drawImage(video, x, y, size, size, 0, 0, size, size);
-      const imageData = context.getImageData(0, 0, size, size);
-      const result = jsQR(imageData.data, size, size);
-      if (result?.data) {
-        this.scannedValue = result.data;
+      context.drawImage(video, 0, 0, width, height);
+      void this.decodeCameraFrame(canvas, width, height);
+    }
+    this.scanFrame = window.setTimeout(() => this.scanCameraFrame(), 180) as unknown as number;
+  }
+
+  private async decodeCameraFrame(
+    canvas: HTMLCanvasElement,
+    width: number,
+    height: number,
+  ): Promise<void> {
+    if (!this.isScanning || this.isCameraDetecting) return;
+    this.isCameraDetecting = true;
+    try {
+      const context = canvas.getContext('2d', { willReadFrequently: true });
+      if (!context) return;
+
+      const nativeResult = await this.decodeWithBrowserDetector(canvas);
+      if (nativeResult?.data) {
+        this.scannedValue = nativeResult.data;
         this.scanStatus = 'QR code found.';
         this.stopCamera();
         this.refreshView();
         return;
       }
+
+      const imageData = context.getImageData(0, 0, width, height);
+      const result = jsQR(imageData.data, width, height, { inversionAttempts: 'attemptBoth' });
+      if (result?.data) {
+        this.scannedValue = result.data;
+        this.scanStatus = 'QR code found.';
+        this.stopCamera();
+        this.refreshView();
+      }
+    } finally {
+      this.isCameraDetecting = false;
     }
-    this.scanFrame = requestAnimationFrame(() => this.scanCameraFrame());
   }
 
-  private waitForVideo(): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, 50));
+  private waitForVideoReady(video: HTMLVideoElement): Promise<void> {
+    if (video.readyState >= video.HAVE_CURRENT_DATA) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const handleReady = () => {
+        cleanup();
+        resolve();
+      };
+      const handleError = () => {
+        cleanup();
+        reject(new Error('Camera preview could not be loaded.'));
+      };
+      const cleanup = () => {
+        video.removeEventListener('loadeddata', handleReady);
+        video.removeEventListener('canplay', handleReady);
+        video.removeEventListener('error', handleError);
+      };
+      video.addEventListener('loadeddata', handleReady);
+      video.addEventListener('canplay', handleReady);
+      video.addEventListener('error', handleError);
+    });
   }
 
   private loadImage(url: string): Promise<HTMLImageElement> {
@@ -283,7 +370,7 @@ export class QrStudioComponent implements OnDestroy {
   }
 
   private async decodeWithBrowserDetector(
-    image: HTMLImageElement,
+    image: CanvasImageSource,
   ): Promise<{ data: string } | undefined> {
     const barcodeDetectorApi = (
       window as unknown as {
