@@ -1,0 +1,69 @@
+<div class="tool-page">
+  <main class="tool-content security-page">
+    <header class="tool-header">
+      <span class="eyebrow">Local privacy utility</span>
+      <h1>Password &amp; Security Studio</h1>
+      <p>Generate strong credentials and audit password quality locally.</p>
+    </header>
+    <div class="security-grid">
+      <mat-card class="security-card">
+        <h2>Strong password</h2>
+        <div class="generated-row">
+          <input class="generated-value" [value]="password" readonly aria-label="Generated password" />
+          <button type="button" mat-mini-fab color="primary" (click)="generatePassword()" aria-label="Generate another password"><span class="material-icons">refresh</span></button>
+          <button type="button" mat-mini-fab (click)="copyPassword()" aria-label="Copy password"><span class="material-icons">content_copy</span></button>
+        </div>
+        <div class="strength-meter"><span [style.width.%]="strengthPercent" [attr.aria-label]="strength"></span></div>
+        <div class="strength-row"><strong>{{ strength }}</strong><span>{{ entropy }} bits of entropy</span></div>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Length: {{ length }}</mat-label>
+          <input matInput type="range" min="6" max="64" [(ngModel)]="length" (ngModelChange)="generatePassword()" />
+        </mat-form-field>
+        <div class="option-grid">
+          <label><input type="checkbox" [(ngModel)]="uppercase" (ngModelChange)="generatePassword()" /> Uppercase</label>
+          <label><input type="checkbox" [(ngModel)]="lowercase" (ngModelChange)="generatePassword()" /> Lowercase</label>
+          <label><input type="checkbox" [(ngModel)]="numbers" (ngModelChange)="generatePassword()" /> Numbers</label>
+          <label><input type="checkbox" [(ngModel)]="symbols" (ngModelChange)="generatePassword()" /> Symbols</label>
+        </div>
+      </mat-card>
+
+      <mat-card class="security-card">
+        <h2>Memorable passphrase</h2>
+        <div class="generated-row">
+          <input class="generated-value" [value]="passphrase" readonly aria-label="Generated passphrase" />
+          <button type="button" mat-mini-fab color="primary" (click)="generatePassphrase()" aria-label="Generate another passphrase"><span class="material-icons">refresh</span></button>
+          <button type="button" mat-mini-fab (click)="copyPassphrase()" aria-label="Copy passphrase"><span class="material-icons">content_copy</span></button>
+        </div>
+        <div class="passphrase-options">
+          <mat-form-field appearance="outline">
+            <mat-label>Words</mat-label>
+            <input matInput type="number" min="3" max="12" [(ngModel)]="passphraseWords" (ngModelChange)="generatePassphrase()" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Separator</mat-label>
+            <mat-select [(value)]="passphraseSeparator" (selectionChange)="generatePassphrase()">
+              <mat-option value="-">Hyphen</mat-option>
+              <mat-option value="_">Underscore</mat-option>
+              <mat-option value=" ">Space</mat-option>
+              <mat-option value=".">Period</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-card>
+
+      <mat-card class="security-card audit-card">
+        <h2>Password auditor</h2>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Test a password locally</mat-label>
+          <input matInput type="password" [(ngModel)]="auditPassword" autocomplete="off" />
+        </mat-form-field>
+        <div class="audit-score"><strong>{{ auditScore }}%</strong><span>quality score</span></div>
+        <ul>
+          @for (check of auditChecks; track check.label) {
+            <li [class.passed]="check.passed"><span class="material-icons">{{ check.passed ? 'check_circle' : 'cancel' }}</span>{{ check.label }}</li>
+          }
+        </ul>
+      </mat-card>
+    </div>
+  </main>
+</div>

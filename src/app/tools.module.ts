@@ -13,6 +13,9 @@ const routes: Routes = [
   { path: 'data-manipulation', loadChildren: () => import('./tools/data-manipulator.module').then((module) => module.DataManipulatorModule) },
   { path: 'weather-service', loadChildren: () => import('./tools/weather.module').then((module) => module.WeatherModule) },
   { path: 'qr-studio', loadChildren: () => import('./tools/qr-studio.module').then((module) => module.QrStudioModule) },
+  { path: 'unit-converter', loadChildren: () => import('./tools/unit-converter.module').then((module) => module.UnitConverterModule) },
+  { path: 'text-diff', loadChildren: () => import('./tools/text-diff.module').then((module) => module.TextDiffModule) },
+  { path: 'security-studio', loadChildren: () => import('./tools/security-studio.module').then((module) => module.SecurityStudioModule) },
 ];
 
 @NgModule({ imports: [RouterModule.forChild(routes)] })

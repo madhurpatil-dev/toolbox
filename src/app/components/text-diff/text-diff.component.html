@@ -1,0 +1,48 @@
+<div class="tool-page">
+  <main class="tool-content diff-page">
+    <header class="tool-header">
+      <span class="eyebrow">Document utility</span>
+      <h1>Text Diff Studio</h1>
+      <p>Compare documents line-by-line without uploading them.</p>
+    </header>
+    <mat-card class="diff-card">
+      <div class="diff-options">
+        <label><input type="checkbox" [(ngModel)]="ignoreCase" (ngModelChange)="compare()" /> Ignore case</label>
+        <label><input type="checkbox" [(ngModel)]="ignoreWhitespace" (ngModelChange)="compare()" /> Ignore whitespace</label>
+        <button type="button" mat-stroked-button (click)="swap()">Swap text</button>
+      </div>
+      <div class="diff-editors">
+        <mat-form-field appearance="outline">
+          <mat-label>Original text</mat-label>
+          <textarea matInput rows="12" [(ngModel)]="leftText" (ngModelChange)="compare()" spellcheck="false"></textarea>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Changed text</mat-label>
+          <textarea matInput rows="12" [(ngModel)]="rightText" (ngModelChange)="compare()" spellcheck="false"></textarea>
+        </mat-form-field>
+      </div>
+      <div class="diff-actions">
+        <button type="button" mat-raised-button color="primary" (click)="compare()">Compare</button>
+        <button type="button" mat-stroked-button (click)="clear()">Clear</button>
+        <button type="button" mat-stroked-button [disabled]="stats.added === 0" (click)="copyAdded()">Copy added lines</button>
+      </div>
+      <div class="diff-summary" aria-live="polite">
+        <span class="added">+ {{ stats.added }} added</span>
+        <span class="removed">- {{ stats.removed }} removed</span>
+        <span>{{ stats.unchanged }} unchanged</span>
+        @if (copyStatus) { <span role="status">{{ copyStatus }}</span> }
+      </div>
+      @if (rows.length) {
+        <div class="diff-output" role="table" aria-label="Line comparison">
+          @for (row of rows; track $index) {
+            <div class="diff-row" [class.same]="row.type === 'same'" [class.added]="row.type === 'added'" [class.removed]="row.type === 'removed'">
+              <span class="line-number">{{ row.leftNo ?? '' }}</span>
+              <span class="line-number">{{ row.rightNo ?? '' }}</span>
+              <pre>{{ row.left ?? row.right ?? '' }}</pre>
+            </div>
+          }
+        </div>
+      }
+    </mat-card>
+  </main>
+</div>

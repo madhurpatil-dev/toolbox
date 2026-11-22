@@ -28,6 +28,30 @@ export class HomeComponent {
 
   allServices: Service[] = [
     {
+      title: 'Unit Converter',
+      description: 'Convert length, mass, temperature, area, volume, speed, time, and data',
+      image: './assets/toolbox-icon.svg',
+      route: 'unit-converter',
+      color: '#087f8c',
+      category: 'Converters',
+    },
+    {
+      title: 'Text Diff Studio',
+      description: 'Compare text and documents privately with line-by-line differences',
+      image: './assets/datamanipulation.jpg',
+      route: 'text-diff',
+      color: '#7e22ce',
+      category: 'Creative',
+    },
+    {
+      title: 'Password & Security Studio',
+      description: 'Generate passwords and passphrases and audit credential strength locally',
+      image: './assets/toolbox-icon.svg',
+      route: 'security-studio',
+      color: '#067647',
+      category: 'Everyday',
+    },
+    {
       title: 'QR & Barcode Studio',
       description: 'Generate QR codes and scan codes locally with camera or image upload',
       image: './assets/toolbox-icon.svg',

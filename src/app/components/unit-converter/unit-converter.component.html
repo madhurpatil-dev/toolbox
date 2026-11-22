@@ -1,0 +1,44 @@
+<div class="tool-page">
+  <main class="tool-content unit-converter">
+    <header class="tool-header">
+      <span class="eyebrow">Precision utility</span>
+      <h1>Unit Converter</h1>
+      <p>Convert everyday measurements instantly and accurately.</p>
+    </header>
+    <mat-card class="converter-card">
+      <div class="category-tabs" role="tablist" aria-label="Unit categories">
+        @for (name of ['Length','Mass','Area','Volume','Speed','Time','Data','Temperature']; track name) {
+          <button type="button" [class.active]="category === name" (click)="setCategory(name)" role="tab">{{ name }}</button>
+        }
+      </div>
+      <div class="conversion-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Value</mat-label>
+          <input matInput type="number" [(ngModel)]="value" (ngModelChange)="convert()" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>From</mat-label>
+          <mat-select [(value)]="from" (selectionChange)="convert()">
+            @for (unit of units; track unit.symbol) { <mat-option [value]="unit.symbol">{{ unit.name }} ({{ unit.symbol }})</mat-option> }
+          </mat-select>
+        </mat-form-field>
+        <button type="button" class="swap-button" mat-mini-fab (click)="swap()" aria-label="Swap units"><span class="material-icons">swap_horiz</span></button>
+        <mat-form-field appearance="outline">
+          <mat-label>To</mat-label>
+          <mat-select [(value)]="to" (selectionChange)="convert()">
+            @for (unit of units; track unit.symbol) { <mat-option [value]="unit.symbol">{{ unit.name }} ({{ unit.symbol }})</mat-option> }
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <section class="conversion-result" aria-live="polite">
+        <span>{{ format(value) }} {{ from }}</span>
+        <strong>= {{ format(result) }} {{ to }}</strong>
+      </section>
+      <div class="converter-actions">
+        <button type="button" mat-raised-button color="primary" (click)="copy()">Copy result</button>
+        <button type="button" mat-stroked-button (click)="reset()">Reset</button>
+        @if (copyStatus) { <span role="status">{{ copyStatus }}</span> }
+      </div>
+    </mat-card>
+  </main>
+</div>
