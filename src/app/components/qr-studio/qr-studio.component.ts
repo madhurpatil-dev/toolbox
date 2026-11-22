@@ -105,33 +105,27 @@ export class QrStudioComponent implements OnDestroy {
     const file = input.files?.[0];
     if (!file) return;
 
+    input.value = '';
     if (!file.type.startsWith('image/') && file.type !== '') {
       this.scanStatus = 'Please select a valid image file.';
-      input.value = '';
       return;
     }
 
     const decodeId = ++this.imageDecodeId;
+    if (this.isDecodingImage) this.stopCamera();
     this.isDecodingImage = true;
     this.scannedValue = '';
     this.scanStatus = 'Preparing image...';
 
-    let bitmap: ImageBitmap | undefined;
     let imageUrl: string | undefined;
     try {
-      if ('createImageBitmap' in window) {
-        bitmap = await createImageBitmap(file);
-      } else {
-        imageUrl = URL.createObjectURL(file);
-        const image = await this.loadImage(imageUrl);
-        bitmap = await createImageBitmap(image);
-      }
-
+      imageUrl = URL.createObjectURL(file);
+      const image = await this.loadImage(imageUrl);
       if (decodeId !== this.imageDecodeId) return;
       this.scanStatus = 'Scanning image...';
       await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 
-      const result = await this.decodeImageBitmap(bitmap);
+      const result = await this.decodeImageElement(image);
       if (decodeId !== this.imageDecodeId) return;
       this.scannedValue = result?.data ?? '';
       this.scanStatus = result ? 'QR code found.' : 'No QR code found in this image.';
@@ -141,11 +135,9 @@ export class QrStudioComponent implements OnDestroy {
         console.warn('Unable to scan uploaded QR image.', error);
       }
     } finally {
-      bitmap?.close();
       if (imageUrl) URL.revokeObjectURL(imageUrl);
       if (decodeId === this.imageDecodeId) {
         this.isDecodingImage = false;
-        input.value = '';
       }
     }
   }
@@ -220,33 +212,53 @@ export class QrStudioComponent implements OnDestroy {
   private loadImage(url: string): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
       const image = new Image();
-      image.onload = () => resolve(image);
-      image.onerror = () => reject(new Error('Image decoding failed.'));
+      const timeout = window.setTimeout(
+        () => reject(new Error('Timed out while loading the image.')),
+        10000,
+      );
+      image.onload = () => {
+        window.clearTimeout(timeout);
+        if (!image.naturalWidth || !image.naturalHeight) {
+          reject(new Error('The uploaded image has no readable dimensions.'));
+          return;
+        }
+        resolve(image);
+      };
+      image.onerror = () => {
+        window.clearTimeout(timeout);
+        reject(new Error('Image decoding failed.'));
+      };
       image.src = url;
     });
   }
 
-  private async decodeImageBitmap(bitmap: ImageBitmap): Promise<{ data: string } | undefined> {
-    const sourceWidth = bitmap.width;
-    const sourceHeight = bitmap.height;
-    const maxPrimarySize = 1200;
-    const scales = sourceWidth > maxPrimarySize || sourceHeight > maxPrimarySize
-      ? [1200, 800]
-      : [Math.max(sourceWidth, sourceHeight), 800];
+  private async decodeImageElement(image: HTMLImageElement): Promise<{ data: string } | undefined> {
+    const sourceWidth = image.naturalWidth;
+    const sourceHeight = image.naturalHeight;
+    const longestSide = Math.max(sourceWidth, sourceHeight);
+    const scales = [
+      Math.min(longestSide, 1600),
+      Math.min(longestSide, 1200),
+      Math.min(longestSide, 800),
+    ];
 
-    for (const targetSize of [...new Set(scales)]) {
+    for (const targetSize of [...new Set(scales)].filter((size) => size > 0)) {
       const scale = Math.min(1, targetSize / Math.max(sourceWidth, sourceHeight));
       const width = Math.max(1, Math.round(sourceWidth * scale));
       const height = Math.max(1, Math.round(sourceHeight * scale));
       const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;
-      const context = canvas.getContext('2d', { willReadFrequently: true });
+      const context = canvas.getContext('2d', { willReadFrequently: true, alpha: false });
       if (!context) continue;
 
-      context.drawImage(bitmap, 0, 0, width, height);
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, width, height);
+      context.drawImage(image, 0, 0, width, height);
       const imageData = context.getImageData(0, 0, width, height);
-      const result = jsQR(imageData.data, width, height, { inversionAttempts: 'attemptBoth' });
+      const result = jsQR(imageData.data, width, height, {
+        inversionAttempts: 'attemptBoth',
+      });
       if (result?.data) return { data: result.data };
       await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
     }

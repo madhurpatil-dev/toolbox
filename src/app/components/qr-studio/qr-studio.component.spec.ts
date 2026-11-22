@@ -33,4 +33,14 @@ describe('QrStudioComponent', () => {
     await component.generate();
     expect(component.qrDataUrl).toBe('');
   });
+
+  it('rejects non-image uploads and leaves the scanner reusable', async () => {
+    const component = new QrStudioComponent();
+    const input = { value: 'old-file', files: [new File(['text'], 'notes.txt', { type: 'text/plain' })] } as unknown as HTMLInputElement;
+    await component.onImageSelected({ target: input } as unknown as Event);
+
+    expect(component.scanStatus).toBe('Please select a valid image file.');
+    expect(component.isDecodingImage).toBe(false);
+    expect(input.value).toBe('');
+  });
 });

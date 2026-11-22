@@ -98,8 +98,10 @@
           <section class="scan-panel">
             <h2>Scan a QR code</h2>
             <p>Choose an image or use your device camera.</p>
-            <label class="upload-button" for="qr-image">Upload image</label>
-            <input id="qr-image" class="visually-hidden" type="file" accept="image/*" [disabled]="isDecodingImage" (change)="onImageSelected($event)" />
+            <label class="upload-button" [class.disabled]="isDecodingImage" for="qr-image">
+              {{ isDecodingImage ? 'Scanning...' : 'Upload image' }}
+            </label>
+            <input id="qr-image" class="visually-hidden" type="file" accept="image/*" (change)="onImageSelected($event)" />
             @if (!isScanning) {
               <button type="button" mat-raised-button color="primary" (click)="startCamera()">Start camera</button>
             } @else {
