@@ -28,7 +28,7 @@ export class AppComponent {
       if (event instanceof NavigationEnd) {
         this.isNavigating = false;
         this.toolPreferences.recordVisit(event.urlAfterRedirects);
-        if (event.urlAfterRedirects !== '/' && !event.urlAfterRedirects.startsWith('/population')) {
+        if (event.urlAfterRedirects !== '/' && !event.urlAfterRedirects.startsWith('/country-explorer')) {
           this.loadToolTheme();
         }
         window.scrollTo(0, 0);

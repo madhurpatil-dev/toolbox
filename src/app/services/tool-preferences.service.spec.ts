@@ -20,7 +20,7 @@ describe('ToolPreferencesService', () => {
   });
 
   it('keeps unique recent tools in newest-first order and limits the list', () => {
-    for (const route of ['age-calculator', 'worldclock', 'findcapital', 'weather-service', 'population', 'colorpicker']) {
+    for (const route of ['age-calculator', 'worldclock', 'country-explorer', 'weather-service', 'image-studio', 'colorpicker']) {
       preferences.recordVisit(`/${route}?from=home`);
     }
     preferences.recordVisit('/weather-service');
@@ -28,8 +28,8 @@ describe('ToolPreferencesService', () => {
     expect(preferences.recentRoutes()).toEqual([
       'weather-service',
       'colorpicker',
-      'population',
-      'findcapital',
+      'image-studio',
+      'country-explorer',
       'worldclock',
     ]);
     expect(JSON.parse(localStorage.getItem('toolbox-recent-tools') ?? '[]')).toEqual(preferences.recentRoutes());
@@ -42,5 +42,14 @@ describe('ToolPreferencesService', () => {
 
     expect(preferences.recentRoutes()).toEqual([]);
     expect(localStorage.getItem('toolbox-recent-tools')).toBe('[]');
+  });
+
+  it('migrates saved country tool favorites and history to Country Explorer', () => {
+    localStorage.setItem('toolbox-favorites', '["findcapital","population","findflag"]');
+    localStorage.setItem('toolbox-recent-tools', '["findflag","findcapital","population"]');
+    const migrated = new ToolPreferencesService(document);
+
+    expect(migrated.favoriteRoutes()).toEqual(['country-explorer']);
+    expect(migrated.recentRoutes()).toEqual(['country-explorer']);
   });
 });

@@ -1,0 +1,112 @@
+<main class="image-page tool-page" aria-labelledby="image-title">
+  <header class="page-header">
+    <p class="eyebrow">Private, browser-based image tools</p>
+    <h1 id="image-title">Image Studio</h1>
+    <p>Resize, convert, and compress images without uploading them. Re-encoded images omit common metadata, such as EXIF location, when supported by the browser.</p>
+  </header>
+
+  <section class="studio-card" aria-label="Image conversion controls">
+    <div
+      class="drop-zone"
+      [class.drag-over]="isDragOver"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)">
+      <span class="material-icons" aria-hidden="true">add_photo_alternate</span>
+      <h2>{{ fileName || 'Choose an image to get started' }}</h2>
+      <p>JPEG, PNG, WebP, AVIF, or BMP · up to 20 MB</p>
+      <label class="choose-button" for="image-file">{{ isLoading ? 'Opening image...' : 'Choose image' }}</label>
+      <input id="image-file" class="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/bmp" (change)="onFileSelected($event)" [disabled]="isLoading" />
+      <span class="drop-hint">or drag and drop a file here</span>
+    </div>
+
+    @if (errorMessage) {
+      <p class="message error-message" role="alert">{{ errorMessage }}</p>
+    }
+    @if (statusMessage) {
+      <p class="message status-message" role="status" aria-live="polite">{{ statusMessage }}</p>
+    }
+
+    @if (sourceImage) {
+      <div class="workspace">
+        <section class="settings" aria-labelledby="settings-title">
+          <div class="section-heading">
+            <h2 id="settings-title">Output settings</h2>
+            <span>{{ formatSize(originalFileSize) }} original</span>
+          </div>
+
+          <div class="dimension-fields">
+            <label>
+              <span>Width (px)</span>
+              <input type="number" min="1" max="10000" step="1" [(ngModel)]="maxWidth" (ngModelChange)="invalidateOutput()" />
+            </label>
+            <span class="dimension-separator" aria-hidden="true">×</span>
+            <label>
+              <span>Height (px)</span>
+              <input type="number" min="1" max="10000" step="1" [(ngModel)]="maxHeight" (ngModelChange)="invalidateOutput()" />
+            </label>
+          </div>
+
+          <label class="check-option">
+            <input type="checkbox" [(ngModel)]="preserveAspectRatio" (ngModelChange)="invalidateOutput()" />
+            <span>Keep aspect ratio</span>
+          </label>
+
+          <label class="field-label" for="output-format">Output format</label>
+          <select id="output-format" [(ngModel)]="outputFormat" (ngModelChange)="invalidateOutput()">
+            <option value="image/webp">WebP — smaller files</option>
+            <option value="image/jpeg">JPEG — broad compatibility</option>
+            <option value="image/png">PNG — lossless</option>
+          </select>
+
+          <label class="quality-label" for="image-quality">
+            <span>Quality</span>
+            <strong>{{ (quality * 100) | number:'1.0-0' }}%</strong>
+          </label>
+          <input id="image-quality" class="quality-slider" type="range" min="0.1" max="1" step="0.05" [(ngModel)]="quality" (ngModelChange)="invalidateOutput()" />
+          <p class="quality-note">Quality affects JPEG and WebP. PNG is lossless. JPEG uses a white background for transparency.</p>
+
+          <button type="button" class="primary-button" (click)="processImage()" [disabled]="isProcessing || isLoading">
+            {{ isProcessing ? 'Processing...' : 'Process image' }}
+          </button>
+        </section>
+
+        <section class="previews" aria-label="Image previews">
+          <article class="preview-card">
+            <div class="preview-heading">
+              <h2>Original</h2>
+              <span>{{ sourceImage.naturalWidth }} × {{ sourceImage.naturalHeight }} · {{ formatSize(originalFileSize) }}</span>
+            </div>
+            <div class="preview-image">
+              <img [src]="sourceUrl" [alt]="'Original image: ' + fileName" />
+            </div>
+          </article>
+
+          <article class="preview-card">
+            <div class="preview-heading">
+              <h2>Processed</h2>
+              @if (outputUrl && outputDimensions) {
+                <span>{{ outputDimensions.width }} × {{ outputDimensions.height }} · {{ formatSize(outputFileSize) }}</span>
+              } @else {
+                <span>Preview appears here</span>
+              }
+            </div>
+            <div class="preview-image">
+              @if (outputUrl) {
+                <img [src]="outputUrl" [alt]="'Processed image: ' + outputFileName" />
+              } @else {
+                <div class="preview-empty"><span class="material-icons" aria-hidden="true">image</span><span>Process the image to preview the result</span></div>
+              }
+            </div>
+            @if (outputUrl) {
+              <div class="output-actions">
+                <span class="size-change">{{ sizeChange }}</span>
+                <button type="button" class="secondary-button" (click)="download()">Download {{ outputFileName }}</button>
+              </div>
+            }
+          </article>
+        </section>
+      </div>
+    }
+  </section>
+</main>

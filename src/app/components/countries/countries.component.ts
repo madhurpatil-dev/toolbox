@@ -286,7 +286,7 @@ export class CountriesComponent implements OnInit, OnDestroy {
   async shareSelectedCountry(): Promise<void> {
     if (!this.selectedCountryCode) return;
 
-    const urlTree = this.router.createUrlTree(['/population'], {
+    const urlTree = this.router.createUrlTree(['/country-explorer'], {
       queryParams: { country: this.selectedCountryCode },
     });
     this.shareUrl = new URL(this.router.serializeUrl(urlTree), window.location.origin).toString();

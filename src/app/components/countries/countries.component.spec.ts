@@ -31,7 +31,7 @@ describe('CountriesComponent', () => {
   } as unknown as CountryServiceService;
   const router = {
     createUrlTree: vi.fn(),
-    serializeUrl: vi.fn(() => '/population?country=IN'),
+    serializeUrl: vi.fn(() => '/country-explorer?country=IN'),
     navigate: vi.fn(),
   };
 
@@ -178,10 +178,10 @@ describe('CountriesComponent', () => {
       await component.shareSelectedCountry();
 
       expect(router.createUrlTree).toHaveBeenCalledWith(
-        ['/population'],
+        ['/country-explorer'],
         { queryParams: { country: 'IN' } },
       );
-      expect(writeText).toHaveBeenCalledWith(`${window.location.origin}/population?country=IN`);
+      expect(writeText).toHaveBeenCalledWith(`${window.location.origin}/country-explorer?country=IN`);
       expect(component.shareCopied).toBe(true);
     } finally {
       vi.unstubAllGlobals();

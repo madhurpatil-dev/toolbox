@@ -55,7 +55,8 @@ export class ToolPreferencesService {
       }
 
       const stringRoutes = routes.filter((route: unknown): route is string => typeof route === 'string');
-      return [...new Set(stringRoutes)];
+      const countryRoutes = new Set(['findcapital', 'findflag', 'population']);
+      return [...new Set(stringRoutes.map((route) => countryRoutes.has(route) ? 'country-explorer' : route))];
     } catch (error) {
       console.warn(`Unable to read saved tool preferences for "${key}".`, error);
       return [];

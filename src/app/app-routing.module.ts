@@ -10,8 +10,15 @@ const routes: Routes = [
     pathMatch: 'full',
   },
   {
-    path: 'population',
+    path: 'country-explorer',
     loadChildren: () => import('./countries.module').then((m) => m.CountriesModule),
+  },
+  { path: 'findcapital', redirectTo: 'country-explorer', pathMatch: 'full' },
+  { path: 'findflag', redirectTo: 'country-explorer', pathMatch: 'full' },
+  {
+    path: 'population',
+    redirectTo: 'country-explorer',
+    pathMatch: 'full',
   },
   {
     path: '',

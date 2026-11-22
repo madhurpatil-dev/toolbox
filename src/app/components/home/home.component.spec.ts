@@ -37,10 +37,8 @@ describe('HomeComponent', () => {
     component.activeCategory = 'World';
 
     expect(component.filteredServices.map((service) => service.route)).toEqual([
-      'findcapital',
-      'findflag',
+      'country-explorer',
       'worldclock',
-      'population',
       'weather-service',
     ]);
 
@@ -49,6 +47,7 @@ describe('HomeComponent', () => {
     expect(component.filteredServices.map((service) => service.route)).toEqual([
       'text-diff',
       'qr-studio',
+      'image-studio',
       'colorpicker',
       'data-manipulation',
       'fontconverter',
