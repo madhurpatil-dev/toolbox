@@ -28,6 +28,14 @@ export class HomeComponent {
 
   allServices: Service[] = [
     {
+      title: 'QR & Barcode Studio',
+      description: 'Generate QR codes and scan codes locally with camera or image upload',
+      image: './assets/toolbox-icon.svg',
+      route: 'qr-studio',
+      color: '#4656d8',
+      category: 'Creative',
+    },
+    {
       title: 'Calculator',
       description: 'Perform basic and advanced calculations with our user-friendly calculator',
       image: './assets/calculatorImage.png',

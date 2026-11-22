@@ -12,6 +12,7 @@ const routes: Routes = [
   { path: 'fontconverter', loadChildren: () => import('./tools/font-explorer.module').then((module) => module.FontExplorerModule) },
   { path: 'data-manipulation', loadChildren: () => import('./tools/data-manipulator.module').then((module) => module.DataManipulatorModule) },
   { path: 'weather-service', loadChildren: () => import('./tools/weather.module').then((module) => module.WeatherModule) },
+  { path: 'qr-studio', loadChildren: () => import('./tools/qr-studio.module').then((module) => module.QrStudioModule) },
 ];
 
 @NgModule({ imports: [RouterModule.forChild(routes)] })

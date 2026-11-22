@@ -1,0 +1,127 @@
+<div class="qr-page tool-page">
+  <main class="tool-content">
+    <header class="tool-header">
+      <span class="eyebrow">Privacy-first utility</span>
+      <h1>QR &amp; Barcode Studio</h1>
+      <p>Create QR codes and scan images or camera feeds locally in your browser.</p>
+    </header>
+
+    <mat-card class="qr-card">
+      <div class="qr-tabs" role="tablist" aria-label="QR tools">
+        <button type="button" [class.active]="activeTab === 'generate'" (click)="setTab('generate')" role="tab">Generate</button>
+        <button type="button" [class.active]="activeTab === 'scan'" (click)="setTab('scan')" role="tab">Scan</button>
+      </div>
+
+      @if (activeTab === 'generate') {
+        <div class="qr-layout">
+          <section class="qr-controls" aria-label="QR code options">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>QR code type</mat-label>
+              <mat-select [(value)]="qrType" (selectionChange)="generate()">
+                <mat-option value="text">Text</mat-option>
+                <mat-option value="url">Website URL</mat-option>
+                <mat-option value="wifi">Wi-Fi network</mat-option>
+                <mat-option value="contact">Contact card</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            @if (qrType === 'text') {
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Text</mat-label>
+                <textarea matInput rows="5" [(ngModel)]="textValue" (ngModelChange)="generate()" maxlength="1500"></textarea>
+              </mat-form-field>
+            }
+            @if (qrType === 'url') {
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Website URL</mat-label>
+                <input matInput [(ngModel)]="urlValue" (ngModelChange)="generate()" placeholder="example.com" />
+              </mat-form-field>
+            }
+            @if (qrType === 'wifi') {
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Network name</mat-label>
+                <input matInput [(ngModel)]="wifiName" (ngModelChange)="generate()" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Security</mat-label>
+                <mat-select [(value)]="wifiSecurity" (selectionChange)="generate()">
+                  <mat-option value="WPA">WPA / WPA2</mat-option>
+                  <mat-option value="WEP">WEP</mat-option>
+                  <mat-option value="nopass">No password</mat-option>
+                </mat-select>
+              </mat-form-field>
+              @if (wifiSecurity !== 'nopass') {
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Password</mat-label>
+                  <input matInput type="password" [(ngModel)]="wifiPassword" (ngModelChange)="generate()" />
+                </mat-form-field>
+              }
+            }
+            @if (qrType === 'contact') {
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Name</mat-label>
+                <input matInput [(ngModel)]="contactName" (ngModelChange)="generate()" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Phone</mat-label>
+                <input matInput [(ngModel)]="contactPhone" (ngModelChange)="generate()" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Email</mat-label>
+                <input matInput type="email" [(ngModel)]="contactEmail" (ngModelChange)="generate()" />
+              </mat-form-field>
+            }
+
+            <div class="color-options">
+              <label>Foreground <input type="color" [(ngModel)]="foreground" (ngModelChange)="generate()" /></label>
+              <label>Background <input type="color" [(ngModel)]="background" (ngModelChange)="generate()" /></label>
+            </div>
+          </section>
+
+          <section class="qr-preview" aria-live="polite">
+            @if (qrDataUrl) {
+              <img [src]="qrDataUrl" alt="Generated QR code" />
+              <div class="qr-actions">
+                <button type="button" mat-raised-button color="primary" (click)="download()">Download PNG</button>
+                <button type="button" mat-stroked-button (click)="share()">Share</button>
+              </div>
+            } @else {
+              <div class="qr-empty">
+                <span class="material-icons" aria-hidden="true">qr_code_2</span>
+                <p>Enter details to generate a QR code.</p>
+              </div>
+            }
+          </section>
+        </div>
+      } @else {
+        <div class="scan-layout">
+          <section class="scan-panel">
+            <h2>Scan a QR code</h2>
+            <p>Choose an image or use your device camera.</p>
+            <label class="upload-button" for="qr-image">Upload image</label>
+            <input id="qr-image" class="visually-hidden" type="file" accept="image/*" (change)="onImageSelected($event)" />
+            @if (!isScanning) {
+              <button type="button" mat-raised-button color="primary" (click)="startCamera()">Start camera</button>
+            } @else {
+              <button type="button" mat-stroked-button (click)="stopCamera()">Stop camera</button>
+            }
+
+            <video #videoElement class="camera-preview" [class.visible]="isScanning" muted playsinline></video>
+            <canvas #scanCanvas class="scan-canvas" aria-hidden="true"></canvas>
+          </section>
+
+          <section class="scan-result" aria-live="polite">
+            <span class="status-label">{{ scanStatus || 'Ready to scan' }}</span>
+            @if (scannedValue) {
+              <textarea [value]="scannedValue" readonly aria-label="Scanned content"></textarea>
+              <button type="button" mat-stroked-button (click)="copyScannedValue()">Copy result</button>
+              @if (scannedValue.startsWith('http://') || scannedValue.startsWith('https://')) {
+                <a mat-raised-button color="primary" [href]="scannedValue" target="_blank" rel="noopener noreferrer">Open link</a>
+              }
+            }
+          </section>
+        </div>
+      }
+    </mat-card>
+  </main>
+</div>

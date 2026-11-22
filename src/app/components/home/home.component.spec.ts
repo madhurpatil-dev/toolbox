@@ -47,6 +47,7 @@ describe('HomeComponent', () => {
     component.activeCategory = 'All';
     component.searchTerm = 'creative';
     expect(component.filteredServices.map((service) => service.route)).toEqual([
+      'qr-studio',
       'colorpicker',
       'data-manipulation',
       'fontconverter',
