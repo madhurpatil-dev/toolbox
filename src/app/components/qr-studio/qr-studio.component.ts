@@ -36,6 +36,9 @@ export class QrStudioComponent implements OnDestroy {
   private scanFrame?: number;
   private imageDecodeId = 0;
   private isCameraDetecting = false;
+  private barcodeDetector?: {
+    detect(source: CanvasImageSource): Promise<Array<{ rawValue?: string }>>;
+  };
 
   constructor(private readonly changeDetectorRef?: ChangeDetectorRef) {}
 
@@ -217,7 +220,10 @@ export class QrStudioComponent implements OnDestroy {
   }
 
   stopCamera(): void {
-    if (this.scanFrame) window.clearTimeout(this.scanFrame);
+    if (this.scanFrame) {
+      window.clearTimeout(this.scanFrame);
+      cancelAnimationFrame(this.scanFrame);
+    }
     this.scanFrame = undefined;
     this.stream?.getTracks().forEach((track) => track.stop());
     this.stream = undefined;
@@ -240,7 +246,7 @@ export class QrStudioComponent implements OnDestroy {
       return;
     }
 
-    const scale = Math.min(1, 640 / Math.max(video.videoWidth, video.videoHeight));
+    const scale = Math.min(1, 480 / Math.max(video.videoWidth, video.videoHeight));
     const width = Math.max(1, Math.round(video.videoWidth * scale));
     const height = Math.max(1, Math.round(video.videoHeight * scale));
     canvas.width = width;
@@ -250,7 +256,7 @@ export class QrStudioComponent implements OnDestroy {
       context.drawImage(video, 0, 0, width, height);
       void this.decodeCameraFrame(canvas, width, height);
     }
-    this.scanFrame = window.setTimeout(() => this.scanCameraFrame(), 180) as unknown as number;
+    this.scanFrame = window.setTimeout(() => this.scanCameraFrame(), 120) as unknown as number;
   }
 
   private async decodeCameraFrame(
@@ -274,7 +280,7 @@ export class QrStudioComponent implements OnDestroy {
       }
 
       const imageData = context.getImageData(0, 0, width, height);
-      const result = jsQR(imageData.data, width, height, { inversionAttempts: 'attemptBoth' });
+      const result = jsQR(imageData.data, width, height, { inversionAttempts: 'dontInvert' });
       if (result?.data) {
         this.scannedValue = result.data;
         this.scanStatus = 'QR code found.';
@@ -339,8 +345,6 @@ export class QrStudioComponent implements OnDestroy {
     if (nativeResult) return nativeResult;
 
     const scales = [
-      longestSide,
-      Math.min(longestSide, 1600),
       Math.min(longestSide, 1200),
       Math.min(longestSide, 800),
     ];
@@ -360,7 +364,7 @@ export class QrStudioComponent implements OnDestroy {
       context.drawImage(image, 0, 0, width, height);
       const imageData = context.getImageData(0, 0, width, height);
       const result = jsQR(imageData.data, width, height, {
-        inversionAttempts: 'attemptBoth',
+        inversionAttempts: 'dontInvert',
       });
       if (result?.data) return { data: result.data };
       await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
@@ -372,18 +376,19 @@ export class QrStudioComponent implements OnDestroy {
   private async decodeWithBrowserDetector(
     image: CanvasImageSource,
   ): Promise<{ data: string } | undefined> {
-    const barcodeDetectorApi = (
-      window as unknown as {
-        BarcodeDetector?: new (options: { formats: string[] }) => {
-          detect(source: CanvasImageSource): Promise<Array<{ rawValue?: string }>>;
-        };
-      }
-    ).BarcodeDetector;
-    if (!barcodeDetectorApi) return undefined;
-
     try {
-      const detector = new barcodeDetectorApi({ formats: ['qr_code'] });
-      const results = await detector.detect(image);
+      if (!this.barcodeDetector) {
+        const barcodeDetectorApi = (
+          window as unknown as {
+            BarcodeDetector?: new (options: { formats: string[] }) => {
+              detect(source: CanvasImageSource): Promise<Array<{ rawValue?: string }>>;
+            };
+          }
+        ).BarcodeDetector;
+        if (!barcodeDetectorApi) return undefined;
+        this.barcodeDetector = new barcodeDetectorApi({ formats: ['qr_code'] });
+      }
+      const results = await this.barcodeDetector.detect(image);
       const value = results.find((result) => result.rawValue)?.rawValue;
       return value ? { data: value } : undefined;
     } catch {
