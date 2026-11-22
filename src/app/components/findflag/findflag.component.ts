@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { saveAs } from 'file-saver';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from 'rxjs/operators';
 import { Observable, of, Subject } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -329,12 +328,30 @@ private fetchFlagUrl(countryName: string): Observable<string> {
     });
   }
 
-  downloadFlag(): void {
-    if (this.flagUrl) {
-      saveAs(this.flagUrl, `${this.selectedCountry.replace(/\s+/g, '_')}_flag.png`);
+  async downloadFlag(): Promise<void> {
+    if (!this.flagUrl) return;
+
+    try {
+      const response = await fetch(this.flagUrl);
+      if (!response.ok) throw new Error(`Unable to download the flag (${response.status}).`);
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${this.selectedCountry.replace(/\s+/g, '_')}_flag.png`;
+      link.click();
+      URL.revokeObjectURL(url);
+
       this.snackBar.open('Download started!', 'Close', {
         duration: 3000,
         panelClass: ['success-snackbar']
+      });
+    } catch (error) {
+      console.warn('Unable to download the flag.', error);
+      this.snackBar.open('Unable to download the flag. Please try again.', 'Close', {
+        duration: 5000,
+        panelClass: ['error-snackbar']
       });
     }
   }
