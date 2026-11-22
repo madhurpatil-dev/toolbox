@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
-  { path: 'calculator', loadChildren: () => import('./tools/calculator.module').then((module) => module.CalculatorModule) },
   { path: 'age-calculator', loadChildren: () => import('./tools/age-calculator.module').then((module) => module.AgeCalculatorModule) },
   { path: 'currencyconverter', loadChildren: () => import('./tools/currency-converter.module').then((module) => module.CurrencyConverterModule) },
   { path: 'findcapital', loadChildren: () => import('./tools/find-capital.module').then((module) => module.FindCapitalModule) },

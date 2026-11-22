@@ -10,17 +10,17 @@ describe('ToolPreferencesService', () => {
   });
 
   it('persists favorites and removes them when toggled again', () => {
-    preferences.toggleFavorite('calculator');
+    preferences.toggleFavorite('age-calculator');
 
-    expect(preferences.isFavorite('calculator')).toBe(true);
-    expect(localStorage.getItem('toolbox-favorites')).toBe('["calculator"]');
+    expect(preferences.isFavorite('age-calculator')).toBe(true);
+    expect(localStorage.getItem('toolbox-favorites')).toBe('["age-calculator"]');
 
-    preferences.toggleFavorite('calculator');
+    preferences.toggleFavorite('age-calculator');
     expect(preferences.favoriteRoutes()).toEqual([]);
   });
 
   it('keeps unique recent tools in newest-first order and limits the list', () => {
-    for (const route of ['calculator', 'worldclock', 'findcapital', 'weather-service', 'population', 'colorpicker']) {
+    for (const route of ['age-calculator', 'worldclock', 'findcapital', 'weather-service', 'population', 'colorpicker']) {
       preferences.recordVisit(`/${route}?from=home`);
     }
     preferences.recordVisit('/weather-service');
@@ -37,7 +37,7 @@ describe('ToolPreferencesService', () => {
 
   it('ignores the home route and can clear recent tools', () => {
     preferences.recordVisit('/');
-    preferences.recordVisit('/calculator');
+    preferences.recordVisit('/age-calculator');
     preferences.clearRecentTools();
 
     expect(preferences.recentRoutes()).toEqual([]);

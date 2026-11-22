@@ -57,16 +57,16 @@ describe('HomeComponent', () => {
 
   it('shows favorites and recent tools in their saved order', () => {
     const component = new HomeComponent(preferences);
-    preferences.toggleFavorite('calculator');
+    preferences.toggleFavorite('age-calculator');
     preferences.toggleFavorite('worldclock');
     preferences.recordVisit('/worldclock');
-    preferences.recordVisit('/calculator');
+    preferences.recordVisit('/age-calculator');
 
     component.activeView = 'favorites';
-    expect(component.filteredServices.map((service) => service.route)).toEqual(['worldclock', 'calculator']);
+    expect(component.filteredServices.map((service) => service.route)).toEqual(['worldclock', 'age-calculator']);
 
     component.activeView = 'recent';
-    expect(component.filteredServices.map((service) => service.route)).toEqual(['calculator', 'worldclock']);
+    expect(component.filteredServices.map((service) => service.route)).toEqual(['age-calculator', 'worldclock']);
   });
 
   it('focuses search with slash without hijacking typing', () => {

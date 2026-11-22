@@ -60,14 +60,6 @@ export class HomeComponent {
       category: 'Creative',
     },
     {
-      title: 'Calculator',
-      description: 'Perform basic and advanced calculations with our user-friendly calculator',
-      image: './assets/calculatorImage.png',
-      route: 'calculator',
-      color: '#4e73df',
-      category: 'Everyday',
-    },
-    {
       title: 'Age Calculator',
       description: 'Find out the age according to your birth date',
       image: './assets/calculator.png',
