@@ -1,7 +1,7 @@
 <a class="skip-link" href="#main-content">Skip to content</a>
 <header class="site-header">
   <nav class="navbar-v2" aria-label="Primary navigation">
-    <a class="brand-v2" routerLink="/" (click)="closeAll()" aria-label="Toolbox home"><span class="brand-mark">T</span><span>Toolbox</span></a>
+    <a class="brand-v2" routerLink="/" (click)="closeAll()" aria-label="EverydayKit home"><span class="brand-mark">E</span><span>EverydayKit</span></a>
     <button *ngIf="isToolPage" class="back-button" type="button" (click)="goBack()" aria-label="Return to all tools"><span class="material-icons">arrow_back</span><span>Back to tools</span></button>
     <button class="theme-toggle-v2" type="button" [attr.aria-pressed]="themeService.isDark" [attr.aria-label]="themeService.isDark ? 'Switch to light theme' : 'Switch to dark theme'" (click)="themeService.toggle()"><span class="material-icons" aria-hidden="true">{{ themeService.isDark ? 'light_mode' : 'dark_mode' }}</span><span>{{ themeService.isDark ? 'Light' : 'Dark' }}</span></button>
     <button class="menu-toggle-v2" type="button" (click)="toggleMenu()" [attr.aria-expanded]="isMenuOpen" aria-controls="primary-menu" [attr.aria-label]="isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'"><span class="menu-icon-v2" [class.open]="isMenuOpen"></span></button>
@@ -11,17 +11,17 @@
         <button class="tools-trigger" type="button" (click)="toggleTools($event)" [attr.aria-expanded]="isToolsOpen">Explore tools <span class="material-icons chevron" aria-hidden="true">expand_more</span></button>
         <div class="tools-popover" [class.open]="isToolsOpen">
           <a routerLink="age-calculator" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">cake</span>Age calculator</a>
-          <a routerLink="currencyconverter" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">currency_exchange</span>Currency converter</a>
-          <a routerLink="unit-converter" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">straighten</span>Unit converter</a>
-          <a routerLink="text-diff" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">difference</span>Text diff</a>
           <a routerLink="security-studio" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">shield</span>Password security</a>
-          <a routerLink="qr-studio" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">qr_code_2</span>QR Studio</a>
-          <a routerLink="image-studio" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">image</span>Image Studio</a>
-          <a routerLink="country-explorer" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">public</span>Country Explorer</a>
-          <a routerLink="colorpicker" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">palette</span>Color explorer</a>
-          <a routerLink="worldclock" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">schedule</span>World clock</a>
+          <a routerLink="unit-converter" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">straighten</span>Unit converter</a>
+          <a routerLink="currencyconverter" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">currency_exchange</span>Currency converter</a>
+          <a routerLink="text-diff" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">difference</span>Text diff</a>
           <a routerLink="data-manipulation" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">data_object</span>Data tools</a>
+          <a routerLink="image-studio" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">image</span>Image Studio</a>
+          <a routerLink="qr-studio" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">qr_code_2</span>QR Studio</a>
+          <a routerLink="colorpicker" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">palette</span>Color explorer</a>
           <a routerLink="fontconverter" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">text_fields</span>Font converter</a>
+          <a routerLink="country-explorer" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">public</span>Country Explorer</a>
+          <a routerLink="worldclock" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">schedule</span>World clock</a>
           <a routerLink="weather-service" routerLinkActive="router-link-active" ariaCurrentWhenActive="page" (click)="closeAll()"><span class="material-icons" aria-hidden="true">cloud</span>Weather</a>
         </div>
       </div>

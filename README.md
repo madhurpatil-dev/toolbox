@@ -1,6 +1,6 @@
-# Toolbox
+# EverydayKit
 
-Toolbox is a responsive collection of calculators, converters, and world-data utilities for everyday use.
+EverydayKit is a responsive collection of practical tools for text, images, security, conversions, and exploring the world.
 
 The application uses Angular 22, TypeScript, Angular Material, and RxJS. Unit tests run with Vitest.
 

@@ -1,7 +1,7 @@
 {
-  "name": "OneStopTools",
-  "short_name": "OneStopTools",
-  "description": "Practical calculators, converters, and world data tools.",
+  "name": "EverydayKit",
+  "short_name": "EverydayKit",
+  "description": "Practical tools for text, images, security, conversions, and exploring the world.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

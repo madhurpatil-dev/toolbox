@@ -1,7 +1,7 @@
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { ToolPreferencesService } from '../../services/tool-preferences.service';
 
-type ToolCategory = 'Everyday' | 'World' | 'Creative' | 'Converters';
+type ToolCategory = 'Everyday' | 'World' | 'Creative & Files' | 'Text & Data' | 'Converters';
 type ToolView = 'all' | 'favorites' | 'recent';
 
 interface Service {
@@ -24,24 +24,23 @@ export class HomeComponent {
   searchTerm = '';
   activeCategory: ToolCategory | 'All' = 'All';
   activeView: ToolView = 'all';
-  readonly categories: Array<ToolCategory | 'All'> = ['All', 'Everyday', 'World', 'Creative', 'Converters'];
+  readonly categories: Array<ToolCategory | 'All'> = [
+    'All',
+    'Everyday',
+    'Converters',
+    'Text & Data',
+    'Creative & Files',
+    'World',
+  ];
 
   allServices: Service[] = [
     {
-      title: 'Unit Converter',
-      description: 'Convert length, mass, temperature, area, volume, speed, time, and data',
-      image: './assets/toolbox-icon.svg',
-      route: 'unit-converter',
-      color: '#087f8c',
-      category: 'Converters',
-    },
-    {
-      title: 'Text Diff Studio',
-      description: 'Compare text and documents privately with line-by-line differences',
-      image: './assets/datamanipulation.jpg',
-      route: 'text-diff',
-      color: '#7e22ce',
-      category: 'Creative',
+      title: 'Age Calculator',
+      description: 'Find out the age according to your birth date',
+      image: './assets/calculator.png',
+      route: 'age-calculator',
+      color: '#1cc88a',
+      category: 'Everyday',
     },
     {
       title: 'Password & Security Studio',
@@ -52,28 +51,12 @@ export class HomeComponent {
       category: 'Everyday',
     },
     {
-      title: 'QR & Barcode Studio',
-      description: 'Generate QR codes and scan codes locally with camera or image upload',
+      title: 'Unit Converter',
+      description: 'Convert length, mass, temperature, area, volume, speed, time, and data',
       image: './assets/toolbox-icon.svg',
-      route: 'qr-studio',
-      color: '#4656d8',
-      category: 'Creative',
-    },
-    {
-      title: 'Image Studio',
-      description: 'Resize, compress, convert, and remove common image metadata locally',
-      image: './assets/toolbox-icon.svg',
-      route: 'image-studio',
+      route: 'unit-converter',
       color: '#087f8c',
-      category: 'Creative',
-    },
-    {
-      title: 'Age Calculator',
-      description: 'Find out the age according to your birth date',
-      image: './assets/calculator.png',
-      route: 'age-calculator',
-      color: '#1cc88a',
-      category: 'Everyday',
+      category: 'Converters',
     },
     {
       title: 'Currency Converter',
@@ -84,6 +67,54 @@ export class HomeComponent {
       category: 'Converters',
     },
     {
+      title: 'Text Diff Studio',
+      description: 'Compare text and documents privately with line-by-line differences',
+      image: './assets/datamanipulation.jpg',
+      route: 'text-diff',
+      color: '#7e22ce',
+      category: 'Text & Data',
+    },
+    {
+      title: 'Data Manipulator',
+      description: 'Perform over 40 different operations, including encoding, decoding, and string transformations',
+      image: './assets/datamanipulation.jpg',
+      route: 'data-manipulation',
+      color: '#5a5c69',
+      category: 'Text & Data',
+    },
+    {
+      title: 'Image Studio',
+      description: 'Resize, compress, convert, and remove common image metadata locally',
+      image: './assets/toolbox-icon.svg',
+      route: 'image-studio',
+      color: '#087f8c',
+      category: 'Creative & Files',
+    },
+    {
+      title: 'QR & Barcode Studio',
+      description: 'Generate QR codes and scan codes locally with camera or image upload',
+      image: './assets/toolbox-icon.svg',
+      route: 'qr-studio',
+      color: '#4656d8',
+      category: 'Creative & Files',
+    },
+    {
+      title: 'Color Picker',
+      description: 'Explore a variety of colors and their RGB formats with our interactive color picker including Gradient Color',
+      image: './assets/colorPicker.jpg',
+      route: 'colorpicker',
+      color: '#e74a3b',
+      category: 'Creative & Files',
+    },
+    {
+      title: 'Font Converter',
+      description: 'Convert your normal text to amazing fonts for social media and design',
+      image: './assets/fontconverter.png',
+      route: 'fontconverter',
+      color: '#1cc88a',
+      category: 'Creative & Files',
+    },
+    {
       title: 'Country Explorer',
       description: 'Explore country flags, capitals, population, and geography in one place',
       image: './assets/findCapital.png',
@@ -92,36 +123,12 @@ export class HomeComponent {
       category: 'World',
     },
     {
-      title: 'Color Picker',
-      description: 'Explore a variety of colors and their RGB formats with our interactive color picker including Gradient Color',
-      image: './assets/colorPicker.jpg',
-      route: 'colorpicker',
-      color: '#e74a3b',
-      category: 'Creative',
-    },
-    {
       title: 'World Clock',
       description: 'Check realtime date and time across different timezones',
       image: './assets/clock.png',
       route: 'worldclock',
       color: '#858796',
       category: 'World',
-    },
-    {
-      title: 'Data Manipulator',
-      description: 'Perform over 40 different operations, including encoding, decoding, and string transformations',
-      image: './assets/datamanipulation.jpg',
-      route: 'data-manipulation',
-      color: '#5a5c69',
-      category: 'Creative',
-    },
-    {
-      title: 'Font Converter',
-      description: 'Convert your normal text to amazing fonts for social media and design',
-      image: './assets/fontconverter.png',
-      route: 'fontconverter',
-      color: '#1cc88a',
-      category: 'Creative',
     },
     {
       title: 'Weather Info',

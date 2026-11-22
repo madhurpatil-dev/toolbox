@@ -45,12 +45,17 @@ describe('HomeComponent', () => {
     component.activeCategory = 'All';
     component.searchTerm = 'creative';
     expect(component.filteredServices.map((service) => service.route)).toEqual([
-      'text-diff',
-      'qr-studio',
       'image-studio',
+      'qr-studio',
       'colorpicker',
-      'data-manipulation',
       'fontconverter',
+    ]);
+
+    component.searchTerm = '';
+    component.activeCategory = 'Text & Data';
+    expect(component.filteredServices.map((service) => service.route)).toEqual([
+      'text-diff',
+      'data-manipulation',
     ]);
   });
 
