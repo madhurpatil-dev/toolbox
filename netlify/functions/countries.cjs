@@ -37,7 +37,7 @@ exports.handler = async (event) => {
     return jsonResponse(405, { message: 'Only GET requests are supported.' }, { Allow: 'GET' });
   }
 
-  const apiKey = process.env.REST_COUNTRIES_API_KEY;
+  const apiKey = process.env.API_KEY;
   if (!apiKey) {
     return jsonResponse(503, { message: 'Country data is temporarily unavailable.' });
   }
