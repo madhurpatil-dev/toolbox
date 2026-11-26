@@ -119,6 +119,10 @@ body {
 }
 
 button, input, select, textarea { font: inherit; }
+button { min-width: var(--control-height); min-height: var(--control-height); }
+input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']):not(.mat-mdc-input-element):not(.visually-hidden),
+select:not(.mat-mdc-select),
+textarea:not(.mat-mdc-input-element) { min-height: var(--control-height); }
 
 button:focus-visible,
 a:focus-visible,
@@ -132,6 +136,7 @@ textarea:focus-visible {
 a { color: inherit; }
 
 .route-progress { position:fixed; z-index:49; top:72px; left:0; right:0; height:3px; overflow:hidden; background:var(--brand-soft); }
+.skip-link { min-height:44px; display:inline-flex; align-items:center; }
 .route-progress-bar { display:block; width:36%; height:100%; background:var(--brand); animation:route-progress 1s ease-in-out infinite alternate; }
 .visually-hidden { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 @keyframes route-progress { from { transform:translateX(-100%); } to { transform:translateX(280%); } }

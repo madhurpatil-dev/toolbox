@@ -15,10 +15,10 @@
         </div>
         <div class="strength-meter"><span [style.width.%]="strengthPercent" [attr.aria-label]="strength"></span></div>
         <div class="strength-row"><strong>{{ strength }}</strong><span>{{ entropy }} bits of entropy</span></div>
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Length: {{ length }}</mat-label>
-          <input matInput type="range" min="6" max="64" [(ngModel)]="length" (ngModelChange)="generatePassword()" />
-        </mat-form-field>
+        <label class="length-control">
+          <span>Length: {{ length }}</span>
+          <input type="range" min="6" max="64" [(ngModel)]="length" (ngModelChange)="generatePassword()" />
+        </label>
         <div class="option-grid">
           <label><input type="checkbox" [(ngModel)]="uppercase" (ngModelChange)="generatePassword()" /> Uppercase</label>
           <label><input type="checkbox" [(ngModel)]="lowercase" (ngModelChange)="generatePassword()" /> Lowercase</label>

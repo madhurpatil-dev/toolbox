@@ -242,9 +242,9 @@
 }
 
 .clear-search {
-  width: 38px;
-  height: 38px;
-  flex: 0 0 38px;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
   border: 0;
   border-radius: 8px;
   background: transparent;
@@ -346,7 +346,7 @@ kbd {
 }
 
 .category-filters button {
-  min-height: 32px;
+  min-height: 44px;
   padding: 0 10px;
   font-size: .75rem;
 }
@@ -498,8 +498,8 @@ kbd {
   right: 17px;
   z-index: 1;
   display: grid;
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   place-items: center;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -631,19 +631,19 @@ kbd {
   .view-filters button {
     flex: 1 1 auto;
     gap: 4px;
-    min-height: 40px;
+    min-height: 44px;
     padding: 0 7px;
     font-size: .74rem;
   }
 
   .category-filters {
     width: 100%;
-    overflow-x: auto;
-    flex-wrap: nowrap;
+    display: flex;
+    flex-wrap: wrap;
   }
 
   .category-filters button {
-    flex: 0 0 auto;
+    flex: 0 1 auto;
   }
 
   .services-grid {
@@ -661,3 +661,4 @@ kbd {
     right: 14px;
   }
 }
+.view-filters button { min-height:44px; }

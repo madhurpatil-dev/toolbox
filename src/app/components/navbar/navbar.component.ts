@@ -1,4 +1,4 @@
-import { Component, DestroyRef, HostListener, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, HostListener, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
@@ -8,7 +8,8 @@ import { ThemeService } from '../../services/theme.service';
     selector: 'app-navbar',
     templateUrl: './navbar.component.html',
     styleUrls: ['./navbar.component.css'],
-    standalone: false
+    standalone: false,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavbarComponent implements OnInit {
   isMenuOpen = false;
@@ -18,6 +19,7 @@ export class NavbarComponent implements OnInit {
   constructor(
     private router: Router,
     private destroyRef: DestroyRef,
+    private changeDetector: ChangeDetectorRef,
     public themeService: ThemeService,
   ) {}
 
@@ -32,6 +34,7 @@ export class NavbarComponent implements OnInit {
       .subscribe(() => {
         this.isToolPage = this.router.url !== '/';
         this.closeAll();
+        this.changeDetector.markForCheck();
       });
   }
 

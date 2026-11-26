@@ -294,8 +294,8 @@ p {
 }
 
 .color-picker-wrapper input[type="color"] {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -513,6 +513,10 @@ p {
 }
 
 .footer-links a {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
   color: var(--text-secondary);
   text-decoration: none;
   font-size: 0.875rem;

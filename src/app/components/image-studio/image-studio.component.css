@@ -44,6 +44,7 @@
 .quality-label strong { color: var(--brand); }
 .quality-slider { width: 100%; margin: var(--space-2) 0 0; accent-color: var(--brand); }
 .quality-note { margin: var(--space-1) 0 var(--space-4); color: var(--muted); font-size: .78rem; }
+.check-option { min-height:44px; }
 .primary-button { width: 100%; }
 
 .previews { min-width: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }

@@ -8,6 +8,7 @@
 .editor-heading{display:flex;align-items:center;justify-content:space-between;gap:var(--space-2);min-height:36px;margin-bottom:var(--space-1);color:var(--text-primary);font-weight:700}
 .editor-heading>label:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .file-button{flex:none;padding:var(--space-2) var(--space-3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--brand);font-size:var(--type-sm);cursor:pointer}
+.diff-options label,.changes-only{min-height:44px}
 .file-button:hover{background:var(--brand-soft)}
 .diff-editors mat-form-field{width:100%}
 .diff-editors textarea{font-family:var(--font-mono);line-height:1.55}
@@ -33,3 +34,4 @@
 .change-marker{text-align:center;font-weight:700}
 pre{min-width:0;margin:0;padding:6px 10px;white-space:pre-wrap;overflow-wrap:anywhere}
 @media(max-width:760px){.diff-card{padding:var(--space-3)}.diff-editors{grid-template-columns:1fr}.diff-summary{justify-content:flex-start;flex-wrap:wrap}.diff-actions{justify-content:flex-start}.split-row{grid-template-columns:34px minmax(0,1fr) 34px minmax(0,1fr)}.unified-row{grid-template-columns:42px 24px minmax(0,1fr)}}
+.view-toggle button{min-width:44px;min-height:44px}

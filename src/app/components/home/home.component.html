@@ -74,7 +74,7 @@
           <article class="service-card" [style.--card-color]="service.color">
             <a class="service-card-link" [routerLink]="service.route" [attr.aria-label]="'Open ' + service.title">
               <div class="card-topline">
-                <span class="card-icon"><img [src]="service.image" alt="" loading="lazy" decoding="async"></span>
+                <span class="card-icon"><img [src]="service.image" alt="" width="54" height="54" loading="lazy" decoding="async"></span>
                 <span class="category-label">{{ service.category }}</span>
               </div>
               <div class="card-content">

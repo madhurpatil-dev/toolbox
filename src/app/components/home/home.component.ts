@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { ToolPreferencesService } from '../../services/tool-preferences.service';
 
 type ToolCategory = 'Everyday' | 'World' | 'Creative & Files' | 'Text & Data' | 'Converters';
@@ -17,7 +17,8 @@ interface Service {
     selector: 'app-home',
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.css'],
-    standalone: false
+    standalone: false,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {
   @ViewChild('toolSearch') toolSearch?: ElementRef<HTMLInputElement>;
