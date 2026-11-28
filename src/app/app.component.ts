@@ -12,7 +12,7 @@ import { ToolPreferencesService } from './services/tool-preferences.service';
     standalone: false
 })
 export class AppComponent {
-  title = 'EverydayKit';
+  title = 'EverydayStack';
   isNavigating = false;
 
   constructor(

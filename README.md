@@ -1,6 +1,6 @@
-# EverydayKit
+# EverydayStack
 
-EverydayKit is a responsive collection of practical tools for text, images, security, conversions, and exploring the world.
+EverydayStack is a responsive collection of practical tools for text, images, security, conversions, and exploring the world.
 
 The application uses Angular 22, TypeScript, Angular Material, and RxJS. Unit tests run with Vitest.
 

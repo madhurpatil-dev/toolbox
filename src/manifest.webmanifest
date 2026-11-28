@@ -1,6 +1,6 @@
 {
-  "name": "EverydayKit",
-  "short_name": "EverydayKit",
+  "name": "EverydayStack",
+  "short_name": "EverydayStack",
   "description": "Practical tools for text, images, security, conversions, and exploring the world.",
   "start_url": "/",
   "scope": "/",
